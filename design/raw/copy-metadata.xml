@@ -1,0 +1,1864 @@
+<canvas id="0:1" name="Page 1" x="0" y="0" width="0" height="0">
+  <frame id="1:1608" name="Social feed" x="40" y="0" width="375" height="812" hidden="true">
+    <frame id="1:1609" name="Feed" x="16" y="108" width="343" height="1075">
+      <frame id="1:1610" name="Post" x="0" y="0" width="343" height="414">
+        <frame id="1:1611" name="Avatar" x="0" y="4" width="32" height="32">
+          <rounded-rectangle id="1:1612" name="Image" x="0" y="0" width="32" height="32" />
+        </frame>
+        <frame id="1:1613" name="Post Content" x="44" y="0" width="299" height="414">
+          <frame id="1:1614" name="Post Header" x="0" y="0" width="299" height="39">
+            <frame id="1:1615" name="Meta Data" x="0" y="0" width="259" height="39">
+              <frame id="1:1616" name="Name + Group" x="0" y="0" width="259" height="21">
+                <text id="1:1617" name="Helena" x="0" y="0" width="48" height="21" />
+                <text id="1:1618" name="in Group name" x="52" y="0" width="97" height="21" />
+              </frame>
+              <text id="1:1619" name="3 min ago" x="0" y="21" width="259" height="18" />
+            </frame>
+            <frame id="1:1620" name="Icon/More" x="275" y="7.5" width="24" height="24" />
+          </frame>
+          <frame id="1:1625" name="Image" x="0" y="51" width="299" height="299" />
+          <frame id="1:1626" name="Description + Actions" x="0" y="362" width="206" height="52">
+            <text id="1:1627" name="Post Description" x="0" y="0" width="206" height="20" />
+            <frame id="1:1628" name="Post Actions" x="0" y="32" width="206" height="20">
+              <frame id="1:1629" name="Likes" x="0" y="0" width="78" height="20">
+                <frame id="1:1630" name="Icon/Heart" x="0" y="0" width="20" height="20" />
+                <text id="1:1632" name="21 likes" x="28" y="0" width="50" height="20" />
+              </frame>
+              <frame id="1:1633" name="Comments" x="94" y="0" width="112" height="20">
+                <frame id="1:1634" name="Icon/Comments" x="0" y="0" width="20" height="20" />
+                <text id="1:1636" name="4 comments" x="28" y="0" width="84" height="20" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+      </frame>
+      <frame id="1:1637" name="Post" x="0" y="446" width="343" height="143">
+        <frame id="1:1638" name="Avatar" x="0" y="4" width="32" height="32">
+          <rounded-rectangle id="1:1639" name="Image" x="0" y="0" width="32" height="32" />
+        </frame>
+        <frame id="1:1640" name="Post Content" x="44" y="0" width="259" height="143">
+          <frame id="1:1641" name="Post Header" x="0" y="0" width="299" height="39">
+            <frame id="1:1642" name="Meta Data" x="0" y="0" width="259" height="39">
+              <frame id="1:1643" name="Name + Group" x="0" y="0" width="259" height="21">
+                <text id="1:1644" name="Daniel" x="0" y="0" width="43" height="21" />
+                <text id="1:1645" name="in Group Name" x="47" y="0" width="212" height="21" />
+              </frame>
+              <text id="1:1646" name="2 hrs ago" x="0" y="21" width="259" height="18" />
+            </frame>
+            <frame id="1:1647" name="Icon/More" x="275" y="7.5" width="24" height="24" />
+          </frame>
+          <frame id="1:1652" name="Description + Actions" x="0" y="51" width="299" height="92">
+            <text id="1:1653" name="Post Description" x="0" y="0" width="299" height="60" />
+            <frame id="1:1654" name="Post Actions" x="0" y="72" width="299" height="20">
+              <frame id="1:1655" name="Likes" x="0" y="0" width="71" height="20">
+                <frame id="1:1656" name="Icon/Heart" x="0" y="0" width="20" height="20" />
+                <text id="1:1658" name="6 likes" x="28" y="0" width="43" height="20" />
+              </frame>
+              <frame id="1:1659" name="Comments" x="87" y="0" width="118" height="20">
+                <frame id="1:1660" name="Icon/Comment" x="0" y="0" width="20" height="20" />
+                <text id="1:1662" name="18 comments" x="28" y="0" width="90" height="20" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+      </frame>
+      <frame id="1:1663" name="Post" x="0" y="621" width="343" height="454">
+        <frame id="1:1664" name="Avatar" x="0" y="4" width="32" height="32">
+          <rounded-rectangle id="1:1665" name="Image" x="0" y="0" width="32" height="32" />
+        </frame>
+        <frame id="1:1666" name="Post Content" x="44" y="0" width="259" height="414">
+          <frame id="1:1667" name="Post Header" x="0" y="0" width="299" height="39">
+            <frame id="1:1668" name="Meta Data" x="0" y="0" width="259" height="39">
+              <frame id="1:1669" name="Name + Group" x="0" y="0" width="259" height="21">
+                <text id="1:1670" name="Oscar" x="0" y="0" width="41" height="21" />
+                <text id="1:1671" name="in Group Name" x="45" y="0" width="214" height="21" />
+              </frame>
+              <text id="1:1672" name="1 day ago" x="0" y="21" width="259" height="18" />
+            </frame>
+            <frame id="1:1673" name="Icon/More" x="275" y="7.5" width="24" height="24" />
+          </frame>
+          <frame id="1:1678" name="Image" x="0" y="51" width="299" height="299" />
+          <frame id="1:1679" name="Description + Actions" x="0" y="362" width="299" height="52">
+            <text id="1:1680" name="Post Description" x="0" y="0" width="299" height="20" />
+            <frame id="1:1681" name="Post Actions" x="0" y="32" width="299" height="20">
+              <frame id="1:1682" name="Likes" x="0" y="0" width="80" height="20">
+                <frame id="1:1683" name="Icon/Heart" x="0" y="0" width="20" height="20" />
+                <text id="1:1685" name="58 likes" x="28" y="0" width="52" height="20" />
+              </frame>
+              <frame id="1:1686" name="Comments" x="96" y="0" width="111" height="20">
+                <frame id="1:1687" name="Icon/Comment" x="0" y="0" width="20" height="20" />
+                <text id="1:1689" name="5 comments" x="28" y="0" width="83" height="20" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1:1690" name="Tab Bar" x="0" y="734" width="375" height="78">
+      <frame id="1:1691" name="Tabs" x="0" y="0" width="375" height="44">
+        <frame id="1:1692" name="Tab Bar Item" x="0" y="0" width="76" height="44">
+          <frame id="1:1693" name="Icon/Home" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1699" name="Tab Bar Item" x="75" y="0" width="76" height="44">
+          <frame id="1:1700" name="Icon/Search" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1703" name="Tab Bar Item" x="150" y="0" width="76" height="44">
+          <frame id="1:1704" name="Icon/Create" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1708" name="Tab Bar Item" x="225" y="0" width="76" height="44">
+          <frame id="1:1709" name="Icon/Bell" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1712" name="Tab Bar Item" x="300" y="0" width="76" height="44">
+          <ellipse id="1:1713" name="Profile Image" x="26" y="12" width="24" height="24" />
+        </frame>
+      </frame>
+      <frame id="1:1714" name="Home Indicator" x="0" y="44" width="375" height="34">
+        <rounded-rectangle id="1:1715" name="Home Indicator" x="121" y="21" width="134" height="5" />
+      </frame>
+    </frame>
+    <frame id="1:1716" name="Header" x="0" y="44" width="373" height="40">
+      <text id="1:1717" name="Following" x="70" y="10" width="63" height="20" />
+      <text id="1:1718" name="For you" x="163" y="10" width="49" height="20" />
+      <text id="1:1719" name="Favorites" x="242" y="10" width="61" height="20" />
+      <rounded-rectangle id="1:1720" name="Indicator" x="174" y="38" width="24" height="2" />
+    </frame>
+    <frame id="1:1721" name="Status Bar" x="0" y="0" width="375" height="44">
+      <frame id="1:1722" name="Notch" x="78" y="-2" width="219" height="30" hidden="true" />
+      <frame id="1:1727" name="Right Side" x="293.6666564941406" y="17.3306884765625" width="66.661376953125" height="11.336018562316895" />
+      <frame id="1:1743" name="Left Side" x="21.000022888183594" y="12" width="54" height="21">
+        <frame id="1:1744" name="Time" x="21.000022888183594" y="12" width="54" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="1:1746" name="Ecommerce" x="-1780" y="0" width="375" height="812" hidden="true">
+    <frame id="1:1747" name="Row" x="0" y="300" width="375" height="158">
+      <frame id="1:1748" name="Title" x="0" y="300" width="375" height="38">
+        <text id="1:1749" name="Title" x="16" y="8" width="34" height="22" />
+        <frame id="1:1750" name="Chevron" x="60" y="9" width="20" height="20">
+          <ellipse id="1:1751" name="Container" x="60" y="9" width="20" height="20" />
+          <instance id="1:1752" name="Icon/Chevron" x="67" y="12" width="7" height="14" />
+        </frame>
+      </frame>
+      <frame id="1:1753" name="Carousel" x="0" y="338" width="375" height="120">
+        <frame id="1:1754" name="Item" x="16" y="8" width="76" height="104">
+          <frame id="1:1755" name="Image" x="0" y="0" width="76" height="76" />
+          <text id="1:1756" name="Title" x="0" y="84" width="76" height="20" />
+        </frame>
+        <frame id="1:1757" name="Item" x="116" y="8" width="76" height="104">
+          <frame id="1:1758" name="Image" x="0" y="0" width="76" height="76" />
+          <text id="1:1759" name="Title" x="0" y="84" width="76" height="20" />
+        </frame>
+        <frame id="1:1760" name="Item" x="216" y="8" width="76" height="104">
+          <frame id="1:1761" name="Image" x="0" y="0" width="76" height="76" />
+          <text id="1:1762" name="Title" x="0" y="84" width="76" height="20" />
+        </frame>
+        <frame id="1:1763" name="Item" x="316" y="8" width="76" height="104">
+          <frame id="1:1764" name="Image" x="0" y="0" width="76" height="76" />
+          <text id="1:1765" name="Title" x="0" y="84" width="76" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1:1766" name="Row" x="0" y="474" width="500" height="277">
+      <frame id="1:1767" name="Header" x="0" y="474" width="375" height="38">
+        <text id="1:1768" name="Title" x="16" y="8" width="34" height="22" />
+        <frame id="1:1769" name="Group 123201" x="60" y="9" width="20" height="20">
+          <ellipse id="1:1770" name="Ellipse 160" x="60" y="9" width="20" height="20" />
+          <instance id="1:1771" name="Icon/Chevron_Right_Slim_LTR" x="67" y="12" width="7" height="14" />
+        </frame>
+      </frame>
+      <frame id="1:1772" name="Carousel" x="0" y="512" width="500" height="239">
+        <frame id="1:1773" name="Card" x="16" y="8" width="148" height="223">
+          <rounded-rectangle id="1:1774" name="Image" x="0" y="0" width="148" height="148" />
+          <frame id="1:1775" name="Info" x="0" y="160" width="148" height="63">
+            <text id="1:1776" name="Brand" x="0" y="0" width="148" height="17" />
+            <text id="1:1777" name="Product name" x="0" y="19" width="148" height="20" />
+            <text id="1:1778" name="$10.99" x="0" y="41" width="148" height="22" />
+          </frame>
+        </frame>
+        <frame id="1:1779" name="Card" x="176" y="8" width="148" height="223">
+          <rounded-rectangle id="1:1780" name="Image" x="0" y="0" width="148" height="148" />
+          <frame id="1:1781" name="Info" x="0" y="160" width="148" height="63">
+            <text id="1:1782" name="Brand" x="0" y="0" width="148" height="17" />
+            <text id="1:1783" name="Product name" x="0" y="19" width="148" height="20" />
+            <text id="1:1784" name="$10.99" x="0" y="41" width="148" height="22" />
+          </frame>
+        </frame>
+        <frame id="1:1785" name="Card" x="336" y="8" width="148" height="223">
+          <rounded-rectangle id="1:1786" name="Image" x="0" y="0" width="148" height="148" />
+          <frame id="1:1787" name="Info" x="0" y="160" width="148" height="63">
+            <text id="1:1788" name="Brand" x="0" y="0" width="148" height="17" />
+            <text id="1:1789" name="Product name" x="0" y="19" width="148" height="20" />
+            <text id="1:1790" name="$10.99" x="0" y="41" width="148" height="22" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1:1791" name="Row" x="0" y="767" width="452" height="150">
+      <frame id="1:1792" name="Title" x="0" y="767" width="375" height="38">
+        <text id="1:1793" name="Title" x="16" y="8" width="34" height="22" />
+        <frame id="1:1794" name="Chevron" x="60" y="9" width="20" height="20">
+          <ellipse id="1:1795" name="BG" x="60" y="9" width="20" height="20" />
+          <instance id="1:1796" name="Icon/Chevron" x="67" y="12" width="7" height="14" />
+        </frame>
+      </frame>
+      <frame id="1:1797" name="Carousel" x="0" y="805" width="452" height="112">
+        <rounded-rectangle id="1:1798" name="Image" x="16" y="8" width="96" height="96" />
+        <rounded-rectangle id="1:1799" name="Image" x="124" y="8" width="96" height="96" />
+        <rounded-rectangle id="1:1800" name="Image" x="232" y="8" width="96" height="96" />
+        <rounded-rectangle id="1:1801" name="Image" x="340" y="8" width="96" height="96" />
+      </frame>
+    </frame>
+    <frame id="1:1802" name="Banner" x="16" y="148" width="343" height="136" />
+    <frame id="1:1810" name="Pills" x="16" y="100" width="413" height="32">
+      <frame id="1:1811" name="Pill" x="0" y="0" width="104" height="32">
+        <frame id="1:1812" name="Icon + Label" x="10" y="5" width="84" height="22">
+          <instance id="1:1813" name="Icon/Favorite" x="0" y="2" width="18" height="18" />
+          <text id="1:1814" name="Label" x="22" y="0" width="62" height="22" />
+        </frame>
+      </frame>
+      <frame id="1:1815" name="Pill" x="112" y="0" width="91" height="32">
+        <frame id="1:1816" name="Icon + Label" x="10" y="5" width="71" height="22">
+          <instance id="1:1817" name="Icon/History" x="0" y="2" width="18" height="18" />
+          <text id="1:1818" name="Label" x="22" y="0" width="49" height="22" />
+        </frame>
+      </frame>
+      <frame id="1:1819" name="Pill" x="211" y="0" width="106" height="32">
+        <frame id="1:1820" name="Icon + Label" x="10" y="5" width="86" height="22">
+          <instance id="1:1821" name="Icon/Following" x="0" y="2" width="18" height="18" />
+          <text id="1:1822" name="Label" x="22" y="0" width="64" height="22" />
+        </frame>
+      </frame>
+      <frame id="1:1823" name="Pill" x="325" y="0" width="88" height="32">
+        <frame id="1:1824" name="Icon + Label" x="10" y="5" width="68" height="22">
+          <instance id="1:1825" name="Icon/Order" x="0" y="2" width="18" height="18" />
+          <text id="1:1826" name="Label" x="22" y="0" width="46" height="22" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1:1827" name="Search" x="16" y="52" width="343" height="40">
+      <frame id="1:1828" name="search" x="12" y="8" width="24" height="24" />
+      <text id="1:1831" name="Label" x="48" y="8" width="279" height="24" />
+    </frame>
+    <frame id="1:1832" name="Tab Bar" x="0" y="734" width="375" height="78">
+      <frame id="1:1833" name="Tabs" x="0" y="0" width="375" height="44">
+        <frame id="1:1834" name="Tab Bar Item" x="0" y="0" width="76" height="44">
+          <frame id="1:1835" name="Icon_Tab/Home_Fill" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1837" name="Tab Bar Item" x="75" y="0" width="76" height="44">
+          <instance id="1:1838" name="Icon_Tab/Discover" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1839" name="Tab Bar Item" x="150" y="0" width="76" height="44">
+          <frame id="1:1840" name="iconmonstr-shopping-cart-2 1" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1842" name="Tab Bar Item" x="225" y="0" width="76" height="44">
+          <instance id="1:1843" name="Icon_3pt/Bell" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1844" name="Tab Bar Item" x="300" y="0" width="76" height="44">
+          <instance id="1:1845" name="Icon/Person" x="26" y="12" width="24" height="24" />
+        </frame>
+      </frame>
+      <frame id="1:1846" name="Home Indicator" x="0" y="44" width="375" height="34">
+        <rounded-rectangle id="1:1847" name="Home Indicator" x="121" y="21" width="134" height="5" />
+      </frame>
+    </frame>
+    <frame id="1:1848" name="Status Bar" x="0" y="0" width="375" height="44">
+      <frame id="1:1849" name="Notch" x="78" y="-2" width="219" height="30" hidden="true" />
+      <frame id="1:1854" name="Right Side" x="293.66650390625" y="17.3310546875" width="66.66152954101562" height="11.336262702941895" />
+      <frame id="1:1870" name="Left Side" x="21.000022888183594" y="12" width="54" height="21">
+        <frame id="1:1871" name="Time" x="21.000022888183594" y="12" width="54" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="1:1873" name="Booking" x="-870" y="0" width="375" height="812" hidden="true">
+    <frame id="1:1874" name="Search" x="0" y="44" width="375" height="122">
+      <frame id="1:1875" name="Search" x="16" y="8" width="343" height="64">
+        <frame id="1:1876" name="Icon/Search" x="12" y="20" width="24" height="24" />
+        <frame id="1:1879" name="Text" x="48" y="8" width="247" height="48">
+          <text id="1:1880" name="Text" x="0" y="0" width="108" height="24" />
+          <frame id="1:1881" name="Condition" x="0" y="26" width="207" height="22">
+            <text id="1:1882" name="Text" x="0" y="0" width="75" height="22" />
+            <ellipse id="1:1883" name="Dot" x="81" y="9.5" width="3" height="3" />
+            <text id="1:1884" name="Text" x="90" y="0" width="45" height="22" />
+            <ellipse id="1:1885" name="Dot" x="141" y="9.5" width="3" height="3" />
+            <text id="1:1886" name="Text" x="150" y="0" width="57" height="22" />
+          </frame>
+        </frame>
+        <frame id="1:1887" name="Icon/Edit" x="307" y="44" width="24" height="24" />
+      </frame>
+      <text id="1:1891" name="Text" x="293" y="86" width="66" height="22" />
+      <frame id="1:1892" name="Filter + Sorting" x="16" y="80" width="151" height="34">
+        <frame id="1:1893" name="Filter" x="0" y="0" width="74" height="34">
+          <frame id="1:1894" name="Label" x="10" y="6" width="56" height="22">
+            <text id="1:1895" name="Label" x="0" y="0" width="34" height="22" />
+            <instance id="1:1896" name="Icon/Chevron" x="38" y="2" width="18" height="18" />
+          </frame>
+        </frame>
+        <frame id="1:1897" name="Sorting" x="82" y="0" width="69" height="34">
+          <frame id="1:1898" name="Label" x="10" y="6" width="51" height="22">
+            <text id="1:1899" name="Label" x="0" y="0" width="29" height="22" />
+            <instance id="1:1900" name="Icon/Chevron" x="33" y="2" width="18" height="18" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1:1901" name="Map" x="0" y="166" width="376" height="272">
+      <frame id="1:1902" name="Map" x="0" y="-1.8189894035458565e-12" width="376" height="320" />
+      <frame id="1:1903" name="Chip" x="151.5" y="33" width="56" height="34">
+        <text id="1:1904" name="Price" x="12" y="8" width="32" height="18" />
+      </frame>
+      <frame id="1:1905" name="Chip" x="152" y="116" width="55" height="34">
+        <text id="1:1906" name="Price" x="12" y="8" width="31" height="18" />
+      </frame>
+      <frame id="1:1907" name="Chip" x="32.5" y="59" width="58" height="34">
+        <text id="1:1908" name="Price" x="12" y="8" width="34" height="18" />
+      </frame>
+      <frame id="1:1909" name="Chip" x="22.5" y="146" width="57" height="34">
+        <text id="1:1910" name="Price" x="12" y="8" width="33" height="18" />
+      </frame>
+      <frame id="1:1911" name="Chip" x="99.5" y="184" width="58" height="34">
+        <text id="1:1912" name="Price" x="12" y="8" width="34" height="18" />
+      </frame>
+      <frame id="1:1913" name="Chip" x="292" y="60" width="57" height="34">
+        <text id="1:1914" name="Price" x="12" y="8" width="33" height="18" />
+      </frame>
+      <frame id="1:1915" name="Chip" x="271" y="153" width="55" height="34">
+        <text id="1:1916" name="Price" x="12" y="8" width="31" height="18" />
+      </frame>
+    </frame>
+    <frame id="1:1917" name="List" x="0" y="414" width="376" height="320">
+      <frame id="1:1918" name="Handle" x="0" y="0" width="375" height="24">
+        <rounded-rectangle id="1:1919" name="Handle" x="164" y="8" width="48" height="4" />
+      </frame>
+      <frame id="1:1920" name="Listing" x="16" y="24" width="344" height="520">
+        <frame id="1:1921" name="Location Info" x="0" y="0" width="344" height="244">
+          <frame id="1:1922" name="Image Carousel" x="0" y="0" width="344" height="150">
+            <rounded-rectangle id="1:1923" name="Image" x="0" y="2.2737367544323206e-13" width="344" height="150" />
+            <frame id="1:1924" name="Pagination" x="150" y="137" width="45" height="5" />
+          </frame>
+          <frame id="1:1930" name="Info" x="0" y="162" width="344" height="82">
+            <frame id="1:1931" name="Text" x="0" y="0" width="344" height="42">
+              <text id="1:1932" name="Product name" x="0" y="0" width="344" height="20" />
+              <frame id="1:1933" name="Rating + Distance" x="0" y="22" width="225" height="20">
+                <frame id="1:1934" name="Rating" x="0" y="0" width="134" height="20">
+                  <instance id="1:1935" name="Icon/Star" x="0" y="2" width="16" height="16" />
+                  <text id="1:1936" name=" Subheading" x="18" y="0" width="116" height="20" />
+                </frame>
+                <frame id="1:1937" name="Distance" x="150" y="0" width="75" height="20">
+                  <instance id="1:1938" name="Icon/Map_Pin" x="0" y="2" width="16" height="16" />
+                  <text id="1:1939" name=" Subheading" x="18" y="0" width="57" height="20" />
+                </frame>
+              </frame>
+            </frame>
+            <frame id="1:1940" name="Price + CTA" x="0" y="50" width="344" height="32">
+              <frame id="1:1941" name="Price" x="0" y="2" width="89" height="28">
+                <text id="1:1942" name="Price" x="0" y="0" width="48" height="28" />
+                <text id="1:1943" name="/ night" x="52" y="6" width="37" height="22" />
+              </frame>
+              <frame id="1:1944" name="Button" x="272" y="0" width="72" height="32">
+                <text id="1:1945" name="Select" x="14.5" y="6" width="43" height="20" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="1:1946" name="Location Info" x="0" y="276" width="344" height="244">
+          <frame id="1:1947" name="Image Carousel" x="0" y="276" width="344" height="150">
+            <rounded-rectangle id="1:1948" name="Image" x="0" y="2.2737367544323206e-13" width="344" height="150" />
+            <frame id="1:1949" name="Pagination" x="150" y="137" width="45" height="5" />
+          </frame>
+          <frame id="1:1955" name="Info" x="0" y="438" width="344" height="82">
+            <frame id="1:1956" name="Text" x="0" y="0" width="344" height="42">
+              <text id="1:1957" name="Product name" x="0" y="0" width="344" height="20" />
+              <frame id="1:1958" name="Rating + Distance" x="0" y="22" width="225" height="20">
+                <frame id="1:1959" name="Rating" x="0" y="0" width="134" height="20">
+                  <instance id="1:1960" name="Icon/Star" x="0" y="2" width="16" height="16" />
+                  <text id="1:1961" name=" Subheading" x="18" y="0" width="116" height="20" />
+                </frame>
+                <frame id="1:1962" name="Distance" x="150" y="0" width="75" height="20">
+                  <instance id="1:1963" name="Icon/Map_Pin" x="0" y="2" width="16" height="16" />
+                  <text id="1:1964" name=" Subheading" x="18" y="0" width="57" height="20" />
+                </frame>
+              </frame>
+            </frame>
+            <frame id="1:1965" name="Price + CTA" x="0" y="50" width="344" height="32">
+              <frame id="1:1966" name="Price" x="0" y="2" width="88" height="28">
+                <text id="1:1967" name="Price" x="0" y="0" width="47" height="28" />
+                <text id="1:1968" name="/ night" x="51" y="6" width="37" height="22" />
+              </frame>
+              <frame id="1:1969" name="Button" x="272" y="0" width="72" height="32">
+                <text id="1:1970" name="Select" x="14.5" y="6" width="43" height="20" />
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1:1971" name="Tab Bar" x="0" y="734" width="375" height="78">
+      <frame id="1:1972" name="Tabs" x="0" y="0" width="375" height="44">
+        <frame id="1:1973" name="Tab Bar Item" x="0" y="0" width="76" height="44">
+          <instance id="1:1974" name="Icon/Home" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1975" name="Tab Bar Item" x="75" y="0" width="76" height="44">
+          <instance id="1:1976" name="Icon/Calendar" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1977" name="Tab Bar Item" x="150" y="0" width="76" height="44">
+          <frame id="1:1978" name="Icon/Trips" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1983" name="Tab Bar Item" x="225" y="0" width="76" height="44">
+          <instance id="1:1984" name="Icon/Heart" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:1985" name="Tab Bar Item" x="300" y="0" width="76" height="44">
+          <instance id="1:1986" name="Icon/Person" x="26" y="12" width="24" height="24" />
+        </frame>
+      </frame>
+      <frame id="1:1987" name="Home Indicator" x="0" y="44" width="375" height="34">
+        <rounded-rectangle id="1:1988" name="Home Indicator" x="121" y="21" width="134" height="5" />
+      </frame>
+    </frame>
+    <frame id="1:1989" name="Status Bar" x="0" y="0" width="375" height="44">
+      <frame id="1:1990" name="Notch" x="78" y="-2" width="219" height="30" hidden="true" />
+      <frame id="1:1995" name="Right Side" x="293.66650390625" y="17.3310546875" width="66.66152954101562" height="11.336262702941895" />
+      <frame id="1:2011" name="Left Side" x="21.000022888183594" y="12" width="54" height="21">
+        <frame id="1:2012" name="Time" x="21.000022888183594" y="12" width="54" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="1:2014" name="Checkout" x="-1325" y="0" width="375" height="812" hidden="true">
+    <frame id="1:2015" name="Bottom button" x="0" y="714" width="375" height="98">
+      <frame id="1:2016" name="Home Indicator" x="0" y="64" width="375" height="34">
+        <rounded-rectangle id="1:2017" name="Home Indicator" x="121" y="21" width="134" height="5" />
+      </frame>
+      <frame id="1:2018" name="Button" x="16" y="12" width="343" height="52">
+        <text id="1:2019" name="Place order" x="127.5" y="14" width="88" height="24" />
+      </frame>
+    </frame>
+    <frame id="1:2020" name="Text" x="16" y="582" width="343" height="104">
+      <frame id="1:2021" name="Subtotal" x="0" y="0" width="343" height="20">
+        <text id="1:2022" name="$19.98" x="298" y="0" width="45" height="20" />
+        <text id="1:2023" name="Subtotal (2)" x="0" y="0" width="100" height="20" />
+      </frame>
+      <frame id="1:2024" name="Shipping" x="0" y="28" width="343" height="20">
+        <text id="1:2025" name="Free" x="313" y="28" width="30" height="20" />
+        <text id="1:2026" name="Shipping total" x="0" y="28" width="100" height="20" />
+      </frame>
+      <frame id="1:2027" name="Tax" x="0" y="56" width="343" height="20">
+        <text id="1:2028" name="$2.00" x="304" y="56" width="39" height="20" />
+        <text id="1:2029" name="Taxes" x="0" y="56" width="100" height="20" />
+      </frame>
+      <frame id="1:2030" name="Total" x="0" y="84" width="343" height="20">
+        <text id="1:2031" name="$21.98" x="297" y="84" width="46" height="20" />
+        <text id="1:2032" name="Total" x="0" y="84" width="100" height="20" />
+      </frame>
+    </frame>
+    <frame id="1:2033" name="Checkout Info" x="0" y="86" width="375" height="480">
+      <frame id="1:2034" name="Shipping" x="0" y="0" width="375" height="52">
+        <text id="1:2035" name="SHIPPING" x="16" y="16" width="100" height="20" />
+        <frame id="1:2036" name="Info" x="128" y="16" width="231" height="20">
+          <text id="1:2037" name="Add shipping address" x="0" y="0" width="211" height="20" />
+          <frame id="1:2038" name="Icon/Chevron_Right" x="211" y="0" width="20" height="20" />
+        </frame>
+      </frame>
+      <frame id="1:2040" name="Delivery" x="0" y="52" width="375" height="72">
+        <text id="1:2041" name="DELIVERY" x="16" y="16" width="100" height="20" />
+        <frame id="1:2042" name="Info" x="128" y="16" width="231" height="40">
+          <frame id="1:2043" name="Text" x="0" y="0" width="211" height="40">
+            <text id="1:2044" name="Free" x="0" y="0" width="211" height="20" />
+            <text id="1:2045" name="Standard | 3-4 days" x="0" y="20" width="211" height="20" />
+          </frame>
+          <frame id="1:2046" name="Icon/Chevron_Right" x="211" y="0" width="20" height="20" />
+        </frame>
+      </frame>
+      <frame id="1:2048" name="Payment" x="0" y="124" width="375" height="52">
+        <text id="1:2049" name="PAYMENT" x="16" y="16" width="100" height="20" />
+        <frame id="1:2050" name="Info" x="128" y="16" width="231" height="20">
+          <text id="1:2051" name="Visa *1234" x="0" y="0" width="211" height="20" />
+          <frame id="1:2052" name="Icon/Chevron_Right" x="211" y="0" width="20" height="20" />
+        </frame>
+      </frame>
+      <frame id="1:2054" name="Promos" x="0" y="176" width="375" height="52">
+        <text id="1:2055" name="PROMOS" x="16" y="16" width="100" height="20" />
+        <frame id="1:2056" name="Info" x="128" y="16" width="231" height="20">
+          <text id="1:2057" name="Apply promo code" x="0" y="0" width="211" height="20" />
+          <frame id="1:2058" name="Icon/Chevron_Right" x="211" y="0" width="20" height="20" />
+        </frame>
+      </frame>
+      <frame id="1:2060" name="Items" x="0" y="228" width="375" height="252">
+        <text id="1:2061" name="ITEMS" x="16" y="16" width="100" height="20" />
+        <text id="1:2062" name="DESCRIPTION" x="128" y="16" width="100" height="20" />
+        <text id="1:2063" name="PRICE" x="259" y="16" width="100" height="20" />
+        <frame id="1:2064" name="Item" x="16" y="52" width="343" height="84">
+          <frame id="1:2065" name="Image" x="0" y="0" width="84" height="84" />
+          <frame id="1:2066" name="Info" x="112" y="0" width="148" height="84">
+            <text id="1:2067" name="Brand" x="0" y="0" width="148" height="18" />
+            <text id="1:2068" name="Product name" x="0" y="20" width="148" height="20" />
+            <text id="1:2069" name="Description" x="0" y="42" width="148" height="20" />
+            <text id="1:2070" name="Quantity: 01" x="0" y="64" width="148" height="20" />
+          </frame>
+          <text id="1:2071" name="$10.99" x="297" y="0" width="46" height="20" />
+        </frame>
+        <frame id="1:2072" name="Item" x="16" y="152" width="343" height="84">
+          <frame id="1:2073" name="Image" x="0" y="0" width="84" height="84" />
+          <frame id="1:2074" name="Info" x="112" y="0" width="148" height="84">
+            <text id="1:2075" name="Brand" x="0" y="0" width="148" height="18" />
+            <text id="1:2076" name="Product name" x="0" y="20" width="148" height="20" />
+            <text id="1:2077" name="Description" x="0" y="42" width="148" height="20" />
+            <text id="1:2078" name="Quantity: 01" x="0" y="64" width="148" height="20" />
+          </frame>
+          <text id="1:2079" name="$8.99" x="304" y="0" width="39" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1:2080" name="Header" x="0" y="44" width="375" height="42">
+      <frame id="1:2081" name="Icon/Chevron_Left" x="16" y="9" width="24" height="24" />
+      <text id="1:2083" name="Checkout" x="149" y="9" width="78" height="24" />
+    </frame>
+    <frame id="1:2084" name="Status Bar" x="0" y="0" width="375" height="44">
+      <frame id="1:2085" name="Notch" x="78" y="-2" width="219" height="30" hidden="true" />
+      <frame id="1:2090" name="Right Side" x="293.66650390625" y="17.3310546875" width="66.66152954101562" height="11.336262702941895" />
+      <frame id="1:2106" name="Left Side" x="21.000022888183594" y="12" width="54" height="21">
+        <frame id="1:2107" name="Time" x="21.000022888183594" y="12" width="54" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="1:2165" name="Chat" x="950" y="0" width="375" height="812" hidden="true">
+    <frame id="1:2166" name="Footer Input" x="0" y="730" width="375" height="82">
+      <frame id="1:2167" name="Home Indicator" x="0" y="48" width="375" height="34">
+        <rounded-rectangle id="1:2168" name="Home Indicator" x="121" y="21" width="134" height="5" />
+      </frame>
+      <frame id="1:2169" name="Reply" x="16" y="8" width="343" height="40">
+        <text id="1:2170" name="Label" x="16" y="10" width="191" height="20" />
+        <frame id="1:2171" name="Icon/Mic" x="223" y="8" width="24" height="24" />
+        <frame id="1:2176" name="Icon/Emoji" x="263" y="8" width="24" height="24" />
+        <frame id="1:2181" name="Icon/Image" x="303" y="8" width="24" height="24" />
+      </frame>
+    </frame>
+    <frame id="1:2185" name="Recipient Chat" x="16" y="590" width="279" height="132">
+      <ellipse id="1:2186" name="Avatar" x="16" y="698" width="24" height="24" />
+      <frame id="1:2187" name="Message Bubbles" x="48" y="590" width="247" height="132">
+        <frame id="1:2188" name="Message Bubble" x="0" y="0" width="80" height="36">
+          <text id="1:2189" name="Hmmm" x="16" y="8" width="48" height="20" />
+        </frame>
+        <frame id="1:2190" name="Message Bubble" x="0" y="38" width="119" height="36">
+          <text id="1:2191" name="I think I get it" x="16" y="8" width="87" height="20" />
+        </frame>
+        <frame id="1:2192" name="Message Bubble" x="0" y="76" width="247" height="56">
+          <text id="1:2193" name="Will head to the Help Center if I have more questions tho" x="16" y="8" width="215" height="40" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="1:2194" name="Sender Chat" x="92" y="440" width="267" height="134">
+      <frame id="1:2195" name="Message Bubble" x="0" y="0" width="267" height="96">
+        <text id="1:2196" name="You just edit any text to type in the conversation you want to show, and delete any bubbles you don’t want to use" x="16" y="8" width="235" height="80" />
+      </frame>
+      <frame id="1:2197" name="Message Bubble" x="192" y="98" width="75" height="36">
+        <text id="1:2198" name="Boom!" x="16" y="8" width="43" height="20" />
+      </frame>
+    </frame>
+    <frame id="1:2199" name="Recipient Chat" x="16" y="312" width="279" height="112">
+      <ellipse id="1:2200" name="Avatar" x="16" y="400" width="24" height="24" />
+      <frame id="1:2201" name="Message Bubbles" x="48" y="312" width="247" height="112">
+        <frame id="1:2202" name="Message Bubble" x="0" y="0" width="59" height="36">
+          <text id="1:2203" name="Oh?" x="16" y="8" width="27" height="20" />
+        </frame>
+        <frame id="1:2204" name="Message Bubble" x="0" y="38" width="63" height="36">
+          <text id="1:2205" name="Cool" x="16" y="8" width="31" height="20" />
+        </frame>
+        <frame id="1:2206" name="Message Bubble" x="0" y="76" width="156" height="36">
+          <text id="1:2207" name="How does it work?" x="16" y="8" width="124" height="20" />
+        </frame>
+      </frame>
+    </frame>
+    <text id="1:2208" name="Timestamp" x="0" y="270" width="375" height="18" />
+    <frame id="1:2209" name="Message Bubble" x="127" y="210" width="233" height="36">
+      <text id="1:2210" name="This is the main chat template" x="16" y="8" width="201" height="20" />
+    </frame>
+    <frame id="1:2211" name="Header" x="0" y="44" width="375" height="56">
+      <frame id="1:2212" name="Icon/Chevron_Left" x="16" y="16" width="24" height="24" />
+      <ellipse id="1:2214" name="Profile Image" x="52" y="12" width="32" height="32" />
+      <frame id="1:2215" name="Text" x="92" y="8" width="92" height="40">
+        <text id="1:2216" name="Helena Hills" x="0" y="0" width="92" height="22" />
+        <text id="1:2217" name="Active 11m ago" x="0" y="22" width="86" height="18" />
+      </frame>
+      <frame id="1:2218" name="Icon/Phone" x="287" y="16" width="24" height="24" />
+      <frame id="1:2220" name="Icon/Video" x="335" y="16" width="24" height="24" />
+    </frame>
+    <frame id="1:2223" name="Status Bar" x="0" y="0" width="375" height="44">
+      <frame id="1:2224" name="Notch" x="78" y="0" width="219" height="30" hidden="true" />
+      <frame id="1:2229" name="Right Side" x="293.6666564941406" y="17.3306884765625" width="66.661376953125" height="11.336018562316895" />
+      <frame id="1:2245" name="Left Side" x="21.000022888183594" y="12" width="54" height="21">
+        <frame id="1:2246" name="Time" x="21.000022888183594" y="12" width="54" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="1:2248" name="Dashboard" x="-415" y="0" width="375" height="812" hidden="true">
+    <frame id="1:2249" name="List" x="16" y="594" width="343" height="330">
+      <frame id="1:2250" name="Lists" x="16" y="44" width="311" height="270">
+        <frame id="1:2251" name="Cell" x="0" y="0" width="311" height="54">
+          <frame id="1:2252" name="Avatar" x="0" y="11" width="32" height="32">
+            <rounded-rectangle id="1:2253" name="Rectangle 1" x="0" y="0" width="32" height="32" />
+          </frame>
+          <frame id="1:2254" name="Text" x="44" y="8" width="267" height="38">
+            <text id="1:2255" name="Elynn Lee" x="0" y="0" width="267" height="20" />
+            <text id="1:2256" name="email@fakedomain.net" x="0" y="20" width="267" height="18" />
+          </frame>
+        </frame>
+        <frame id="1:2257" name="Cell" x="0" y="54" width="311" height="54">
+          <frame id="1:2258" name="Avatar" x="0" y="11" width="32" height="32">
+            <rounded-rectangle id="1:2259" name="Rectangle 1" x="0" y="0" width="32" height="32" />
+          </frame>
+          <frame id="1:2260" name="Text" x="44" y="8" width="267" height="38">
+            <text id="1:2261" name="Oscar Dum" x="0" y="0" width="267" height="20" />
+            <text id="1:2262" name="email@fakedomain.net" x="0" y="20" width="267" height="18" />
+          </frame>
+        </frame>
+        <frame id="1:2263" name="Cell" x="0" y="108" width="311" height="54">
+          <frame id="1:2264" name="Avatar" x="0" y="11" width="32" height="32">
+            <rounded-rectangle id="1:2265" name="Rectangle 1" x="0" y="0" width="32" height="32" />
+          </frame>
+          <frame id="1:2266" name="Text" x="44" y="8" width="267" height="38">
+            <text id="1:2267" name="Carlo Emilion" x="0" y="0" width="267" height="20" />
+            <text id="1:2268" name="email@fakedomain.net" x="0" y="20" width="267" height="18" />
+          </frame>
+        </frame>
+        <frame id="1:2269" name="Cell" x="0" y="162" width="311" height="54">
+          <frame id="1:2270" name="Avatar" x="0" y="11" width="32" height="32">
+            <rounded-rectangle id="1:2271" name="Rectangle 1" x="0" y="0" width="32" height="32" />
+          </frame>
+          <frame id="1:2272" name="Text" x="44" y="8" width="267" height="38">
+            <text id="1:2273" name="Daniel Jay Park" x="0" y="0" width="267" height="20" />
+            <text id="1:2274" name="djpark@gmail.com" x="0" y="20" width="267" height="18" />
+          </frame>
+        </frame>
+        <frame id="1:2275" name="Cell" x="0" y="216" width="311" height="54">
+          <frame id="1:2276" name="Avatar" x="0" y="11" width="32" height="32">
+            <rounded-rectangle id="1:2277" name="Rectangle 1" x="0" y="0" width="32" height="32" />
+          </frame>
+          <frame id="1:2278" name="Text" x="44" y="8" width="267" height="38">
+            <text id="1:2279" name="Mark Rojas" x="0" y="0" width="267" height="20" />
+            <text id="1:2280" name="rojasmar@skiff.com" x="0" y="20" width="267" height="18" />
+          </frame>
+        </frame>
+      </frame>
+      <text id="1:2281" name="Title" x="16" y="16" width="31" height="20" />
+    </frame>
+    <frame id="1:2282" name="Header" x="0" y="44" width="375" height="56">
+      <ellipse id="1:2283" name="Profile Image" x="335" y="16" width="24" height="24" />
+      <text id="1:2284" name="App name" x="136" y="14" width="96" height="28" />
+      <frame id="1:2285" name="Icon/Menu" x="16" y="16" width="24" height="24" />
+    </frame>
+    <frame id="1:2289" name="Tab Bar" x="0" y="729" width="375" height="83">
+      <frame id="1:2290" name="Tabs" x="0" y="0" width="375" height="49">
+        <frame id="1:2291" name="Tab Bar Item" x="7" y="0" width="76" height="49">
+          <frame id="1:2292" name="Icon/Home" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:2298" name="Tab Bar Item" x="103" y="0" width="76" height="49">
+          <frame id="1:2299" name="Icon/Search" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:2302" name="Tab Bar Item" x="196" y="0" width="76" height="49">
+          <frame id="1:2303" name="Icon/Transfer" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:2308" name="Tab Bar Item" x="291" y="0" width="76" height="49">
+          <frame id="1:2309" name="Icon/Wallet" x="26" y="12" width="24" height="24" />
+        </frame>
+      </frame>
+      <frame id="1:2311" name="Home Indicator" x="122" y="70" width="134" height="5" />
+    </frame>
+    <frame id="1:2313" name="Chart" x="16" y="300" width="343" height="282">
+      <vector id="1:2314" name="Line" x="16" y="60" width="311" height="0" />
+      <vector id="1:2315" name="Line" x="16" y="96" width="311" height="0" />
+      <vector id="1:2316" name="Line" x="16" y="132" width="311" height="0" />
+      <vector id="1:2317" name="Line" x="16" y="168" width="311" height="0" />
+      <vector id="1:2318" name="Line" x="16" y="204" width="311" height="0" />
+      <vector id="1:2319" name="Line" x="16" y="240" width="311" height="0" />
+      <frame id="1:2320" name="Y Axis" x="16" y="64" width="26" height="158">
+        <text id="1:2321" name="$50K" x="16" y="64" width="26" height="14" />
+        <text id="1:2322" name="$45K" x="16" y="100" width="26" height="14" />
+        <text id="1:2323" name="$40K" x="16" y="136" width="26" height="14" />
+        <text id="1:2324" name="$35K" x="16" y="172" width="26" height="14" />
+        <text id="1:2325" name="$30K" x="16" y="208" width="26" height="14" />
+      </frame>
+      <frame id="1:2326" name="X Axis" x="16" y="244" width="307" height="14">
+        <text id="1:2327" name="Nov 23" x="16" y="244" width="35" height="14" />
+        <text id="1:2328" name="30" x="310" y="244" width="13" height="14" />
+        <text id="1:2329" name="29" x="271" y="244" width="13" height="14" />
+        <text id="1:2330" name="28" x="232" y="244" width="13" height="14" />
+        <text id="1:2331" name="27" x="194" y="244" width="12" height="14" />
+        <text id="1:2332" name="26" x="155" y="244" width="13" height="14" />
+        <text id="1:2333" name="25" x="116" y="244" width="13" height="14" />
+        <text id="1:2334" name="24" x="77" y="244" width="13" height="14" />
+      </frame>
+      <frame id="1:2335" name="Graph" x="16" y="83" width="301" height="157">
+        <vector id="1:2336" name="Graph" x="16" y="83" width="301" height="157" />
+        <vector id="1:2337" name="Graph" x="16" y="83" width="301" height="157" />
+      </frame>
+      <frame id="1:2338" name="Dot" x="302" y="68" width="30" height="30" />
+      <text id="1:2341" name="Title" x="16" y="16" width="31" height="20" />
+    </frame>
+    <frame id="1:2342" name="Stats" x="16" y="168" width="696" height="120">
+      <frame id="1:2343" name="Card" x="0" y="0" width="224" height="120">
+        <text id="1:2344" name="Title" x="16" y="16" width="31" height="20" />
+        <text id="1:2345" name="$45,678.90" x="16" y="44" width="153" height="34" />
+        <text id="1:2346" name="+20% month over month" x="16" y="86" width="142" height="18" />
+      </frame>
+      <frame id="1:2347" name="Card" x="236" y="0" width="224" height="120">
+        <text id="1:2348" name="Title" x="16" y="16" width="31" height="20" />
+        <text id="1:2349" name="2,405" x="16" y="44" width="79" height="34" />
+        <text id="1:2350" name="+33% month over month" x="16" y="86" width="142" height="18" />
+      </frame>
+      <frame id="1:2351" name="Card" x="472" y="0" width="224" height="120">
+        <text id="1:2352" name="MAU (Monthly Active Users)" x="16" y="16" width="193" height="20" />
+        <text id="1:2353" name="10,353" x="16" y="44" width="91" height="34" />
+        <text id="1:2354" name="-8% month over month" x="16" y="86" width="132" height="18" />
+      </frame>
+    </frame>
+    <frame id="1:2355" name="Pills" x="16" y="112" width="183" height="32">
+      <frame id="1:2356" name="Pill" x="0" y="0" width="53" height="32">
+        <text id="1:2357" name="Tab" x="14" y="6" width="25" height="20" />
+      </frame>
+      <frame id="1:2358" name="Pill" x="65" y="0" width="53" height="32">
+        <text id="1:2359" name="Tab" x="14" y="6" width="25" height="20" />
+      </frame>
+      <frame id="1:2360" name="Pill" x="130" y="0" width="53" height="32">
+        <text id="1:2361" name="Tab" x="14" y="6" width="25" height="20" />
+      </frame>
+    </frame>
+    <frame id="1:2362" name="Status Bar" x="0" y="0" width="375" height="44">
+      <frame id="1:2363" name="Notch" x="78" y="-2" width="219" height="30" hidden="true" />
+      <frame id="1:2368" name="Right Side" x="293.6666564941406" y="17.3306884765625" width="66.661376953125" height="11.336018562316895" />
+      <frame id="1:2384" name="Left Side" x="21.000022888183594" y="12" width="54" height="21">
+        <frame id="1:2385" name="Time" x="21.000022888183594" y="12" width="54" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="1:2387" name="Activities" x="495" y="0" width="375" height="812" hidden="true">
+    <frame id="1:2388" name="Activities" x="0" y="144" width="375" height="593">
+      <frame id="1:2389" name="Cell" x="0" y="0" width="375" height="72">
+        <frame id="1:2390" name="Content" x="80" y="15" width="279" height="42">
+          <frame id="1:2391" name="Text" x="0" y="0" width="191" height="42">
+            <frame id="1:2392" name="Name + Timestamp" x="0" y="0" width="191" height="20">
+              <text id="1:2393" name="starryskies23" x="0" y="0" width="92" height="20" />
+              <text id="1:2394" name="1d" x="96" y="0" width="97" height="20" />
+            </frame>
+            <text id="1:2395" name="Started following you" x="0" y="22" width="191" height="20" />
+          </frame>
+          <frame id="1:2396" name="Button" x="207" y="5" width="72" height="32">
+            <text id="1:2397" name="Button" x="13.5" y="6" width="45" height="20" />
+          </frame>
+        </frame>
+        <ellipse id="1:2398" name="Dot" x="5" y="33" width="6" height="6" />
+        <frame id="1:2399" name="Avatar" x="16" y="12" width="48" height="48" />
+      </frame>
+      <frame id="1:2400" name="Cell" x="0" y="72" width="375" height="72">
+        <frame id="1:2401" name="Image" x="311" y="12" width="48" height="48" />
+        <frame id="1:2402" name="Content" x="80" y="15" width="215" height="42">
+          <frame id="1:2403" name="Text" x="0" y="0" width="215" height="42">
+            <frame id="1:2404" name="Name + Timestamp" x="0" y="0" width="215" height="20">
+              <text id="1:2405" name="nebulanomad" x="0" y="0" width="92" height="20" />
+              <text id="1:2406" name="1d" x="96" y="0" width="97" height="20" />
+            </frame>
+            <text id="1:2407" name="Liked your post" x="0" y="22" width="215" height="20" />
+          </frame>
+        </frame>
+        <ellipse id="1:2408" name="Dot" x="5" y="33" width="6" height="6" />
+        <frame id="1:2409" name="Avatar" x="16" y="12" width="48" height="48" />
+      </frame>
+      <frame id="1:2410" name="Cell" x="0" y="144" width="375" height="97">
+        <frame id="1:2411" name="Quote" x="80" y="65" width="171" height="20">
+          <rounded-rectangle id="1:2412" name="Quotation" x="80" y="65" width="3" height="20" />
+          <text id="1:2413" name="Happy birthday!!! 🎉🎉" x="90" y="65" width="161" height="20" />
+        </frame>
+        <frame id="1:2414" name="Content" x="80" y="15" width="279" height="42">
+          <frame id="1:2415" name="Text" x="0" y="0" width="279" height="42">
+            <frame id="1:2416" name="Name + Timestamp" x="0" y="0" width="279" height="20">
+              <text id="1:2417" name="emberecho" x="0" y="0" width="76" height="20" />
+              <text id="1:2418" name="2d" x="80" y="0" width="97" height="20" />
+            </frame>
+            <text id="1:2419" name="Liked your comment" x="0" y="22" width="279" height="20" />
+          </frame>
+        </frame>
+        <ellipse id="1:2420" name="Dot" x="5" y="33" width="6" height="6" />
+        <frame id="1:2421" name="Avatar" x="16" y="12" width="48" height="48" />
+      </frame>
+      <frame id="1:2422" name="Cell" x="0" y="241" width="375" height="72">
+        <frame id="1:2423" name="Image" x="311" y="12" width="48" height="48" />
+        <frame id="1:2424" name="Content" x="80" y="15" width="215" height="42">
+          <frame id="1:2425" name="Text" x="0" y="0" width="215" height="42">
+            <frame id="1:2426" name="Name + Timestamp" x="0" y="0" width="215" height="20">
+              <text id="1:2427" name="lunavoyager" x="0" y="0" width="82" height="20" />
+              <text id="1:2428" name="3d" x="86" y="0" width="97" height="20" />
+            </frame>
+            <text id="1:2429" name="Saved your post" x="0" y="22" width="215" height="20" />
+          </frame>
+        </frame>
+        <ellipse id="1:2430" name="Dot" x="5" y="33" width="6" height="6" />
+        <frame id="1:2431" name="Avatar" x="16" y="12" width="48" height="48" />
+      </frame>
+      <frame id="1:2432" name="Cell" x="0" y="313" width="375" height="111">
+        <frame id="1:2433" name="Image" x="311" y="12" width="48" height="48" />
+        <frame id="1:2434" name="Content" x="80" y="15" width="215" height="84">
+          <frame id="1:2435" name="Text" x="0" y="0" width="215" height="84">
+            <frame id="1:2436" name="Name + Timestamp" x="0" y="0" width="215" height="20">
+              <text id="1:2437" name="shadowlynx" x="0" y="0" width="80" height="20" />
+              <text id="1:2438" name="4d" x="84" y="0" width="97" height="20" />
+            </frame>
+            <text id="1:2439" name="Commented on your post" x="0" y="22" width="215" height="20" />
+            <text id="1:2440" name="i’m going in september. what about you?" x="0" y="44" width="215" height="40" />
+          </frame>
+        </frame>
+        <ellipse id="1:2441" name="Dot" x="5" y="33" width="6" height="6" />
+        <frame id="1:2442" name="Avatar" x="16" y="12" width="48" height="48" />
+      </frame>
+      <frame id="1:2443" name="Cell" x="0" y="424" width="375" height="72">
+        <frame id="1:2444" name="Content" x="80" y="15" width="215" height="42">
+          <frame id="1:2445" name="Text" x="0" y="0" width="215" height="42">
+            <frame id="1:2446" name="Name + Timestamp" x="0" y="0" width="215" height="20">
+              <text id="1:2447" name="nebulanomad" x="0" y="0" width="92" height="20" />
+              <text id="1:2448" name="5d" x="96" y="0" width="97" height="20" />
+            </frame>
+            <text id="1:2449" name="Shared a post you might like" x="0" y="22" width="215" height="20" />
+          </frame>
+        </frame>
+        <frame id="1:2450" name="Image" x="311" y="12" width="48" height="48" />
+        <frame id="1:2451" name="Avatar" x="16" y="12" width="48" height="48" />
+      </frame>
+      <frame id="1:2452" name="Cell" x="0" y="496" width="375" height="97">
+        <frame id="1:2453" name="Quote" x="80" y="65" width="171" height="20">
+          <rounded-rectangle id="1:2454" name="Quotation" x="80" y="65" width="3" height="20" />
+          <text id="1:2455" name="This is so adorable!!!" x="90" y="65" width="161" height="20" />
+        </frame>
+        <frame id="1:2456" name="Content" x="80" y="15" width="279" height="42">
+          <frame id="1:2457" name="Text" x="0" y="0" width="279" height="42">
+            <frame id="1:2458" name="Name + Timestamp" x="0" y="0" width="279" height="20">
+              <text id="1:2459" name="lunavoyager" x="0" y="0" width="82" height="20" />
+              <text id="1:2460" name="5d" x="86" y="0" width="97" height="20" />
+            </frame>
+            <text id="1:2461" name="Liked your comment" x="0" y="22" width="279" height="20" />
+          </frame>
+        </frame>
+        <frame id="1:2462" name="Avatar" x="16" y="12" width="48" height="48" />
+      </frame>
+    </frame>
+    <frame id="1:2463" name="Tab Bar" x="0" y="734" width="375" height="78">
+      <frame id="1:2464" name="Tabs" x="0" y="0" width="375" height="44">
+        <frame id="1:2465" name="Tab Bar Item" x="0" y="0" width="76" height="44">
+          <frame id="1:2466" name="Icon/Home" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:2472" name="Tab Bar Item" x="75" y="0" width="76" height="44">
+          <frame id="1:2473" name="Icon/Search" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:2476" name="Tab Bar Item" x="150" y="0" width="76" height="44">
+          <frame id="1:2477" name="Icon/Create" x="26" y="12" width="24" height="24" />
+        </frame>
+        <frame id="1:2481" name="Tab Bar Item" x="225" y="0" width="76" height="44">
+          <frame id="1:2482" name="Icon/Bell" x="26" y="12" width="24" height="24" />
+          <frame id="1:2485" name="Badge" x="40" y="6" width="19" height="16">
+            <text id="1:2486" name="5" x="6" y="2" width="7" height="12" />
+          </frame>
+        </frame>
+        <frame id="1:2487" name="Tab Bar Item" x="300" y="0" width="76" height="44">
+          <ellipse id="1:2488" name="Profile Image" x="26" y="12" width="24" height="24" />
+        </frame>
+      </frame>
+      <frame id="1:2489" name="Home Indicator" x="0" y="44" width="375" height="34">
+        <rounded-rectangle id="1:2490" name="Home Indicator" x="121" y="21" width="134" height="5" />
+      </frame>
+    </frame>
+    <frame id="1:2491" name="Pills" x="16" y="96" width="388" height="32">
+      <frame id="1:2492" name="Pill" x="0" y="0" width="91" height="32">
+        <text id="1:2493" name="Category" x="14" y="6" width="63" height="20" />
+      </frame>
+      <frame id="1:2494" name="Pill" x="99" y="0" width="91" height="32">
+        <text id="1:2495" name="Category" x="14" y="6" width="63" height="20" />
+      </frame>
+      <frame id="1:2496" name="Pill" x="198" y="0" width="91" height="32">
+        <text id="1:2497" name="Category" x="14" y="6" width="63" height="20" />
+      </frame>
+      <frame id="1:2498" name="Pill" x="297" y="0" width="91" height="32">
+        <text id="1:2499" name="Category" x="14" y="6" width="63" height="20" />
+      </frame>
+    </frame>
+    <frame id="1:2500" name="Header" x="0" y="44" width="375" height="52">
+      <text id="1:2501" name="Activity" x="16" y="12" width="72" height="28" />
+    </frame>
+    <frame id="1:2502" name="Status Bar" x="0" y="0" width="375" height="44">
+      <frame id="1:2503" name="Notch" x="78" y="-2" width="219" height="30" hidden="true" />
+      <frame id="1:2508" name="Right Side" x="293.6666564941406" y="17.3306884765625" width="66.661376953125" height="11.336018562316895" />
+      <frame id="1:2524" name="Left Side" x="21.000022888183594" y="12" width="54" height="21">
+        <frame id="1:2525" name="Time" x="21.000022888183594" y="12" width="54" height="21" />
+      </frame>
+    </frame>
+  </frame>
+  <frame id="4:64" name="BaseDex Fan" x="-1249" y="1116" width="3437" height="954">
+    <frame id="1:2109" name="Sign In" x="40" y="40" width="375" height="874">
+      <frame id="1:2110" name="Home Indicator" x="0" y="840" width="375" height="34">
+        <rounded-rectangle id="1:2111" name="Home Indicator" x="121" y="21" width="134" height="5" />
+      </frame>
+      <frame id="1:2112" name="Content" x="0" y="326.5" width="375" height="227">
+        <frame id="1:2113" name="Copy" x="59.5" y="0" width="256" height="47">
+          <text id="1:2114" name="Create an account" x="57" y="0" width="142" height="24" />
+          <text id="1:2115" name="Enter your email to sign up for this app" x="0" y="26" width="256" height="21" />
+        </frame>
+        <frame id="1:2116" name="Input + Button" x="24" y="71" width="327" height="96">
+          <frame id="1:2117" name="Field" x="0" y="0" width="327" height="40">
+            <text id="1:2118" name="Label" x="16" y="10" width="295" height="20" />
+          </frame>
+          <frame id="1:2119" name="Button" x="0" y="56" width="327" height="40">
+            <text id="1:2120" name="Continue" x="133" y="10" width="61" height="20" />
+          </frame>
+        </frame>
+        <text id="1:2138" name="By clicking continue, you agree to our Terms of Service and Privacy Policy" x="24" y="191" width="327" height="36" />
+      </frame>
+      <text id="1:2139" name="BaseDex Fan" x="95" y="113" width="185" height="27" />
+      <frame id="1:2140" name="Status Bar" x="0" y="0" width="375" height="44">
+        <frame id="1:2141" name="Notch" x="78" y="-2" width="219" height="30" hidden="true" />
+        <frame id="1:2146" name="Right Side" x="293.6666564941406" y="17.3306884765625" width="66.661376953125" height="11.336018562316895" />
+        <frame id="1:2162" name="Left Side" x="21.000022888183594" y="12" width="54" height="21">
+          <frame id="1:2163" name="Time" x="21.000022888183594" y="12" width="54" height="21" />
+        </frame>
+      </frame>
+    </frame>
+    <frame id="4:65" name="home-screen" x="439" y="40" width="402" height="874">
+      <frame id="4:66" name="screen-content-container" x="0" y="0" width="402" height="874">
+        <frame id="4:67" name="status-bar" x="0" y="0" width="402" height="44">
+          <text id="4:68" name="time" x="24" y="13.5" width="30" height="17" />
+          <frame id="4:69" name="status-icons" x="306" y="13" width="72" height="18">
+            <frame id="4:413" name="ios-signal" x="0" y="0" width="18" height="18" />
+            <frame id="4:416" name="ios-wifi-signal" x="24" y="0" width="18" height="18" />
+            <frame id="4:419" name="ios-battery-full" x="48" y="1" width="24" height="16" />
+          </frame>
+        </frame>
+        <frame id="4:73" name="scrollable-body" x="0" y="44" width="402" height="733">
+          <frame id="4:74" name="home-content" x="0" y="0" width="402" height="733">
+            <frame id="4:75" name="branding" x="20" y="0" width="362" height="32">
+              <frame id="4:76" name="wordmark-container" x="0" y="2.5" width="185" height="27">
+                <text id="4:77" name="logo-ar" x="0" y="0" width="185" height="27" />
+              </frame>
+              <frame id="4:80" name="user-profile" x="330" y="0" width="32" height="32">
+                <ellipse id="4:81" name="avatar" x="0" y="0" width="32" height="32" />
+              </frame>
+            </frame>
+            <frame id="4:82" name="hero-mascot-card" x="20" y="52" width="362" height="320">
+              <rounded-rectangle id="4:83" name="mascot-img" x="0" y="0" width="362" height="320" />
+              <frame id="4:84" name="hero-overlay" x="0" y="0" width="362" height="320">
+                <frame id="4:85" name="hero-text" x="20" y="20" width="322" height="41">
+                  <text id="4:86" name="tagline" x="0" y="0" width="322" height="22" />
+                  <text id="4:87" name="subtitle" x="0" y="26" width="322" height="15" />
+                </frame>
+              </frame>
+            </frame>
+            <frame id="4:88" name="start-ar-cta" x="20" y="392" width="362" height="60">
+              <frame id="4:422" name="aperture" x="59" y="18" width="24" height="24" />
+              <text id="4:90" name="cta-label" x="95" y="20" width="208" height="20" />
+            </frame>
+            <frame id="4:91" name="team-slider-section" x="20" y="472" width="362" height="110">
+              <text id="4:92" name="section-title" x="0" y="0" width="158" height="15" />
+              <frame id="4:93" name="badge-row" x="0" y="27" width="362" height="83">
+                <frame id="4:94" name="badge-NYY" x="0" y="0" width="64" height="83">
+                  <frame id="4:95" name="badge-border" x="0" y="0" width="64" height="64">
+                    <rounded-rectangle id="4:96" name="team-logo-img" x="8" y="8" width="48" height="48" />
+                  </frame>
+                  <text id="4:97" name="team-name" x="19.5" y="70" width="25" height="13" />
+                </frame>
+                <frame id="4:98" name="badge-BOS" x="78" y="0" width="64" height="83">
+                  <frame id="4:99" name="badge-border" x="0" y="0" width="64" height="64">
+                    <rounded-rectangle id="4:100" name="team-logo-img" x="8" y="8" width="48" height="48" />
+                  </frame>
+                  <text id="4:101" name="team-name" x="20" y="70" width="24" height="13" />
+                </frame>
+                <frame id="4:102" name="badge-HOU" x="156" y="0" width="64" height="83">
+                  <frame id="4:103" name="badge-border" x="0" y="0" width="64" height="64">
+                    <rounded-rectangle id="4:104" name="team-logo-img" x="8" y="8" width="48" height="48" />
+                  </frame>
+                  <text id="4:105" name="team-name" x="19.5" y="70" width="25" height="13" />
+                </frame>
+                <frame id="4:106" name="badge-TOR" x="234" y="0" width="64" height="83">
+                  <frame id="4:107" name="badge-border" x="0" y="0" width="64" height="64">
+                    <rounded-rectangle id="4:108" name="team-logo-img" x="8" y="8" width="48" height="48" />
+                  </frame>
+                  <text id="4:109" name="team-name" x="20.5" y="70" width="23" height="13" />
+                </frame>
+                <frame id="4:110" name="badge-BAL" x="312" y="0" width="64" height="83">
+                  <frame id="4:111" name="badge-border" x="0" y="0" width="64" height="64">
+                    <rounded-rectangle id="4:112" name="team-logo-img" x="8" y="8" width="48" height="48" />
+                  </frame>
+                  <text id="4:113" name="team-name" x="21" y="70" width="22" height="13" />
+                </frame>
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="4:114" name="bottom-nav-area" x="0" y="777" width="402" height="97">
+          <frame id="4:115" name="tab-bar" x="0" y="0" width="402" height="72">
+            <frame id="4:116" name="tab-home" x="16" y="0" width="64" height="72">
+              <frame id="4:425" name="home" x="21" y="17" width="22" height="22" />
+              <text id="4:118" name="tab-label" x="17.5" y="43" width="29" height="12" />
+            </frame>
+            <frame id="4:125" name="tab-videos" x="92.5" y="0" width="64" height="72">
+              <frame id="4:434" name="play-circle" x="21" y="17" width="22" height="22" />
+              <text id="4:127" name="tab-label" x="15" y="43" width="34" height="12" />
+            </frame>
+            <frame id="4:119" name="tab-scanner" x="169" y="0" width="64" height="72">
+              <frame id="4:428" name="aperture" x="21" y="17" width="22" height="22" />
+              <text id="4:121" name="tab-label" x="20" y="43" width="24" height="12" />
+            </frame>
+            <frame id="4:122" name="tab-collection" x="245.5" y="0" width="64" height="72">
+              <frame id="4:431" name="layers" x="21" y="17" width="22" height="22" />
+              <text id="4:124" name="tab-label" x="7.5" y="43" width="49" height="12" />
+            </frame>
+            <frame id="4:128" name="tab-game" x="322" y="0" width="64" height="72">
+              <frame id="4:437" name="gamepad" x="21" y="17" width="22" height="22">
+                <frame id="21:55" name="gamepad" x="-1" y="-3" width="23" height="30" />
+              </frame>
+              <text id="4:130" name="tab-label" x="18" y="43" width="28" height="12" />
+            </frame>
+          </frame>
+          <frame id="4:131" name="home-indicator" x="0" y="72" width="402" height="25">
+            <rounded-rectangle id="4:132" name="indicator-bar" x="134" y="12" width="134" height="5" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="26:53" name="profile-screen" x="865" y="40" width="402" height="874">
+      <frame id="26:54" name="screen-content-container" x="0" y="0" width="402" height="874">
+        <frame id="26:55" name="status-bar" x="0" y="0" width="402" height="44">
+          <text id="26:56" name="time" x="24" y="13.5" width="30" height="17" />
+          <frame id="26:57" name="status-icons" x="306" y="13" width="72" height="18">
+            <frame id="26:58" name="ios-signal" x="0" y="0" width="18" height="18" />
+            <frame id="26:60" name="ios-wifi-signal" x="24" y="0" width="18" height="18" />
+            <frame id="26:62" name="ios-battery-full" x="48" y="1" width="24" height="16" />
+          </frame>
+        </frame>
+        <frame id="26:64" name="scrollable-body" x="0" y="44" width="402" height="733">
+          <frame id="28:53" name="profile-content" x="0" y="0" width="402" height="681">
+            <frame id="28:54" name="profile-header" x="20" y="0" width="362" height="26">
+              <text id="28:55" name="MY PROFILE" x="0" y="0.5" width="158" height="25" />
+              <frame id="28:56" name="settings-chip" x="265" y="0" width="97" height="26">
+                <text id="28:57" name="SETTINGS" x="14" y="7" width="69" height="12" />
+              </frame>
+            </frame>
+            <frame id="28:58" name="identity-card" x="20" y="44" width="362" height="162">
+              <frame id="28:59" name="identity-row" x="20" y="20" width="322" height="72">
+                <frame id="28:60" name="avatar" x="0" y="0" width="72" height="72">
+                  <text id="28:61" name="SM" x="10" y="21" width="52" height="30" />
+                </frame>
+                <frame id="28:62" name="identity-text" x="88" y="2" width="192" height="68">
+                  <text id="28:63" name="Juan Pérez" x="0" y="0" width="118" height="21" />
+                  <text id="28:64" name="@foopball_fan · Fan desde 2024" x="0" y="26" width="192" height="15" />
+                  <frame id="28:65" name="team-pill" x="0" y="46" width="102" height="22">
+                    <text id="28:66" name="NYY · AL EAST" x="10" y="5" width="82" height="12" />
+                  </frame>
+                </frame>
+              </frame>
+              <frame id="28:67" name="fan-level" x="20" y="110" width="322" height="32">
+                <frame id="28:68" name="level-row" x="0" y="0" width="322" height="15">
+                  <text id="28:69" name="FAN LEVEL 7" x="0" y="0" width="95" height="15" />
+                  <text id="28:70" name="2,480 / 3,000 XP" x="232" y="1" width="90" height="13" />
+                </frame>
+                <frame id="28:71" name="xp-track" x="0" y="24" width="322" height="8">
+                  <rounded-rectangle id="28:72" name="xp-fill" x="0" y="0" width="266" height="8" />
+                </frame>
+              </frame>
+            </frame>
+            <frame id="30:53" name="stats-row" x="20" y="224" width="362" height="69">
+              <frame id="30:54" name="stat-clips" x="0" y="0" width="112.66666412353516" height="69">
+                <text id="30:55" name="24" x="36.83333206176758" y="14" width="39" height="27" />
+                <text id="30:56" name="CLIPS" x="38.33333206176758" y="44" width="36" height="11" />
+              </frame>
+              <frame id="30:57" name="stat-trophies" x="124.66666412353516" y="0" width="112.66667175292969" height="69">
+                <text id="30:58" name="9" x="46.333335876464844" y="14" width="20" height="27" />
+                <text id="30:59" name="TROPHIES" x="25.333335876464844" y="44" width="62" height="11" />
+              </frame>
+              <frame id="30:60" name="stat-cards" x="249.33334350585938" y="0" width="112.66667175292969" height="69">
+                <text id="30:61" name="60" x="35.833335876464844" y="14" width="41" height="27" />
+                <text id="30:62" name="CARDS" x="34.833335876464844" y="44" width="43" height="11" />
+              </frame>
+            </frame>
+            <frame id="30:63" name="trophies-section" x="20" y="311" width="362" height="133">
+              <text id="30:64" name="RECENT TROPHIES" x="0" y="0" width="141" height="15" />
+              <frame id="30:65" name="trophy-row" x="0" y="27" width="362" height="106">
+                <frame id="30:66" name="trophy-AE" x="0" y="0" width="112.66666412353516" height="106">
+                  <frame id="30:67" name="medal" x="36.33333206176758" y="14" width="40" height="40">
+                    <text id="30:68" name="AE" x="8" y="12" width="24" height="16" />
+                  </frame>
+                  <text id="30:69" name="AL East Champs" x="10" y="62" width="92.66666412353516" height="12" />
+                  <text id="30:70" name="MYTHIC" x="33.83333206176758" y="82" width="45" height="10" />
+                </frame>
+                <frame id="30:71" name="trophy-PS" x="124.66666412353516" y="0" width="112.66667175292969" height="106">
+                  <frame id="30:72" name="medal" x="36.333335876464844" y="14" width="40" height="40">
+                    <text id="30:73" name="PS" x="8.5" y="12" width="23" height="16" />
+                  </frame>
+                  <text id="30:74" name="Perfect Scan" x="10" y="62" width="92.66667175292969" height="12" />
+                  <text id="30:75" name="LEGENDARY" x="22.833335876464844" y="82" width="67" height="10" />
+                </frame>
+                <frame id="30:76" name="trophy-FH" x="249.33334350585938" y="0" width="112.66667175292969" height="106">
+                  <frame id="30:77" name="medal" x="36.333335876464844" y="14" width="40" height="40">
+                    <text id="30:78" name="FH" x="8.5" y="12" width="23" height="16" />
+                  </frame>
+                  <text id="30:79" name="First Homerun" x="10" y="62" width="92.66667175292969" height="12" />
+                  <text id="30:80" name="EPIC" x="43.833335876464844" y="82" width="25" height="10" />
+                </frame>
+              </frame>
+            </frame>
+            <frame id="30:81" name="account-section" x="20" y="462" width="362" height="219">
+              <text id="30:82" name="ACCOUNT" x="0" y="0" width="77" height="15" />
+              <frame id="30:83" name="account-list" x="0" y="27" width="362" height="192">
+                <frame id="30:84" name="row-favorite-team" x="0" y="0" width="362" height="42">
+                  <text id="30:85" name="Favorite team" x="16" y="13" width="86" height="16" />
+                  <text id="30:86" name="New York Yankees ›" x="225" y="13.5" width="121" height="15" />
+                </frame>
+                <frame id="30:87" name="row-ar-quality" x="0" y="50" width="362" height="42">
+                  <text id="30:88" name="AR quality" x="16" y="13" width="63" height="16" />
+                  <text id="30:89" name="High ›" x="305" y="13.5" width="41" height="15" />
+                </frame>
+                <frame id="30:90" name="row-notifications" x="0" y="100" width="362" height="42">
+                  <text id="30:91" name="Notifications" x="16" y="13" width="80" height="16" />
+                  <text id="30:92" name="On ›" x="315" y="13.5" width="31" height="15" />
+                </frame>
+                <frame id="30:93" name="row-sign-out" x="0" y="150" width="362" height="42">
+                  <text id="30:94" name="Sign out" x="16" y="13" width="52" height="16" />
+                  <text id="30:95" name="›" x="341" y="13.5" width="5" height="15" />
+                </frame>
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="26:134" name="bottom-nav-area" x="0" y="777" width="402" height="97">
+          <frame id="26:135" name="tab-bar" x="0" y="0" width="402" height="72">
+            <frame id="26:136" name="tab-home" x="16" y="0" width="64" height="72">
+              <frame id="26:137" name="home" x="21" y="17" width="22" height="22" />
+              <text id="26:139" name="tab-label" x="17.5" y="43" width="29" height="12" />
+            </frame>
+            <frame id="26:140" name="tab-videos" x="92.5" y="0" width="64" height="72">
+              <frame id="26:141" name="play-circle" x="21" y="17" width="22" height="22" />
+              <text id="26:143" name="tab-label" x="15" y="43" width="34" height="12" />
+            </frame>
+            <frame id="26:144" name="tab-scanner" x="169" y="0" width="64" height="72">
+              <frame id="26:145" name="aperture" x="21" y="17" width="22" height="22" />
+              <text id="26:147" name="tab-label" x="20" y="43" width="24" height="12" />
+            </frame>
+            <frame id="26:148" name="tab-collection" x="245.5" y="0" width="64" height="72">
+              <frame id="26:149" name="layers" x="21" y="17" width="22" height="22" />
+              <text id="26:151" name="tab-label" x="7.5" y="43" width="49" height="12" />
+            </frame>
+            <frame id="26:152" name="tab-game" x="322" y="0" width="64" height="72">
+              <frame id="26:153" name="gamepad" x="21" y="17" width="22" height="22">
+                <frame id="26:154" name="gamepad" x="-1" y="-3" width="23" height="30" />
+              </frame>
+              <text id="26:156" name="tab-label" x="18" y="43" width="28" height="12" />
+            </frame>
+          </frame>
+          <frame id="26:157" name="home-indicator" x="0" y="72" width="402" height="25">
+            <rounded-rectangle id="26:158" name="indicator-bar" x="134" y="12" width="134" height="5" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="4:224" name="video-gallery" x="1291" y="40" width="402" height="874">
+      <frame id="4:225" name="screen-content-container" x="0" y="0" width="402" height="874">
+        <frame id="4:226" name="status-bar" x="0" y="0" width="402" height="44">
+          <text id="4:227" name="time" x="24" y="13.5" width="30" height="17" />
+          <frame id="4:228" name="status-icons" x="306" y="13" width="72" height="18">
+            <frame id="4:479" name="ios-signal" x="0" y="0" width="18" height="18" />
+            <frame id="4:482" name="ios-wifi-signal" x="24" y="0" width="18" height="18" />
+            <frame id="4:485" name="ios-battery-full" x="48" y="1" width="24" height="16" />
+          </frame>
+        </frame>
+        <frame id="4:232" name="scrollable-body" x="0" y="44" width="402" height="733">
+          <frame id="4:233" name="gallery-content" x="0" y="0" width="402" height="733">
+            <frame id="4:234" name="header" x="20" y="0" width="362" height="44">
+              <text id="4:235" name="title" x="0" y="0" width="362" height="25" />
+              <text id="4:236" name="sub" x="0" y="29" width="362" height="15" />
+            </frame>
+            <frame id="4:237" name="video-player-container" x="20" y="60" width="362" height="200">
+              <rounded-rectangle id="4:238" name="video-img" x="0" y="0" width="362" height="200" />
+              <frame id="4:239" name="player-overlay" x="0" y="0" width="362" height="200">
+                <frame id="4:240" name="overlay-top" x="12" y="12" width="338" height="20">
+                  <frame id="4:241" name="filter-badge" x="0" y="0" width="101" height="20">
+                    <text id="4:242" name="badge-text" x="8" y="4" width="85" height="12" />
+                  </frame>
+                  <frame id="4:488" name="maximize" x="320" y="0" width="18" height="18" />
+                </frame>
+                <frame id="4:244" name="play-row" x="12" y="79.5" width="338" height="48">
+                  <frame id="4:491" name="play-circle" x="145" y="0" width="48" height="48" />
+                </frame>
+                <frame id="4:246" name="scrubber" x="12" y="175" width="338" height="13">
+                  <text id="4:247" name="cur-time" x="0" y="0" width="22" height="13" />
+                  <frame id="4:248" name="track" x="30" y="4.5" width="276" height="4">
+                    <rounded-rectangle id="4:249" name="progress" x="0" y="0" width="110" height="4" />
+                    <ellipse id="4:250" name="knob" x="105" y="-4" width="10" height="12" />
+                  </frame>
+                  <text id="4:251" name="tot-time" x="314" y="0" width="24" height="13" />
+                </frame>
+              </frame>
+            </frame>
+            <frame id="4:252" name="filters-section" x="20" y="276" width="362" height="87">
+              <text id="4:253" name="label" x="0" y="0" width="152" height="13" />
+              <frame id="4:254" name="filter-row" x="0" y="21" width="362" height="66">
+                <frame id="4:255" name="chip-Pixelate" x="0" y="0" width="67" height="29">
+                  <text id="4:256" name="chip-label" x="12" y="8" width="43" height="13" />
+                </frame>
+                <frame id="4:257" name="chip-Thermal" x="75" y="0" width="69" height="29">
+                  <text id="4:258" name="chip-label" x="12" y="8" width="45" height="13" />
+                </frame>
+                <frame id="4:259" name="chip-Pastel" x="152" y="0" width="58" height="29">
+                  <text id="4:260" name="chip-label" x="12" y="8" width="34" height="13" />
+                </frame>
+                <frame id="4:261" name="chip-Blur" x="218" y="0" width="46" height="29">
+                  <text id="4:262" name="chip-label" x="12" y="8" width="22" height="13" />
+                </frame>
+                <frame id="4:263" name="chip-Color Adjust" x="0" y="37" width="92" height="29">
+                  <text id="4:264" name="chip-label" x="12" y="8" width="68" height="13" />
+                </frame>
+              </frame>
+            </frame>
+            <frame id="4:265" name="video-grid-section" x="20" y="379" width="362" height="297">
+              <text id="4:266" name="grid-title" x="0" y="0" width="122" height="13" />
+              <frame id="4:267" name="grid" x="0" y="25" width="362" height="272">
+                <frame id="4:268" name="row-1" x="0" y="0" width="362" height="130">
+                  <frame id="4:269" name="vid-card-0" x="0" y="0" width="175" height="130">
+                    <rounded-rectangle id="4:270" name="img" x="0" y="0" width="175" height="130" />
+                    <frame id="4:271" name="text-overlay" x="0" y="0" width="175" height="130">
+                      <frame id="4:272" name="meta" x="10" y="10" width="155" height="16">
+                        <frame id="4:494" name="play" x="0" y="0" width="16" height="16" />
+                        <text id="4:274" name="dur" x="135" y="0" width="20" height="12" />
+                      </frame>
+                      <text id="4:275" name="vid-title" x="10" y="107" width="155" height="13" />
+                    </frame>
+                  </frame>
+                  <frame id="4:276" name="vid-card-1" x="187" y="0" width="175" height="130">
+                    <rounded-rectangle id="4:277" name="img" x="0" y="0" width="175" height="130" />
+                    <frame id="4:278" name="text-overlay" x="0" y="0" width="175" height="130">
+                      <frame id="4:279" name="meta" x="10" y="10" width="155" height="16">
+                        <frame id="4:497" name="play" x="0" y="0" width="16" height="16" />
+                        <text id="4:281" name="dur" x="133" y="0" width="22" height="12" />
+                      </frame>
+                      <text id="4:282" name="vid-title" x="10" y="107" width="155" height="13" />
+                    </frame>
+                  </frame>
+                </frame>
+                <frame id="4:283" name="row-2" x="0" y="142" width="362" height="130">
+                  <frame id="4:284" name="vid-card-2" x="0" y="0" width="175" height="130">
+                    <rounded-rectangle id="4:285" name="img" x="0" y="0" width="175" height="130" />
+                    <frame id="4:286" name="text-overlay" x="0" y="0" width="175" height="130">
+                      <frame id="4:287" name="meta" x="10" y="10" width="155" height="16">
+                        <frame id="4:500" name="play" x="0" y="0" width="16" height="16" />
+                        <text id="4:289" name="dur" x="133" y="0" width="22" height="12" />
+                      </frame>
+                      <text id="4:290" name="vid-title" x="10" y="107" width="155" height="13" />
+                    </frame>
+                  </frame>
+                  <frame id="4:291" name="vid-card-3" x="187" y="0" width="175" height="130">
+                    <rounded-rectangle id="4:292" name="img" x="0" y="0" width="175" height="130" />
+                    <frame id="4:293" name="text-overlay" x="0" y="0" width="175" height="130">
+                      <frame id="4:294" name="meta" x="10" y="10" width="155" height="16">
+                        <frame id="4:503" name="play" x="0" y="0" width="16" height="16" />
+                        <text id="4:296" name="dur" x="133" y="0" width="22" height="12" />
+                      </frame>
+                      <text id="4:297" name="vid-title" x="10" y="107" width="155" height="13" />
+                    </frame>
+                  </frame>
+                </frame>
+              </frame>
+            </frame>
+            <frame id="3:188" name="video-grid-section" x="20" y="692" width="362" height="297">
+              <text id="3:189" name="grid-title" x="0" y="0" width="119" height="13" />
+              <frame id="3:190" name="grid" x="0" y="25" width="362" height="272">
+                <frame id="3:191" name="row-1" x="0" y="0" width="362" height="130">
+                  <frame id="3:192" name="vid-card-0" x="0" y="0" width="175" height="130">
+                    <rounded-rectangle id="3:193" name="img" x="0" y="0" width="175" height="130" />
+                    <frame id="3:194" name="text-overlay" x="0" y="0" width="175" height="130">
+                      <frame id="3:195" name="meta" x="10" y="10" width="155" height="16">
+                        <frame id="3:196" name="play" x="0" y="0" width="16" height="16" />
+                        <text id="3:198" name="dur" x="135" y="0" width="20" height="12" />
+                      </frame>
+                      <text id="3:199" name="vid-title" x="10" y="107" width="155" height="13" />
+                    </frame>
+                  </frame>
+                  <frame id="3:200" name="vid-card-1" x="187" y="0" width="175" height="130">
+                    <rounded-rectangle id="3:201" name="img" x="0" y="0" width="175" height="130" />
+                    <frame id="3:202" name="text-overlay" x="0" y="0" width="175" height="130">
+                      <frame id="3:203" name="meta" x="10" y="10" width="155" height="16">
+                        <frame id="3:204" name="play" x="0" y="0" width="16" height="16" />
+                        <text id="3:206" name="dur" x="133" y="0" width="22" height="12" />
+                      </frame>
+                      <text id="3:207" name="vid-title" x="10" y="107" width="155" height="13" />
+                    </frame>
+                  </frame>
+                </frame>
+                <frame id="3:208" name="row-2" x="0" y="142" width="362" height="130">
+                  <frame id="3:209" name="vid-card-2" x="0" y="0" width="175" height="130">
+                    <rounded-rectangle id="3:210" name="img" x="0" y="0" width="175" height="130" />
+                    <frame id="3:211" name="text-overlay" x="0" y="0" width="175" height="130">
+                      <frame id="3:212" name="meta" x="10" y="10" width="155" height="16">
+                        <frame id="3:213" name="play" x="0" y="0" width="16" height="16" />
+                        <text id="3:215" name="dur" x="133" y="0" width="22" height="12" />
+                      </frame>
+                      <text id="3:216" name="vid-title" x="10" y="107" width="155" height="13" />
+                    </frame>
+                  </frame>
+                  <frame id="3:217" name="vid-card-3" x="187" y="0" width="175" height="130">
+                    <rounded-rectangle id="3:218" name="img" x="0" y="0" width="175" height="130" />
+                    <frame id="3:219" name="text-overlay" x="0" y="0" width="175" height="130">
+                      <frame id="3:220" name="meta" x="10" y="10" width="155" height="16">
+                        <frame id="3:221" name="play" x="0" y="0" width="16" height="16" />
+                        <text id="3:223" name="dur" x="133" y="0" width="22" height="12" />
+                      </frame>
+                      <text id="3:224" name="vid-title" x="10" y="107" width="155" height="13" />
+                    </frame>
+                  </frame>
+                </frame>
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="4:298" name="bottom-nav-area" x="0" y="777" width="402" height="97">
+          <frame id="4:299" name="tab-bar" x="0" y="0" width="402" height="72">
+            <frame id="4:300" name="tab-home" x="16" y="0" width="64" height="72">
+              <frame id="4:506" name="home" x="21" y="17" width="22" height="22" />
+              <text id="4:302" name="tab-label" x="17.5" y="43" width="29" height="12" />
+            </frame>
+            <frame id="4:309" name="tab-videos" x="92.5" y="0" width="64" height="72">
+              <frame id="4:515" name="play-circle" x="21" y="17" width="22" height="22" />
+              <text id="4:311" name="tab-label" x="14.5" y="43" width="35" height="12" />
+            </frame>
+            <frame id="4:303" name="tab-scanner" x="169" y="0" width="64" height="72">
+              <frame id="4:509" name="aperture" x="21" y="17" width="22" height="22" />
+              <text id="4:305" name="tab-label" x="20" y="43" width="24" height="12" />
+            </frame>
+            <frame id="4:306" name="tab-collection" x="245.5" y="0" width="64" height="72">
+              <frame id="4:512" name="layers" x="21" y="17" width="22" height="22" />
+              <text id="4:308" name="tab-label" x="7.5" y="43" width="49" height="12" />
+            </frame>
+            <frame id="4:312" name="tab-game" x="322" y="0" width="64" height="72">
+              <frame id="4:518" name="gamepad" x="21" y="17" width="22" height="22">
+                <frame id="21:58" name="gamepad" x="-1" y="-3" width="23" height="30" />
+              </frame>
+              <text id="4:314" name="tab-label" x="18" y="43" width="28" height="12" />
+            </frame>
+          </frame>
+          <frame id="4:315" name="home-indicator" x="0" y="72" width="402" height="25">
+            <rounded-rectangle id="4:316" name="indicator-bar" x="134" y="12" width="134" height="5" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="4:133" name="ar-scanner-screen" x="1717" y="40" width="402" height="874">
+      <rounded-rectangle id="4:134" name="viewfinder-bg" x="0" y="0" width="402" height="874" />
+      <frame id="4:135" name="viewfinder-overlay" x="0" y="0" width="402" height="874">
+        <frame id="8:298" name="status-bar" x="0" y="20" width="402" height="44">
+          <text id="8:299" name="time" x="24" y="13.5" width="30" height="17" />
+          <frame id="8:300" name="status-icons" x="306" y="13" width="72" height="18">
+            <frame id="8:301" name="ios-signal" x="0" y="0" width="18" height="18" />
+            <frame id="8:303" name="ios-wifi-signal" x="24" y="0" width="18" height="18" />
+            <frame id="8:305" name="ios-battery-full" x="48" y="1" width="24" height="16" />
+          </frame>
+        </frame>
+        <frame id="4:142" name="scanner-top-bar" x="0" y="154.25" width="402" height="40">
+          <frame id="4:143" name="ar-status-badge" x="24" y="6.5" width="147" height="27">
+            <ellipse id="4:144" name="glowing-pulse" x="12" y="9.5" width="8" height="8" />
+            <text id="4:145" name="status-text" x="28" y="6" width="107" height="15" />
+          </frame>
+          <frame id="4:146" name="close-btn" x="338" y="0" width="40" height="40">
+            <frame id="4:551" name="x" x="11" y="11" width="18" height="18" />
+          </frame>
+        </frame>
+        <frame id="4:148" name="scanner-reticle-container" x="71" y="284.5" width="260" height="260">
+          <frame id="4:149" name="corner-tl" x="0" y="0" width="30" height="30" />
+          <frame id="4:152" name="corner-tr" x="230" y="0" width="30" height="30" />
+          <frame id="4:155" name="corner-bl" x="0" y="260.5" width="30" height="0" />
+          <frame id="4:158" name="corner-br" x="230" y="260.5" width="30" height="0" />
+        </frame>
+        <frame id="4:163" name="instructional-overlay" x="0" y="634.75" width="402" height="52">
+          <text id="4:164" name="instruction" x="40" y="0" width="322" height="17" />
+          <text id="4:165" name="sub-instruction" x="40" y="25" width="322" height="15" />
+          <frame id="4:166" name="loader-bar" x="131" y="48" width="140" height="4">
+            <rounded-rectangle id="4:167" name="loader-fill" x="0" y="0" width="80" height="4" />
+          </frame>
+        </frame>
+        <frame id="3:119" name="bottom-nav-area" x="0" y="777" width="402" height="97">
+          <frame id="3:120" name="tab-bar" x="0" y="0" width="402" height="72">
+            <frame id="3:121" name="tab-home" x="16" y="0" width="64" height="72">
+              <frame id="3:122" name="home" x="21" y="17" width="22" height="22" />
+              <text id="3:124" name="tab-label" x="17.5" y="43" width="29" height="12" />
+            </frame>
+            <frame id="3:133" name="tab-videos" x="92.5" y="0" width="64" height="72">
+              <frame id="3:134" name="play-circle" x="21" y="17" width="22" height="22" />
+              <text id="3:136" name="tab-label" x="15" y="43" width="34" height="12" />
+            </frame>
+            <frame id="3:129" name="tab-scanner" x="169" y="0" width="64" height="72">
+              <frame id="3:130" name="aperture" x="21" y="17" width="22" height="22" />
+              <text id="3:132" name="tab-label" x="20" y="43" width="24" height="12" />
+            </frame>
+            <frame id="3:125" name="tab-collection" x="245.5" y="0" width="64" height="72">
+              <frame id="3:126" name="layers" x="21" y="17" width="22" height="22" />
+              <text id="3:128" name="tab-label" x="7.5" y="43" width="49" height="12" />
+            </frame>
+            <frame id="3:137" name="tab-game" x="322" y="0" width="64" height="72">
+              <frame id="3:138" name="gamepad" x="21" y="17" width="22" height="22">
+                <frame id="21:61" name="gamepad" x="0" y="-3" width="22" height="28" />
+              </frame>
+              <text id="3:140" name="tab-label" x="18" y="43" width="28" height="12" />
+            </frame>
+          </frame>
+          <frame id="3:141" name="home-indicator" x="0" y="72" width="402" height="25">
+            <rounded-rectangle id="3:142" name="indicator-bar" x="134" y="12" width="134" height="5" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="20:53" name="ar-combined-screen" x="2143" y="40" width="402" height="874">
+      <rounded-rectangle id="20:54" name="viewfinder-bg" x="0" y="0" width="402" height="874" />
+      <frame id="20:55" name="viewfinder-overlay" x="0" y="0" width="402" height="874">
+        <frame id="20:56" name="status-bar" x="0" y="20" width="402" height="44">
+          <text id="20:57" name="time" x="24" y="13.5" width="30" height="17" />
+          <frame id="20:58" name="status-icons" x="306" y="13" width="72" height="18">
+            <frame id="20:59" name="ios-signal" x="0" y="0" width="18" height="18" />
+            <frame id="20:61" name="ios-wifi-signal" x="24" y="0" width="18" height="18" />
+            <frame id="20:63" name="ios-battery-full" x="48" y="1" width="24" height="16" />
+          </frame>
+        </frame>
+        <frame id="20:157" name="top-controls" x="0" y="65.5" width="402" height="40">
+          <frame id="20:158" name="back-ar-btn" x="20" y="0" width="40" height="40">
+            <frame id="20:159" name="arrow-left" x="11" y="11" width="18" height="18" />
+          </frame>
+          <frame id="20:161" name="recording-status" x="258" y="7.5" width="124" height="25">
+            <ellipse id="20:162" name="pulse" x="12" y="8.5" width="8" height="8" />
+            <text id="20:163" name="rec-label" x="26" y="6" width="86" height="13" />
+          </frame>
+        </frame>
+        <frame id="20:114" name="bottom-sheet" x="0" y="107" width="402" height="663">
+          <frame id="20:117" name="mascot-info" x="24" y="0" width="354" height="45">
+            <frame id="20:118" name="team-tag" x="0" y="0" width="267" height="14">
+              <text id="20:119" name="team" x="0" y="0" width="149" height="14" />
+              <ellipse id="20:120" name="sep" x="155" y="5" width="4" height="4" />
+              <text id="20:121" name="category" x="165" y="0.5" width="102" height="13" />
+            </frame>
+            <text id="20:122" name="mascot-name" x="0" y="18" width="354" height="27" />
+          </frame>
+          <frame id="20:136" name="dock-Video" x="251" y="590" width="100" height="73">
+            <frame id="20:137" name="circle-btn" x="23" y="0" width="54" height="54">
+              <frame id="20:138" name="video" x="16" y="16" width="22" height="22" />
+            </frame>
+            <text id="20:140" name="label" x="34.5" y="60" width="31" height="13" />
+          </frame>
+          <frame id="20:152" name="dock-Trivia" x="1" y="246" width="100" height="73">
+            <frame id="20:153" name="circle-btn" x="23" y="0" width="54" height="54">
+              <frame id="20:154" name="help-circle" x="16" y="16" width="22" height="22" />
+            </frame>
+            <text id="20:156" name="label" x="35" y="60" width="30" height="13" />
+          </frame>
+          <frame id="20:142" name="dock-Effects" x="51" y="590" width="100" height="73">
+            <frame id="20:143" name="circle-btn" x="23" y="0" width="54" height="54">
+              <frame id="20:144" name="sparkles" x="16" y="16" width="22" height="22" />
+            </frame>
+            <text id="20:146" name="label" x="31" y="60" width="38" height="13" />
+          </frame>
+          <frame id="20:147" name="dock-Stats" x="1" y="332" width="100" height="73">
+            <frame id="20:148" name="circle-btn" x="23" y="0" width="54" height="54">
+              <frame id="20:149" name="bar-chart-2" x="16" y="16" width="22" height="22" />
+            </frame>
+            <text id="20:151" name="label" x="36" y="60" width="28" height="13" />
+          </frame>
+          <frame id="20:131" name="dock-Info" x="1" y="418" width="100" height="73">
+            <frame id="20:132" name="circle-btn" x="23" y="0" width="54" height="54">
+              <frame id="20:133" name="info" x="16" y="16" width="22" height="22" />
+            </frame>
+            <text id="20:135" name="label" x="39.5" y="60" width="21" height="13" />
+          </frame>
+          <frame id="20:126" name="dock-Animation" x="151" y="590" width="100" height="73">
+            <frame id="20:127" name="circle-btn" x="23" y="0" width="54" height="54">
+              <frame id="20:128" name="refresh-cw" x="16" y="16" width="22" height="22" />
+            </frame>
+            <text id="20:130" name="label" x="22.5" y="60" width="55" height="13" />
+          </frame>
+        </frame>
+        <frame id="20:85" name="instructional-overlay" x="0" y="771.5" width="402" height="4" />
+        <frame id="20:90" name="bottom-nav-area" x="0" y="777" width="402" height="97">
+          <frame id="20:91" name="tab-bar" x="0" y="0" width="402" height="72">
+            <frame id="20:92" name="tab-home" x="16" y="0" width="64" height="72">
+              <frame id="20:93" name="home" x="21" y="17" width="22" height="22" />
+              <text id="20:95" name="tab-label" x="17.5" y="43" width="29" height="12" />
+            </frame>
+            <frame id="20:96" name="tab-videos" x="92.5" y="0" width="64" height="72">
+              <frame id="20:97" name="play-circle" x="21" y="17" width="22" height="22" />
+              <text id="20:99" name="tab-label" x="15" y="43" width="34" height="12" />
+            </frame>
+            <frame id="20:100" name="tab-scanner" x="169" y="0" width="64" height="72">
+              <frame id="20:101" name="aperture" x="21" y="17" width="22" height="22" />
+              <text id="20:103" name="tab-label" x="20" y="43" width="24" height="12" />
+            </frame>
+            <frame id="20:104" name="tab-collection" x="245.5" y="0" width="64" height="72">
+              <frame id="20:105" name="layers" x="21" y="17" width="22" height="22" />
+              <text id="20:107" name="tab-label" x="7.5" y="43" width="49" height="12" />
+            </frame>
+            <frame id="20:108" name="tab-game" x="322" y="0" width="64" height="72">
+              <frame id="20:109" name="gamepad" x="21" y="17" width="22" height="22">
+                <frame id="21:64" name="gamepad" x="-1" y="-3" width="23" height="30" />
+              </frame>
+              <text id="20:111" name="tab-label" x="18" y="43" width="28" height="12" />
+            </frame>
+          </frame>
+          <frame id="20:112" name="home-indicator" x="0" y="72" width="402" height="25">
+            <rounded-rectangle id="20:113" name="indicator-bar" x="134" y="12" width="134" height="5" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="4:317" name="tcg-vault" x="2569" y="40" width="402" height="874">
+      <frame id="4:318" name="screen-content-container" x="0" y="0" width="402" height="874">
+        <frame id="4:319" name="status-bar" x="0" y="0" width="402" height="44">
+          <text id="4:320" name="time" x="24" y="13.5" width="30" height="17" />
+          <frame id="4:321" name="status-icons" x="306" y="13" width="72" height="18">
+            <frame id="4:521" name="ios-signal" x="0" y="0" width="18" height="18" />
+            <frame id="4:524" name="ios-wifi-signal" x="24" y="0" width="18" height="18" />
+            <frame id="4:527" name="ios-battery-full" x="48" y="1" width="24" height="16" />
+          </frame>
+        </frame>
+        <frame id="4:325" name="scrollable-body" x="0" y="44" width="402" height="733">
+          <frame id="4:326" name="vault-content" x="0" y="0" width="402" height="733">
+            <frame id="4:327" name="vault-header-stats" x="20" y="0" width="362" height="60">
+              <frame id="4:328" name="trophy-count" x="12" y="12" width="89" height="36">
+                <text id="4:329" name="stats-title" x="0" y="0" width="88" height="12" />
+                <frame id="4:330" name="counter" x="0" y="16" width="89" height="20">
+                  <frame id="4:530" name="award" x="0" y="1" width="18" height="18" />
+                  <text id="4:332" name="val" x="24" y="0" width="65" height="20" />
+                </frame>
+              </frame>
+              <frame id="4:333" name="level-progress" x="170" y="18" width="180" height="24">
+                <frame id="4:334" name="prog-meta" x="0" y="0" width="180" height="12">
+                  <text id="4:335" name="level" x="0" y="0" width="67" height="12" />
+                  <text id="4:336" name="percent" x="157" y="0" width="23" height="12" />
+                </frame>
+                <frame id="4:337" name="bar" x="0" y="18" width="180" height="6">
+                  <rounded-rectangle id="4:338" name="fill" x="0" y="0" width="72" height="6" />
+                </frame>
+              </frame>
+            </frame>
+            <frame id="4:339" name="featured-unlock-banner" x="20" y="76" width="362" height="85">
+              <rounded-rectangle id="4:340" name="promo-img" x="0" y="0" width="362" height="85" />
+              <frame id="4:341" name="trophy-badge" x="12" y="18.5" width="48" height="48">
+                <frame id="4:533" name="award" x="12" y="12" width="24" height="24" />
+              </frame>
+              <frame id="4:343" name="promo-details" x="72" y="21" width="278" height="43">
+                <text id="4:344" name="tag" x="0" y="0" width="159" height="12" />
+                <text id="4:345" name="heading" x="0" y="14" width="278" height="15" />
+                <text id="4:346" name="caption" x="0" y="31" width="278" height="12" />
+              </frame>
+            </frame>
+            <frame id="4:347" name="category-tabs" x="20" y="177" width="362" height="29">
+              <frame id="4:348" name="tab-Trophies" x="0" y="0" width="80" height="29">
+                <text id="4:349" name="label" x="16" y="8" width="48" height="13" />
+              </frame>
+              <frame id="4:350" name="tab-Cards" x="88" y="0" width="65" height="29">
+                <text id="4:351" name="label" x="16" y="8" width="33" height="13" />
+              </frame>
+              <frame id="4:352" name="tab-Badges" x="161" y="0" width="73" height="29">
+                <text id="4:353" name="label" x="16" y="8" width="41" height="13" />
+              </frame>
+            </frame>
+            <frame id="4:354" name="grid" x="20" y="222" width="362" height="272">
+              <frame id="4:355" name="row-1" x="0" y="0" width="362" height="130">
+                <frame id="4:368" name="card-2" x="-0.00000762939453125" y="0" width="112.66667175292969" height="130">
+                  <rounded-rectangle id="4:369" name="img" x="0" y="0" width="112.66667175292969" height="130" />
+                  <frame id="4:370" name="meta-overlay" x="0.666748046875" y="0" width="112.66667175292969" height="130">
+                    <frame id="4:371" name="badge" x="8" y="8" width="44" height="14">
+                      <text id="4:372" name="rarity" x="6" y="2" width="32" height="10" />
+                    </frame>
+                    <text id="4:373" name="card-name" x="8" y="110" width="96.66667175292969" height="12" />
+                  </frame>
+                </frame>
+                <frame id="4:356" name="card-0" x="124.66667175292969" y="0" width="112.66666412353516" height="130">
+                  <rounded-rectangle id="4:357" name="img" x="0" y="0" width="112.66666412353516" height="130" />
+                  <frame id="4:358" name="meta-overlay" x="0" y="0" width="113" height="130">
+                    <frame id="4:359" name="badge" x="8" y="8" width="60" height="14">
+                      <text id="4:360" name="rarity" x="6" y="2" width="48" height="10" />
+                    </frame>
+                    <text id="4:361" name="card-name" x="8" y="110" width="97" height="12" />
+                  </frame>
+                </frame>
+                <frame id="4:362" name="card-1" x="249.33334350585938" y="0" width="112.66667175292969" height="130">
+                  <rounded-rectangle id="4:363" name="img" x="0" y="0" width="112.66667175292969" height="130" />
+                  <frame id="4:364" name="meta-overlay" x="0.333251953125" y="0" width="113" height="130">
+                    <frame id="4:365" name="badge" x="8" y="8" width="30" height="14">
+                      <text id="4:366" name="rarity" x="6" y="2" width="18" height="10" />
+                    </frame>
+                    <text id="4:367" name="card-name" x="8" y="110" width="97" height="12" />
+                  </frame>
+                </frame>
+              </frame>
+              <frame id="4:374" name="row-2" x="0" y="142" width="362" height="130">
+                <frame id="4:375" name="card-3" x="0" y="0" width="112.66666412353516" height="130">
+                  <rounded-rectangle id="4:376" name="img" x="0" y="0" width="112.66666412353516" height="130" />
+                  <frame id="4:377" name="meta-overlay" x="-1" y="0" width="113" height="130">
+                    <frame id="4:378" name="badge" x="8" y="8" width="33" height="14">
+                      <text id="4:379" name="rarity" x="6" y="2" width="21" height="10" />
+                    </frame>
+                    <text id="4:380" name="card-name" x="8" y="110" width="97" height="12" />
+                  </frame>
+                </frame>
+                <frame id="4:381" name="card-4" x="124.666748046875" y="0" width="112.66667175292969" height="130">
+                  <rounded-rectangle id="4:382" name="img" x="0" y="0" width="112.66667175292969" height="130" />
+                  <frame id="4:383" name="meta-overlay" x="-0.666748046875" y="0" width="113" height="130">
+                    <frame id="4:384" name="badge" x="8" y="8" width="63" height="14">
+                      <text id="4:385" name="rarity" x="6" y="2" width="51" height="10" />
+                    </frame>
+                    <text id="4:386" name="card-name" x="8" y="110" width="97" height="12" />
+                  </frame>
+                </frame>
+                <frame id="4:387" name="card-5" x="249.33334350585938" y="0" width="112.66667175292969" height="130">
+                  <rounded-rectangle id="4:388" name="img" x="0" y="0" width="112.66667175292969" height="130" />
+                  <frame id="4:389" name="meta-overlay" x="-0.333251953125" y="0" width="112.66667175292969" height="130">
+                    <frame id="4:390" name="badge" x="8" y="8" width="51" height="14">
+                      <text id="4:391" name="rarity" x="6" y="2" width="39" height="10" />
+                    </frame>
+                    <text id="4:392" name="card-name" x="8" y="110" width="96.66667175292969" height="12" />
+                  </frame>
+                </frame>
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="4:393" name="bottom-nav-area" x="0" y="777" width="402" height="97">
+          <frame id="4:394" name="tab-bar" x="0" y="0" width="402" height="72">
+            <frame id="4:395" name="tab-home" x="16" y="0" width="64" height="72">
+              <frame id="4:536" name="home" x="21" y="17" width="22" height="22" />
+              <text id="4:397" name="tab-label" x="17.5" y="43" width="29" height="12" />
+            </frame>
+            <frame id="4:404" name="tab-videos" x="92.5" y="0" width="64" height="72">
+              <frame id="4:545" name="play-circle" x="21" y="17" width="22" height="22" />
+              <text id="4:406" name="tab-label" x="15" y="43" width="34" height="12" />
+            </frame>
+            <frame id="4:398" name="tab-scanner" x="169" y="0" width="64" height="72">
+              <frame id="4:539" name="aperture" x="21" y="17" width="22" height="22" />
+              <text id="4:400" name="tab-label" x="20" y="43" width="24" height="12" />
+            </frame>
+            <frame id="4:401" name="tab-collection" x="245.5" y="0" width="64" height="72">
+              <frame id="4:542" name="layers" x="21" y="17" width="22" height="22" />
+              <text id="4:403" name="tab-label" x="7" y="43" width="50" height="12" />
+            </frame>
+            <frame id="4:407" name="tab-game" x="322" y="0" width="64" height="72">
+              <frame id="4:548" name="gamepad" x="21" y="17" width="22" height="22">
+                <frame id="21:67" name="gamepad" x="-1" y="-3" width="23" height="30" />
+              </frame>
+              <text id="4:409" name="tab-label" x="18" y="43" width="28" height="12" />
+            </frame>
+          </frame>
+          <frame id="4:410" name="home-indicator" x="0" y="72" width="402" height="25">
+            <rounded-rectangle id="4:411" name="indicator-bar" x="134" y="12" width="134" height="5" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <frame id="26:159" name="game-screen" x="2995" y="40" width="402" height="874">
+      <frame id="26:160" name="screen-content-container" x="0" y="0" width="402" height="874">
+        <frame id="26:161" name="status-bar" x="0" y="0" width="402" height="44">
+          <text id="26:162" name="time" x="24" y="13.5" width="30" height="17" />
+          <frame id="26:163" name="status-icons" x="306" y="13" width="72" height="18">
+            <frame id="26:164" name="ios-signal" x="0" y="0" width="18" height="18" />
+            <frame id="26:166" name="ios-wifi-signal" x="24" y="0" width="18" height="18" />
+            <frame id="26:168" name="ios-battery-full" x="48" y="1" width="24" height="16" />
+          </frame>
+        </frame>
+        <frame id="26:170" name="scrollable-body" x="0" y="44" width="402" height="733">
+          <frame id="36:53" name="game-content" x="0" y="0" width="402" height="678">
+            <frame id="36:54" name="game-header" x="20" y="0" width="362" height="25">
+              <text id="36:55" name="FAN ARCADE" x="0" y="0" width="169" height="25" />
+              <frame id="36:56" name="beta-chip" x="267" y="1" width="95" height="23">
+                <text id="36:57" name="PROTOTIPO" x="12" y="6" width="71" height="11" />
+              </frame>
+            </frame>
+            <frame id="36:58" name="game-hud" x="20" y="43" width="362" height="60">
+              <frame id="36:59" name="hud-score" x="0" y="0" width="112.66666412353516" height="60">
+                <text id="36:60" name="SCORE" x="35.33333206176758" y="12" width="42" height="11" />
+                <text id="36:61" name="0" x="47.33333206176758" y="26" width="18" height="22" />
+              </frame>
+              <frame id="36:62" name="hud-streak" x="124.66666412353516" y="0" width="112.66667175292969" height="60">
+                <text id="36:63" name="STREAK" x="31.833335876464844" y="12" width="49" height="11" />
+                <text id="36:64" name="4" x="47.833335876464844" y="26" width="17" height="22" />
+              </frame>
+              <frame id="36:65" name="hud-best" x="249.33334350585938" y="0" width="112.66667175292969" height="60">
+                <text id="36:66" name="BEST" x="40.333335876464844" y="12" width="32" height="11" />
+                <text id="36:67" name="12,400" x="15.333335876464844" y="26" width="82" height="22" />
+              </frame>
+            </frame>
+            <frame id="36:68" name="game-stage-placeholder" x="20" y="121" width="362" height="262">
+              <frame id="36:69" name="stage-icon" x="152.39999389648438" y="32.900001525878906" width="57.20000076293945" height="57.20000076293945">
+                <frame id="36:70" name="gamepad" x="11.914758682250977" y="7.150000095367432" width="33.3704833984375" height="42.900001525878906" />
+              </frame>
+              <text id="36:72" name="ÁREA DE JUEGO" x="102.5" y="104.0999984741211" width="157" height="19" />
+              <text id="36:73" name="Espacio reservado para el minijuego. La mecánica y la temática se definen en la siguiente entrega." x="24" y="137.10000610351562" width="314" height="57" />
+              <frame id="36:74" name="placeholder-tag" x="132.5" y="208.10000610351562" width="97" height="21">
+                <text id="36:75" name="PLACEHOLDER" x="11" y="5" width="75" height="11" />
+              </frame>
+            </frame>
+            <frame id="36:76" name="play-cta" x="20" y="401" width="362" height="60">
+              <text id="36:77" name="JUGAR AHORA" x="104.5" y="20" width="153" height="20" />
+            </frame>
+            <frame id="36:78" name="leaderboard-section" x="20" y="479" width="362" height="199">
+              <text id="36:79" name="WEEKLY LEADERBOARD" x="0" y="0" width="182" height="15" />
+              <frame id="36:80" name="leaderboard-list" x="0" y="27" width="362" height="172">
+                <frame id="36:81" name="lb-1" x="0" y="0" width="362" height="52">
+                  <text id="36:82" name="1" x="14" y="18" width="8" height="16" />
+                  <frame id="36:83" name="lb-avatar" x="34" y="11" width="30" height="30">
+                    <text id="36:84" name="KM" x="6" y="8.5" width="18" height="13" />
+                  </frame>
+                  <text id="36:85" name="Kenji Morales" x="76" y="18" width="206" height="16" />
+                  <text id="36:86" name="18,920" x="294" y="18.5" width="52" height="15" />
+                </frame>
+                <frame id="36:87" name="lb-2" x="0" y="60" width="362" height="52">
+                  <text id="36:88" name="2" x="14" y="18" width="12" height="16" />
+                  <frame id="36:89" name="lb-avatar" x="38" y="11" width="30" height="30">
+                    <text id="36:90" name="SM" x="6" y="8.5" width="18" height="13" />
+                  </frame>
+                  <text id="36:91" name="Tú" x="80" y="18" width="201" height="16" />
+                  <text id="36:92" name="12,400" x="293" y="18.5" width="53" height="15" />
+                </frame>
+                <frame id="36:93" name="lb-3" x="0" y="120" width="362" height="52">
+                  <text id="36:94" name="3" x="14" y="18" width="12" height="16" />
+                  <frame id="36:95" name="lb-avatar" x="38" y="11" width="30" height="30">
+                    <text id="36:96" name="AR" x="7" y="8.5" width="16" height="13" />
+                  </frame>
+                  <text id="36:97" name="Ana Ruiz" x="80" y="18" width="211" height="16" />
+                  <text id="36:98" name="11,150" x="303" y="18.5" width="43" height="15" />
+                </frame>
+              </frame>
+            </frame>
+          </frame>
+        </frame>
+        <frame id="26:240" name="bottom-nav-area" x="0" y="777" width="402" height="97">
+          <frame id="26:241" name="tab-bar" x="0" y="0" width="402" height="72">
+            <frame id="26:242" name="tab-home" x="16" y="0" width="64" height="72">
+              <frame id="26:243" name="home" x="21" y="17" width="22" height="22" />
+              <text id="26:245" name="tab-label" x="17.5" y="43" width="29" height="12" />
+            </frame>
+            <frame id="26:246" name="tab-videos" x="92.5" y="0" width="64" height="72">
+              <frame id="26:247" name="play-circle" x="21" y="17" width="22" height="22" />
+              <text id="26:249" name="tab-label" x="15" y="43" width="34" height="12" />
+            </frame>
+            <frame id="26:250" name="tab-scanner" x="169" y="0" width="64" height="72">
+              <frame id="26:251" name="aperture" x="21" y="17" width="22" height="22" />
+              <text id="26:253" name="tab-label" x="20" y="43" width="24" height="12" />
+            </frame>
+            <frame id="26:254" name="tab-collection" x="245.5" y="0" width="64" height="72">
+              <frame id="26:255" name="layers" x="21" y="17" width="22" height="22" />
+              <text id="26:257" name="tab-label" x="7.5" y="43" width="49" height="12" />
+            </frame>
+            <frame id="26:258" name="tab-game" x="322" y="0" width="64" height="72">
+              <frame id="26:259" name="gamepad" x="21" y="17" width="22" height="22">
+                <frame id="26:260" name="gamepad" x="-1" y="-3" width="23" height="30" />
+              </frame>
+              <text id="26:262" name="tab-label" x="17.5" y="43" width="29" height="12" />
+            </frame>
+          </frame>
+          <frame id="26:263" name="home-indicator" x="0" y="72" width="402" height="25">
+            <rounded-rectangle id="26:264" name="indicator-bar" x="134" y="12" width="134" height="5" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+  </frame>
+  <frame id="4:170" name="ar-hub-screen" x="3028" y="1989" width="402" height="874" hidden="true">
+    <rounded-rectangle id="4:171" name="viewfinder-bg" x="0" y="0" width="402" height="874" />
+    <frame id="4:172" name="screen-overlays" x="0" y="0" width="402" height="874">
+      <frame id="4:173" name="status-bar" x="0" y="0" width="402" height="44">
+        <text id="4:174" name="time" x="24" y="13.5" width="30" height="17" />
+        <frame id="4:175" name="status-icons" x="306" y="13" width="72" height="18">
+          <frame id="4:449" name="ios-signal" x="0" y="0" width="18" height="18" />
+          <frame id="4:452" name="ios-wifi-signal" x="24" y="0" width="18" height="18" />
+          <frame id="4:455" name="ios-battery-full" x="48" y="1" width="24" height="16" />
+        </frame>
+      </frame>
+      <frame id="4:179" name="top-controls" x="0" y="155" width="402" height="40">
+        <frame id="4:180" name="back-ar-btn" x="20" y="0" width="40" height="40">
+          <frame id="4:458" name="arrow-left" x="11" y="11" width="18" height="18" />
+        </frame>
+        <frame id="4:182" name="recording-status" x="258" y="7.5" width="124" height="25">
+          <ellipse id="4:183" name="pulse" x="12" y="8.5" width="8" height="8" />
+          <text id="4:184" name="rec-label" x="26" y="6" width="86" height="13" />
+        </frame>
+      </frame>
+      <frame id="4:185" name="bottom-sheet" x="0" y="306" width="402" height="360">
+        <frame id="4:186" name="sheet-handle" x="24" y="12" width="354" height="4">
+          <rounded-rectangle id="4:187" name="pill" x="157" y="0" width="40" height="4" />
+        </frame>
+        <frame id="4:188" name="mascot-info" x="24" y="36" width="354" height="45">
+          <frame id="4:189" name="team-tag" x="0" y="0" width="267" height="14">
+            <text id="4:190" name="team" x="0" y="0" width="149" height="14" />
+            <ellipse id="4:191" name="sep" x="155" y="5" width="4" height="4" />
+            <text id="4:192" name="category" x="165" y="0.5" width="102" height="13" />
+          </frame>
+          <text id="4:193" name="mascot-name" x="0" y="18" width="354" height="27" />
+        </frame>
+        <frame id="4:194" name="action-dock-grid" x="24" y="101" width="354" height="183">
+          <text id="4:195" name="dock-title" x="0" y="0" width="111" height="13" />
+          <frame id="4:196" name="dock-row-1" x="0" y="25" width="354" height="73">
+            <frame id="4:197" name="dock-Animation" x="0" y="0" width="100" height="73">
+              <frame id="4:198" name="circle-btn" x="23" y="0" width="54" height="54">
+                <frame id="4:461" name="refresh-cw" x="16" y="16" width="22" height="22" />
+              </frame>
+              <text id="4:200" name="label" x="22.5" y="60" width="55" height="13" />
+            </frame>
+            <frame id="4:201" name="dock-Info" x="127" y="0" width="100" height="73">
+              <frame id="4:202" name="circle-btn" x="23" y="0" width="54" height="54">
+                <frame id="4:464" name="info" x="16" y="16" width="22" height="22" />
+              </frame>
+              <text id="4:204" name="label" x="39.5" y="60" width="21" height="13" />
+            </frame>
+            <frame id="4:205" name="dock-Video" x="254" y="0" width="100" height="73">
+              <frame id="4:206" name="circle-btn" x="23" y="0" width="54" height="54">
+                <frame id="4:467" name="video" x="16" y="16" width="22" height="22" />
+              </frame>
+              <text id="4:208" name="label" x="34.5" y="60" width="31" height="13" />
+            </frame>
+          </frame>
+          <frame id="4:209" name="dock-row-2" x="0" y="110" width="354" height="73">
+            <frame id="4:210" name="dock-Effects" x="0" y="0" width="100" height="73">
+              <frame id="4:211" name="circle-btn" x="23" y="0" width="54" height="54">
+                <frame id="4:470" name="sparkles" x="16" y="16" width="22" height="22" />
+              </frame>
+              <text id="4:213" name="label" x="31" y="60" width="38" height="13" />
+            </frame>
+            <frame id="4:214" name="dock-Stats" x="127" y="0" width="100" height="73">
+              <frame id="4:215" name="circle-btn" x="23" y="0" width="54" height="54">
+                <frame id="4:473" name="bar-chart-2" x="16" y="16" width="22" height="22" />
+              </frame>
+              <text id="4:217" name="label" x="36" y="60" width="28" height="13" />
+            </frame>
+            <frame id="4:218" name="dock-Trivia" x="254" y="0" width="100" height="73">
+              <frame id="4:219" name="circle-btn" x="23" y="0" width="54" height="54">
+                <frame id="4:476" name="help-circle" x="16" y="16" width="22" height="22" />
+              </frame>
+              <text id="4:221" name="label" x="35" y="60" width="30" height="13" />
+            </frame>
+          </frame>
+        </frame>
+      </frame>
+      <frame id="5:248" name="bottom-nav-area" x="0" y="777" width="402" height="97">
+        <frame id="5:249" name="tab-bar" x="0" y="0" width="402" height="72">
+          <frame id="5:250" name="tab-home" x="16" y="0" width="64" height="72">
+            <frame id="5:251" name="home" x="21" y="17" width="22" height="22" />
+            <text id="5:253" name="tab-label" x="17.5" y="43" width="29" height="12" />
+          </frame>
+          <frame id="5:254" name="tab-videos" x="92.5" y="0" width="64" height="72">
+            <frame id="5:255" name="play-circle" x="21" y="17" width="22" height="22" />
+            <text id="5:257" name="tab-label" x="15" y="43" width="34" height="12" />
+          </frame>
+          <frame id="5:258" name="tab-scanner" x="169" y="0" width="64" height="72">
+            <frame id="5:259" name="aperture" x="21" y="17" width="22" height="22" />
+            <text id="5:261" name="tab-label" x="20" y="43" width="24" height="12" />
+          </frame>
+          <frame id="5:262" name="tab-collection" x="245.5" y="0" width="64" height="72">
+            <frame id="5:263" name="layers" x="21" y="17" width="22" height="22" />
+            <text id="5:265" name="tab-label" x="7.5" y="43" width="49" height="12" />
+          </frame>
+          <frame id="5:266" name="tab-profile" x="322" y="0" width="64" height="72">
+            <frame id="5:267" name="user" x="21" y="17" width="22" height="22" />
+            <text id="5:269" name="tab-label" x="16.5" y="43" width="31" height="12" />
+          </frame>
+        </frame>
+        <frame id="5:270" name="home-indicator" x="0" y="72" width="402" height="25">
+          <rounded-rectangle id="5:271" name="indicator-bar" x="134" y="12" width="134" height="5" />
+        </frame>
+      </frame>
+    </frame>
+  </frame>
+</canvas>IMPORTANT: After you call this tool, you MUST call get_design_context if trying to implement the design, since this tool only returns metadata. If you do not call get_design_context, the agent will not be able to implement the design.

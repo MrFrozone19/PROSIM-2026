@@ -1,59 +1,102 @@
-# BasedexAr
+# BaseDex Fan — prototipo web AR (Liga Americana)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.23.
+Prototipo navegable en Angular de una app web de realidad aumentada con temática de beisbol de la Liga Americana.
+Proyecto Integrador de **Procesamiento de Imágenes** (LMAD, FCFM-UANL), segunda entrega.
 
-## Development server
+- Programación: Sinuhé Martínez Hernández (1955659)
+- Diseño de ventanas: Ka Hernández Álvarez (1908595)
+- Demo publicada: **https://mrfrozone19.github.io/PROSIM/**
 
-To start a local development server, run:
+## Cómo correrlo
 
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Requisitos: Node 22.12+ o 24 (probado con 24.14) y npm.
 
 ```bash
-ng generate component component-name
+npm install
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Abre http://localhost:4200. El servidor escucha en todas las interfaces (`0.0.0.0`), así que también puedes
+entrar desde otro dispositivo de la misma red.
+
+Build de producción (sale a `docs/`, listo para GitHub Pages):
 
 ```bash
-ng generate --help
+npm run build
 ```
 
-## Building
+## Cómo probarlo desde el celular
 
-To build the project run:
+### Opción A: GitHub Pages (recomendada)
+
+Abre https://mrfrozone19.github.io/PROSIM/ en Safari (iPhone) o Chrome (Android). Es HTTPS, así que la cámara
+funciona. Cada `git push` a `main` republica el contenido de `docs/` en uno o dos minutos.
+
+Para que se sienta como app, agrégala a la pantalla de inicio (Compartir → "Agregar a inicio" en iOS,
+menú ⋮ → "Agregar a pantalla principal" en Android): se abre sin barra de navegador.
+
+### Opción B: servidor local en la misma red
+
+1. Corre `npm start` en la computadora.
+2. En la consola aparece la dirección de red, por ejemplo `http://192.168.1.145:4200/`.
+3. Ábrela desde el celular conectado al mismo Wi-Fi.
+
+**Limitación:** por HTTP la cámara no funciona (ver siguiente sección). Todo lo demás sí.
+
+### Opción C: túnel HTTPS desde la laptop
+
+Si necesitas cámara sin subir a Pages, expón el servidor local con un túnel. Con Cloudflare Tunnel no hace
+falta cuenta ni aparece página intermedia:
 
 ```bash
-ng build
+npx cloudflared tunnel --url http://localhost:4200
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Te imprime una URL `https://….trycloudflare.com` que puedes abrir desde el celular.
 
-## Running unit tests
+## Por qué la cámara necesita HTTPS
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+`navigator.mediaDevices.getUserMedia` solo existe en **contextos seguros**: `https://` o `http://localhost`.
+En cualquier otro origen (por ejemplo `http://192.168.x.x:4200`) el navegador ni siquiera expone la API, y la
+pantalla de escaneo muestra el estado "sin soporte de cámara". Es una política de los navegadores, no un bug
+de la app. El reconocimiento de marcadores con MindAR (siguiente entrega) tiene la misma restricción.
 
-```bash
-ng test
+## Qué es real y qué es simulado
+
+| Función | Estado |
+|---|---|
+| Navegación entre las 7 pantallas, tab bar, transiciones | Real |
+| Cámara trasera en `/scan` (permiso concedido / rechazado / sin soporte) | Real |
+| Reconocimiento de logos o marcadores | **Simulado**: el botón "Simular detección" elige un equipo al azar y pasa a `/ar` |
+| Modelo 3D anclado en `/ar` | **Placeholder**: logo holográfico animado, marcado en pantalla |
+| Dock de `/ar`: Animation, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos); los datos son de relleno |
+| Narración por voz en el panel Info | Real, con la síntesis de voz del navegador (`speechSynthesis`) |
+| Reproductor de `/videos` y sus 5 filtros | Real. Pixelate y Thermal se procesan en `<canvas>`; Pastel, Blur y Color Adjust con filtros CSS y capas de mezcla |
+| Clips de video | Generados en el proyecto con ffmpeg a partir del arte del diseño (sin derechos de terceros) |
+| Colección de cartas, trofeos, insignias, perfil, leaderboard | Datos de relleno tipados en `src/app/data/` |
+| Minijuego en `/game` | **Placeholder** explícito; "Jugar ahora" muestra "próximamente" |
+| Login, backend, base de datos | No existen |
+
+Filtros de video permitidos por la rúbrica e implementados: desenfoque, pixelado, cámara térmica, ajuste de
+color y pastel (personalizado). **No** se implementan blanco y negro, escala de grises, sepia, exposición ni
+colores invertidos.
+
+## Estructura
+
+```
+src/app/
+  screens/   home, scan, ar, videos, vault, game, profile (un componente standalone por pantalla)
+  shared/    screen-shell, tab-bar, icon (Lucide inline), section-title, stat-card, pill, toast, feedback
+  data/      teams, videos, cards, trophies, standings (+trivia), game, profile
+src/assets/  figma/ (imágenes optimizadas a WebP), video/ (clips MP4)
+design/raw/  respuestas crudas del MCP de Figma, una por pantalla, más el listado de assets
+docs/        build de producción (GitHub Pages)
 ```
 
-## Running end-to-end tests
+Rutas con hash (`/#/home`, `/#/scan`, …) para que cualquier recarga o enlace directo funcione en GitHub Pages.
 
-For end-to-end (e2e) testing, run:
+## Sistema de diseño
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Tokens en `tailwind.config.js`: `ink` #0c0c12, `surface` #141420, `muted` #9090a8, `pink` #f72585,
+`purple` #9d4edd, `line` rgba(255,255,255,.08), gradiente `cta`. Tipografías Unbounded (títulos) e Inter (UI)
+desde Google Fonts. Iconos Lucide de trazo 2px generados inline desde el paquete `lucide`.

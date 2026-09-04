@@ -1,14 +1,15 @@
 import { Component, input } from '@angular/core';
 import { TabBar } from './tab-bar';
+import { ToastHost } from './toast';
 
 /**
- * Contenedor de pantalla: fondo, safe areas, scroll del cuerpo y tab bar fija.
- * - `tabs=false` oculta la tab bar (pantallas AR).
+ * Contenedor de pantalla: fondo, safe areas, scroll del cuerpo, tab bar fija y toasts.
+ * - `tabs=false` oculta la tab bar.
  * - `padded=false` quita el padding lateral para contenido a sangre (cámara).
  */
 @Component({
   selector: 'app-screen-shell',
-  imports: [TabBar],
+  imports: [TabBar, ToastHost],
   template: `
     <div class="screen-in relative flex h-dvh flex-col bg-ink text-white">
       <main
@@ -23,6 +24,7 @@ import { TabBar } from './tab-bar';
       @if (tabs()) {
         <app-tab-bar />
       }
+      <app-toast />
     </div>
   `,
 })
