@@ -67,7 +67,7 @@ button {
   }
 }
 .screen-in {
-  animation: screen-in 180ms ease-out both;
+  animation: screen-in 180ms ease-out;
 }
 
 @layer utilities {
