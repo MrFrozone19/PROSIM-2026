@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #0c0c12;
+  --surface: #141420;
+  --muted: #9090a8;
+  --pink: #f72585;
+  --purple: #9d4edd;
+  --border: rgba(255, 255, 255, 0.08);
+  --cta: linear-gradient(90deg, #9d4edd, #f72585);
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--ink);
+  color: #fff;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+  overflow: hidden;
+}
+
+body {
+  height: 100dvh;
+}
+
+app-root {
+  display: block;
+  height: 100dvh;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Transición corta entre rutas (View Transitions API; se ignora donde no exista). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease-out;
+}
+
+@layer utilities {
+  .pressable {
+    transition: transform 120ms ease, opacity 120ms ease;
+  }
+  .pressable:active {
+    transform: scale(0.96);
+    opacity: 0.85;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .text-gradient {
+    background: var(--cta);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
