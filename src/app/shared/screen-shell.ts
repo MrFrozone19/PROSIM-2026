@@ -10,7 +10,7 @@ import { TabBar } from './tab-bar';
   selector: 'app-screen-shell',
   imports: [TabBar],
   template: `
-    <div class="relative flex h-dvh flex-col bg-ink text-white">
+    <div class="screen-in relative flex h-dvh flex-col bg-ink text-white">
       <main
         class="flex-1 overflow-y-auto overscroll-none pt-safe-top"
         [class.px-5]="padded()"
