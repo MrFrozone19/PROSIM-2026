@@ -25,7 +25,7 @@ npm run build
 
 ### Opción A: GitHub Pages (recomendada)
 
-Abre https://mrfrozone19.github.io/PROSIM/ en Safari (iPhone) o Chrome (Android). Es HTTPS, así que la cámara
+Abre https://mrfrozone19.github.io/PROSIM-2026/ en Safari (iPhone) o Chrome (Android). Es HTTPS, así que la cámara
 funciona. Cada `git push` a `main` republica el contenido de `docs/` en uno o dos minutos.
 
 Para que se sienta como app, agrégala a la pantalla de inicio (Compartir → "Agregar a inicio" en iOS,
@@ -50,22 +50,46 @@ npx cloudflared tunnel --url http://localhost:4200
 
 Te imprime una URL `https://….trycloudflare.com` que puedes abrir desde el celular.
 
+## Cómo probar el escaneo
+
+1. Abre en otra pantalla (o imprime) una de las imágenes de `design/targets/`: `nyy-navy.png` o `nyy-white.png`.
+2. Entra a la pestaña **Scan** y concede el permiso de cámara. Espera a que el indicador diga `SCANNER ACTIVE`
+   (la primera vez tarda unos segundos: descarga el motor de seguimiento, ~400 kB comprimido).
+3. Apunta al logo de frente, que ocupe buena parte del cuadro y sin reflejos. Al reconocerlo aparece la gorra
+   anclada y el indicador cambia a `TARGET LOCKED`.
+4. Desliza un dedo para girar el modelo, pellizca para escalarlo, y usa **Stop / Animate** para detener o
+   reanudar su animación.
+
+Un logo plano de dos colores da pocos puntos de referencia (~70 en la escala mayor), así que el seguimiento es
+sensible a la distancia y a la luz. Funciona mejor con el logo grande y nítido; bordado en una gorra real es poco
+probable que lo reconozca.
+
+### Agregar o cambiar marcadores
+
+1. Pon la imagen en `design/targets/` y agrégala a `design/targets/targets.json` (el orden define el índice).
+2. `npm run targets` recompila `src/assets/targets/targets.mind` (abre Chrome o Edge sin ventana, porque el
+   compilador de MindAR solo corre en navegador) e imprime cuántos puntos de referencia tiene cada imagen.
+3. Refleja el mismo orden en `src/app/data/targets.ts`, con el equipo y el modelo `.glb` de cada índice.
+
 ## Por qué la cámara necesita HTTPS
 
 `navigator.mediaDevices.getUserMedia` solo existe en **contextos seguros**: `https://` o `http://localhost`.
 En cualquier otro origen (por ejemplo `http://192.168.x.x:4200`) el navegador ni siquiera expone la API, y la
 pantalla de escaneo muestra el estado "sin soporte de cámara". Es una política de los navegadores, no un bug
-de la app. El reconocimiento de marcadores con MindAR (siguiente entrega) tiene la misma restricción.
+de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores tiene la misma restricción.
 
 ## Qué es real y qué es simulado
 
 | Función | Estado |
 |---|---|
 | Navegación entre las 7 pantallas, tab bar, transiciones | Real |
-| Cámara trasera en `/scan` (permiso concedido / rechazado / sin soporte) | Real |
-| Reconocimiento de logos o marcadores | **Simulado**: el botón "Simular detección" elige un equipo al azar y pasa a `/ar` |
-| Modelo 3D anclado en `/ar` | **Placeholder**: logo holográfico animado, marcado en pantalla |
-| Dock de `/ar`: Animation, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos); los datos son de relleno |
+| Cámara trasera en `/scan` (permiso concedido / rechazado / sin soporte / error de carga) | Real |
+| Reconocimiento de marcadores en `/scan` | **Real** con MindAR (image tracking). Por ahora un equipo: el logo "NY" de los Yankees, en sus dos versiones (blanco sobre azul y azul sobre blanco) |
+| Modelo 3D anclado al marcador | **Real** con three.js. El modelo es de prueba (gorra generada por `npm run model`) mientras llegan los de Diseño de ventanas |
+| Interacción con el modelo | Real: un dedo lo gira, dos dedos lo escalan; el botón Animate/Stop reanuda o detiene su animación; Info lo hace girar 360° |
+| Modo libre | Real: si el logo sale de cuadro, el modelo queda flotando frente a la cámara para seguir interactuando; la flecha vuelve a escanear |
+| Dock de la ventana AR: Animate/Stop, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos); los datos son de relleno |
+| `/ar` y el botón "Simular detección" | Respaldo sin cámara: el botón solo aparece si la cámara no está disponible o con `/#/scan?sim=1`, y abre la ventana AR con un logo holográfico en lugar del modelo |
 | Narración por voz en el panel Info | Real, con la síntesis de voz del navegador (`speechSynthesis`) |
 | Reproductor de `/videos` y sus 5 filtros | Real. Pixelate y Thermal se procesan en `<canvas>`; Pastel, Blur y Color Adjust con filtros CSS y capas de mezcla |
 | Clips de video | Generados en el proyecto con ffmpeg a partir del arte del diseño (sin derechos de terceros) |
@@ -82,10 +106,15 @@ colores invertidos.
 ```
 src/app/
   screens/   home, scan, ar, videos, vault, game, profile (un componente standalone por pantalla)
+             ar/ar-hud es la capa de controles de la ventana AR, compartida por /scan y /ar
+  ar/        ar-engine: MindAR + escena three.js (anclas, modelos, gestos, animación, modo libre)
   shared/    screen-shell, tab-bar, icon (Lucide inline), section-title, stat-card, pill, toast, feedback
-  data/      teams, videos, cards, trophies, standings (+trivia), game, profile
-src/assets/  figma/ (imágenes optimizadas a WebP), video/ (clips MP4)
+  data/      teams, targets, videos, cards, trophies, standings (+trivia), game, profile
+src/assets/  figma/ (imágenes optimizadas a WebP), video/ (clips MP4), targets/ (.mind), models/ (.glb)
+src/vendor/  mind-ar/: MindAR 1.2.5 ya empaquetado (ver su README)
+scripts/     compile-targets (npm run targets), make-cap (npm run model), download-assets (npm run assets)
 design/raw/  respuestas crudas del MCP de Figma, una por pantalla, más el listado de assets
+design/targets/  imágenes detonadoras y su manifiesto
 docs/        build de producción (GitHub Pages)
 ```
 
@@ -96,3 +125,11 @@ Rutas con hash (`/#/home`, `/#/scan`, …) para que cualquier recarga o enlace d
 Tokens en `tailwind.config.js`: `ink` #0c0c12, `surface` #141420, `muted` #9090a8, `pink` #f72585,
 `purple` #9d4edd, `line` rgba(255,255,255,.08), gradiente `cta`. Tipografías Unbounded (títulos) e Inter (UI)
 desde Google Fonts. Iconos Lucide de trazo 2px generados inline desde el paquete `lucide`.
+
+## Créditos de terceros
+
+- [MindAR](https://github.com/hiukim/mind-ar-js) 1.2.5 (MIT) para el seguimiento de imágenes, copiado en `src/vendor/mind-ar/`.
+- [three.js](https://threejs.org) (MIT) para la escena 3D y la carga de glTF.
+- Logo "NY" de los New York Yankees: marca registrada de su titular, usada solo como imagen detonadora con fines
+  académicos. Archivo tomado de [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:NewYorkYankees_caplogo.svg).
+- La gorra de prueba (`cap.glb`) es un modelo propio generado con `scripts/make-cap.mjs`.

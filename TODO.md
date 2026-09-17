@@ -1,14 +1,17 @@
 # Pendiente para la tercera entrega
 
 ## Reconocimiento de marcadores (prioridad 1)
-- [ ] Integrar MindAR (image tracking) con A-Frame o three.js en `/scan`, reutilizando el `<video>` de la cámara ya implementado.
-- [ ] Compilar los logos de al menos 3 equipos como targets (`.mind`) y guardarlos en `src/assets/targets/`.
-- [ ] Sustituir el botón "Simular detección" por el evento `targetFound` → navegar a `/ar?team=…`; `targetLost` → regresar al estado de escaneo sin cerrar la sesión.
-- [ ] Mantener el botón de simulación solo en desarrollo (query `?sim=1`) para demos sin marcador físico.
+- [x] Integrar MindAR (image tracking) con three.js en `/scan`.
+- [x] Primer marcador: logo NY de los Yankees (dos variantes) compilado en `src/assets/targets/targets.mind`.
+- [x] Sustituir la detección simulada por `targetFound` / `targetLost` (al perderse pasa a modo libre, sin cerrar la sesión).
+- [x] Dejar la simulación solo como respaldo (`?sim=1` o cámara no disponible).
+- [ ] Llegar a mínimo 3 equipos escaneables, cada uno con contenido propio (la segunda entrega pide 2; la final, 3).
+- [ ] Probar el logo NY con marcador físico impreso; si el seguimiento es inestable, usar como detonador una imagen con más textura (tarjeta del equipo con el logo).
 
 ## Modelos 3D
-- [ ] Reemplazar el logo holográfico de `/ar` por el modelo glTF/GLB de la mascota (Diseño de ventanas), optimizado (< 2 MB, texturas comprimidas).
-- [ ] Conectar los botones del dock a animaciones reales del modelo (celebración, bateo, saludo) y a la rotación 360° del panel Info.
+- [x] Modelo glTF anclado al marcador, con rotación y escala táctil, botón para detener/reanudar la animación y giro 360° en Info.
+- [ ] Reemplazar la gorra de prueba por los modelos glTF/GLB de Diseño de ventanas, optimizados (< 2 MB, texturas comprimidas). El motor ya reproduce los clips que traiga el archivo.
+- [ ] Elegir qué clip dispara cada botón cuando el modelo traiga varios (celebración, bateo, saludo); hoy se reproducen todos a la vez.
 - [ ] Efectos: partículas y banner sobre la escena 3D en lugar de la capa 2D actual.
 
 ## Contenido

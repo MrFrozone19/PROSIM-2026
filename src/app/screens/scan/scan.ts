@@ -1,150 +1,154 @@
 import { Location } from '@angular/common';
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnDestroy,
-  inject,
-  signal,
-  viewChild,
-} from '@angular/core';
-import { Router } from '@angular/router';
+import { AfterViewInit, Component, ElementRef, OnDestroy, computed, inject, signal, viewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ScreenShell } from '../../shared/screen-shell';
 import { Icon } from '../../shared/icon';
 import { Feedback } from '../../shared/feedback';
-import { TEAMS } from '../../data/teams';
+import { TEAM_BY_ID, TEAMS, Team } from '../../data/teams';
+import { AR_TARGETS, TARGETS_SRC } from '../../data/targets';
+import { ArEngine, CameraError } from '../../ar/ar-engine';
+import { ArHud } from '../ar/ar-hud';
 
-type CameraState = 'requesting' | 'granted' | 'denied' | 'unsupported';
+type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
 
 /**
- * /scan — cámara real (getUserMedia, cámara trasera) detrás del marco guía.
- * El reconocimiento de imágenes NO está implementado: el botón "Simular detección" navega a /ar.
+ * /scan — escáner y ventana AR en una sola vista.
+ * MindAR abre la cámara trasera y busca las imágenes detonadoras; al reconocer un logo aparece su modelo 3D
+ * anclado y se muestran los controles de la ventana AR. Si el logo sale de cuadro, el modelo queda flotando
+ * frente a la cámara ("modo libre") para seguir interactuando; la flecha regresa a escanear.
  */
 @Component({
   selector: 'app-scan-screen',
-  imports: [ScreenShell, Icon],
+  imports: [ScreenShell, Icon, ArHud],
   template: `
     <app-screen-shell [padded]="false">
       <div class="relative h-full min-h-full w-full overflow-hidden bg-ink">
-        <!-- viewfinder: video en vivo o imagen de respaldo -->
-        <video
-          #cam
-          class="absolute inset-0 h-full w-full object-cover"
-          [class.hidden]="state() !== 'granted'"
-          autoplay
-          muted
-          playsinline
-        ></video>
-        @if (state() !== 'granted') {
+        <!-- aquí MindAR monta el video de la cámara y el canvas de three.js -->
+        <div #stage class="ar-stage absolute inset-0 overflow-hidden"></div>
+
+        @if (state() !== 'scanning') {
           <img
             src="assets/figma/viewfinder-bg.webp"
-            class="absolute inset-0 h-full w-full object-cover"
+            class="pointer-events-none absolute inset-0 h-full w-full object-cover"
             style="object-position: 55% 40%"
             alt=""
           />
         }
-        <!-- overlay oscuro + cuadrícula -->
-        <div
-          class="absolute inset-0 transition-colors duration-300"
-          [class.bg-black/45]="state() !== 'granted'"
-          [class.bg-black/25]="state() === 'granted'"
-        ></div>
-        <div
-          class="pointer-events-none absolute inset-0 opacity-60"
-          style="background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 40px 40px;"
-        ></div>
 
-        <!-- contenido -->
-        <div class="relative flex h-full flex-col items-center justify-between px-6 pb-5 pt-5">
-          <!-- scanner-top-bar -->
-          <div class="flex w-full items-center justify-between">
-            <div
-              class="flex items-center gap-2 rounded-row border px-3 py-1.5 transition-colors"
-              [class]="
-                locked()
-                  ? 'border-pink bg-pink/25'
-                  : 'border-line bg-black/60'
-              "
-            >
-              <span
-                class="h-2 w-2 rounded-full"
-                [class]="locked() ? 'bg-pink' : 'animate-pulse bg-[#2ee6c5] shadow-[0_0_6px_#2ee6c5]'"
-              ></span>
-              <span class="font-sans text-[12px] font-bold leading-normal text-white">{{
-                locked() ? 'TARGET LOCKED' : 'SCANNER ACTIVE'
-              }}</span>
-            </div>
-            <button
-              type="button"
-              (click)="close()"
-              class="pressable flex h-10 w-10 items-center justify-center rounded-full border border-line bg-black/60 text-white"
-              aria-label="Cerrar escáner"
-            >
-              <app-icon name="X" [size]="18" />
-            </button>
-          </div>
+        @if (team(); as t) {
+          <div class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/60 to-transparent"></div>
+          <app-ar-hud
+            [team]="t"
+            [animating]="animating()"
+            [status]="tracking() ? 'TARGET LOCKED' : 'AR HUB ACTIVE'"
+            [hint]="tracking() ? 'Desliza para girar · pellizca para escalar' : 'Modo libre · apunta al logo para anclarlo'"
+            (back)="rescan()"
+            (animationToggle)="toggleAnimation()"
+            (infoOpened)="engine?.spin()"
+            (panelChange)="engine?.setPanelOpen($event)"
+          />
+        } @else {
+          <!-- overlay oscuro + cuadrícula -->
+          <div
+            class="pointer-events-none absolute inset-0 transition-colors duration-300"
+            [class.bg-black/45]="state() !== 'scanning'"
+            [class.bg-black/25]="state() === 'scanning'"
+          ></div>
+          <div
+            class="pointer-events-none absolute inset-0 opacity-60"
+            style="background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 40px 40px;"
+          ></div>
 
-          <!-- scanner-reticle -->
-          <div class="relative h-[260px] w-[260px] max-w-full">
-            <span class="reticle-corner left-0 top-0 rounded-tl-sm border-l-2 border-t-2"></span>
-            <span class="reticle-corner right-0 top-0 rounded-tr-sm border-r-2 border-t-2"></span>
-            <span class="reticle-corner bottom-0 left-0 rounded-bl-sm border-b-2 border-l-2"></span>
-            <span class="reticle-corner bottom-0 right-0 rounded-br-sm border-b-2 border-r-2"></span>
-            @if (locked()) {
-              <div class="absolute inset-0 flex items-center justify-center">
-                <img [src]="lockedTeam().logo" class="h-24 w-24 animate-ping-slow rounded-full opacity-90" alt="" />
+          <div class="relative flex h-full flex-col items-center justify-between px-6 pb-5 pt-5">
+            <!-- scanner-top-bar -->
+            <div class="flex w-full items-center justify-between">
+              <div class="flex items-center gap-2 rounded-row border border-line bg-black/60 px-3 py-1.5">
+                <span
+                  class="h-2 w-2 rounded-full"
+                  [class]="state() === 'scanning' ? 'animate-pulse bg-[#2ee6c5] shadow-[0_0_6px_#2ee6c5]' : 'bg-muted'"
+                ></span>
+                <span class="font-sans text-[12px] font-bold leading-normal text-white">{{ statusLabel() }}</span>
               </div>
-            }
-            @if (state() === 'denied' || state() === 'unsupported') {
-              <div
-                class="absolute inset-3 flex flex-col items-center justify-center gap-2 rounded-card-sm border border-line bg-surface/90 p-4 text-center"
+              <button
+                type="button"
+                (click)="close()"
+                class="pressable flex h-10 w-10 items-center justify-center rounded-full border border-line bg-black/60 text-white"
+                aria-label="Cerrar escáner"
               >
-                <app-icon name="CameraOff" [size]="28" class="text-pink" />
-                @if (state() === 'denied') {
-                  <p class="font-display text-[12px] font-bold text-white">CÁMARA BLOQUEADA</p>
-                  <p class="font-sans text-[11px] leading-snug text-muted">
-                    La experiencia AR necesita la cámara para reconocer los logos.
-                  </p>
-                  <button
-                    type="button"
-                    (click)="retry()"
-                    class="pressable mt-1 rounded-pill bg-cta px-4 py-2 font-sans text-[12px] font-bold text-white"
-                  >
-                    Reintentar
-                  </button>
-                } @else {
-                  <p class="font-display text-[12px] font-bold text-white">SIN SOPORTE DE CÁMARA</p>
-                  <p class="font-sans text-[11px] leading-snug text-muted">
-                    Este navegador no expone la cámara. Abre la app por HTTPS en Safari o Chrome.
-                  </p>
-                }
-              </div>
-            }
-          </div>
-
-          <!-- instructional-overlay + simulación -->
-          <div class="flex w-full flex-col items-center gap-2 px-4">
-            <p class="text-center font-display text-[14px] font-bold leading-normal text-white">
-              {{ locked() ? lockedTeam().city.toUpperCase() + ' ' + lockedTeam().name.toUpperCase() : 'POINT AT A TEAM LOGO' }}
-            </p>
-            <p class="text-center font-sans text-[12px] leading-normal text-muted">
-              {{ locked() ? 'Loading AR experience…' : 'Scanning for AR stadium triggers...' }}
-            </p>
-            <div class="h-1 w-[140px] overflow-hidden rounded-sm bg-white/[0.13]">
-              <div class="loader-fill h-full w-20 rounded-sm bg-pink"></div>
+                <app-icon name="X" [size]="18" />
+              </button>
             </div>
-            <button
-              type="button"
-              (click)="simulate()"
-              [disabled]="locked()"
-              class="pressable mt-3 flex min-h-[44px] items-center gap-2 rounded-pill border border-pink/70 bg-black/60 px-5 font-display text-[11px] font-bold tracking-wide text-white disabled:opacity-60"
-            >
-              <app-icon name="ScanLine" [size]="16" class="text-pink" />
-              SIMULAR DETECCIÓN
-            </button>
-            <p class="font-sans text-[10px] text-muted/80">Prototipo: el reconocimiento real llega en la siguiente entrega</p>
+
+            <!-- scanner-reticle -->
+            <div class="relative h-[260px] w-[260px] max-w-full">
+              <span class="reticle-corner left-0 top-0 rounded-tl-sm border-l-2 border-t-2"></span>
+              <span class="reticle-corner right-0 top-0 rounded-tr-sm border-r-2 border-t-2"></span>
+              <span class="reticle-corner bottom-0 left-0 rounded-bl-sm border-b-2 border-l-2"></span>
+              <span class="reticle-corner bottom-0 right-0 rounded-br-sm border-b-2 border-r-2"></span>
+              @if (state() === 'scanning') {
+                <span class="scan-line absolute inset-x-3 h-0.5 rounded-full bg-pink shadow-[0_0_10px_#f72585]"></span>
+              }
+              @if (state() === 'denied' || state() === 'unsupported' || state() === 'error') {
+                <div
+                  class="absolute inset-3 flex flex-col items-center justify-center gap-2 rounded-card-sm border border-line bg-surface/90 p-4 text-center"
+                >
+                  <app-icon name="CameraOff" [size]="28" class="text-pink" />
+                  @switch (state()) {
+                    @case ('denied') {
+                      <p class="font-display text-[12px] font-bold text-white">CÁMARA BLOQUEADA</p>
+                      <p class="font-sans text-[11px] leading-snug text-muted">
+                        La experiencia AR necesita la cámara para reconocer los logos.
+                      </p>
+                    }
+                    @case ('unsupported') {
+                      <p class="font-display text-[12px] font-bold text-white">SIN SOPORTE DE CÁMARA</p>
+                      <p class="font-sans text-[11px] leading-snug text-muted">
+                        Este navegador no expone la cámara. Abre la app por HTTPS en Safari o Chrome.
+                      </p>
+                    }
+                    @default {
+                      <p class="font-display text-[12px] font-bold text-white">NO SE PUDO INICIAR EL AR</p>
+                      <p class="font-sans text-[11px] leading-snug text-muted">{{ errorDetail() }}</p>
+                    }
+                  }
+                  @if (state() !== 'unsupported') {
+                    <button
+                      type="button"
+                      (click)="retry()"
+                      class="pressable mt-1 rounded-pill bg-cta px-4 py-2 font-sans text-[12px] font-bold text-white"
+                    >
+                      Reintentar
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- instructional-overlay -->
+            <div class="flex w-full flex-col items-center gap-2 px-4">
+              <p class="text-center font-display text-[14px] font-bold leading-normal text-white">
+                {{ state() === 'loading' ? 'STARTING AR ENGINE' : 'POINT AT A TEAM LOGO' }}
+              </p>
+              <p class="text-center font-sans text-[12px] leading-normal text-muted">
+                {{ state() === 'loading' ? 'Loading camera, targets and 3D models…' : 'Scanning for AR stadium triggers...' }}
+              </p>
+              <div class="h-1 w-[140px] overflow-hidden rounded-sm bg-white/[0.13]">
+                <div class="loader-fill h-full w-20 rounded-sm bg-pink"></div>
+              </div>
+              <p class="mt-1 text-center font-sans text-[10px] text-muted/80">Marcadores activos: {{ activeTeams }}</p>
+              @if (canSimulate()) {
+                <button
+                  type="button"
+                  (click)="simulate()"
+                  class="pressable mt-2 flex min-h-[44px] items-center gap-2 rounded-pill border border-pink/70 bg-black/60 px-5 font-display text-[11px] font-bold tracking-wide text-white"
+                >
+                  <app-icon name="ScanLine" [size]="16" class="text-pink" />
+                  SIMULAR DETECCIÓN
+                </button>
+              }
+            </div>
           </div>
-        </div>
+        }
       </div>
     </app-screen-shell>
   `,
@@ -166,40 +170,61 @@ type CameraState = 'requesting' | 'granted' | 'denied' | 'unsupported';
         transform: translateX(175%);
       }
     }
-    .animate-ping-slow {
-      animation: ping-slow 0.9s ease-out infinite;
+    .scan-line {
+      animation: sweep 2.2s ease-in-out infinite alternate;
     }
-    @keyframes ping-slow {
-      0% {
-        transform: scale(0.9);
-        filter: drop-shadow(0 0 0 #f72585);
+    @keyframes sweep {
+      from {
+        top: 6%;
       }
-      100% {
-        transform: scale(1.05);
-        filter: drop-shadow(0 0 14px #f72585);
+      to {
+        top: 94%;
       }
     }
   `,
 })
 export class ScanScreen implements AfterViewInit, OnDestroy {
-  private readonly cam = viewChild.required<ElementRef<HTMLVideoElement>>('cam');
+  private readonly stage = viewChild.required<ElementRef<HTMLDivElement>>('stage');
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
   private readonly fb = inject(Feedback);
-  private stream?: MediaStream;
-  private timer?: ReturnType<typeof setTimeout>;
+  private destroyed = false;
 
-  protected readonly state = signal<CameraState>('requesting');
-  protected readonly locked = signal(false);
-  protected readonly lockedTeam = signal(TEAMS[3]);
+  protected engine?: ArEngine;
+  protected readonly state = signal<ScanState>('loading');
+  protected readonly errorDetail = signal('');
+  /** Equipo cuyo modelo está en pantalla; null mientras se sigue escaneando. */
+  protected readonly team = signal<Team | null>(null);
+  /** El marcador está a la vista (modelo anclado) o se perdió (modo libre). */
+  protected readonly tracking = signal(false);
+  protected readonly animating = signal(true);
+
+  protected readonly activeTeams = [...new Set(AR_TARGETS.map((t) => TEAM_BY_ID[t.teamId]?.name ?? t.teamId))].join(', ');
+
+  protected readonly statusLabel = computed(() => {
+    switch (this.state()) {
+      case 'loading':
+        return 'STARTING…';
+      case 'scanning':
+        return 'SCANNER ACTIVE';
+      default:
+        return 'SCANNER OFFLINE';
+    }
+  });
+
+  /** La detección simulada queda como respaldo: sin cámara disponible, o a petición con ?sim=1. */
+  protected readonly canSimulate = computed(
+    () => this.state() !== 'loading' && (this.state() !== 'scanning' || this.route.snapshot.queryParamMap.has('sim')),
+  );
 
   ngAfterViewInit(): void {
     void this.start();
   }
 
   ngOnDestroy(): void {
-    this.stop();
-    clearTimeout(this.timer);
+    this.destroyed = true;
+    this.engine?.stop();
   }
 
   protected retry(): void {
@@ -212,39 +237,67 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
     this.location.back();
   }
 
-  /** Detección falsa: elige un equipo con logo y navega a /ar tras una breve confirmación visual. */
+  /** Flecha de la ventana AR: suelta el modelo y vuelve a buscar marcadores. */
+  protected rescan(): void {
+    this.fb.tap();
+    this.engine?.reset();
+    this.engine?.setPanelOpen(false);
+    this.team.set(null);
+    this.tracking.set(false);
+  }
+
+  protected toggleAnimation(): void {
+    const on = !this.animating();
+    this.animating.set(on);
+    this.engine?.setAnimating(on);
+  }
+
+  /** Detección falsa: elige un equipo con logo y abre la ventana AR sin cámara. */
   protected simulate(): void {
     const withLogo = TEAMS.filter((t) => t.logo);
     const team = withLogo[Math.floor(Math.random() * withLogo.length)];
-    this.lockedTeam.set(team);
-    this.locked.set(true);
     this.fb.success();
-    this.timer = setTimeout(() => void this.router.navigate(['/ar'], { queryParams: { team: team.id } }), 900);
+    void this.router.navigate(['/ar'], { queryParams: { team: team.id } });
   }
 
   private async start(): Promise<void> {
-    this.stop();
+    this.engine?.stop();
+    this.engine = undefined;
+    this.team.set(null);
+    this.tracking.set(false);
     if (!navigator.mediaDevices?.getUserMedia) {
       this.state.set('unsupported');
       return;
     }
-    this.state.set('requesting');
-    try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
-        audio: false,
-      });
-      const video = this.cam().nativeElement;
-      video.srcObject = this.stream;
-      await video.play().catch(() => undefined);
-      this.state.set('granted');
-    } catch {
-      this.state.set('denied');
-    }
-  }
+    this.state.set('loading');
 
-  private stop(): void {
-    this.stream?.getTracks().forEach((t) => t.stop());
-    this.stream = undefined;
+    const engine = new ArEngine({
+      container: this.stage().nativeElement,
+      targetsSrc: TARGETS_SRC,
+      targets: AR_TARGETS.map((t) => ({ index: t.index, key: t.teamId, model: t.model })),
+      onFound: (teamId) => {
+        if (!this.team()) this.fb.success();
+        this.team.set(TEAM_BY_ID[teamId]);
+        this.tracking.set(true);
+      },
+      onLost: () => this.tracking.set(false),
+    });
+    this.engine = engine;
+    engine.setAnimating(this.animating());
+
+    try {
+      await engine.start();
+      if (!this.destroyed && this.engine === engine) this.state.set('scanning');
+    } catch (e) {
+      if (this.destroyed || this.engine !== engine) return;
+      engine.stop();
+      this.engine = undefined;
+      if (e instanceof CameraError) this.state.set('denied');
+      else {
+        console.error(e);
+        this.errorDetail.set(e instanceof Error ? e.message : 'Error desconocido');
+        this.state.set('error');
+      }
+    }
   }
 }

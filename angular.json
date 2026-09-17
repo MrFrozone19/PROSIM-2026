@@ -36,7 +36,8 @@
               "base": "docs",
               "browser": ""
             },
-            "baseHref": "./"
+            "baseHref": "./",
+            "externalDependencies": ["node-fetch", "util", "string_decoder", "fs", "path", "crypto", "worker_threads", "perf_hooks", "os"]
           },
           "configurations": {
             "production": {

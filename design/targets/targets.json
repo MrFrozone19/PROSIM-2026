@@ -1,0 +1,4 @@
+[
+  { "team": "nyy", "file": "nyy-navy.png" },
+  { "team": "nyy", "file": "nyy-white.png", "swapFrom": "nyy-navy.png" }
+]
