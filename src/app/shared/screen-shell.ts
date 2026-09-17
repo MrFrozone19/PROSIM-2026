@@ -16,7 +16,9 @@ import { ToastHost } from './toast';
         class="flex-1 overflow-y-auto overscroll-none pt-safe-top"
         [class.px-5]="padded()"
         [style.padding-bottom]="
-          tabs() ? 'calc(72px + env(safe-area-inset-bottom) + 20px)' : 'env(safe-area-inset-bottom)'
+          tabs()
+            ? 'calc(72px + env(safe-area-inset-bottom) + ' + (padded() ? '20px' : '0px') + ')'
+            : 'env(safe-area-inset-bottom)'
         "
       >
         <ng-content />

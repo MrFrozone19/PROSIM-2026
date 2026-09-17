@@ -70,6 +70,14 @@ button {
   animation: screen-in 180ms ease-out;
 }
 
+/* Contenedor donde MindAR monta el <video> de la cámara y el canvas de three.js (elementos creados fuera de Angular). */
+.ar-stage {
+  isolation: isolate; /* el video lleva z-index negativo */
+}
+.ar-stage video {
+  max-width: none; /* el reset de Tailwind lo limita a 100% y MindAR lo dimensiona para cubrir la pantalla */
+}
+
 @layer utilities {
   .pressable {
     transition: transform 120ms ease, opacity 120ms ease;
