@@ -3,10 +3,6 @@
 Prototipo navegable en Angular de una app web de realidad aumentada con temática de beisbol de la Liga Americana.
 Proyecto Integrador de **Procesamiento de Imágenes** (LMAD, FCFM-UANL), segunda entrega.
 
-- Programación: Sinuhé Martínez Hernández (1955659)
-- Diseño de ventanas: Ka Hernández Álvarez (1908595)
-- Demo publicada: **https://mrfrozone19.github.io/PROSIM/**
-
 ## Cómo correrlo
 
 Requisitos: Node 22.12+ o 24 (probado con 24.14) y npm.
