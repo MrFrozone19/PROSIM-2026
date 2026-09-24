@@ -22,6 +22,13 @@ export class Feedback {
     this.vibrate([10, 40, 12]);
   }
 
+  /** Obturador de cámara: dos clics secos. */
+  shutter(): void {
+    this.play(1400, 0.03, 'square', 0.05);
+    setTimeout(() => this.play(700, 0.05, 'square', 0.04), 70);
+    this.vibrate(20);
+  }
+
   /** Respuesta incorrecta / error. */
   error(): void {
     this.play(200, 0.18, 'sawtooth', 0.04);

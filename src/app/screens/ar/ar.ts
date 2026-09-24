@@ -47,6 +47,7 @@ import { ArHud } from './ar-hud';
           [team]="team()"
           [animating]="animating()"
           status="AR HUB · SIMULADO"
+          [photo]="false"
           (back)="back()"
           (animationToggle)="animating.set(!animating())"
           (infoOpened)="spin()"

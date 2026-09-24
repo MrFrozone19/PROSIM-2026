@@ -147,6 +147,52 @@ export class ArEngine {
     this.panelOpen = open;
   }
 
+  /**
+   * Foto de lo que se ve: cuadro de la cámara (con el mismo encuadre que en pantalla) y el modelo 3D encima,
+   * sin la interfaz. Es síncrona a propósito: la hoja de compartir del sistema solo se puede abrir dentro del
+   * gesto del usuario, y un toBlob asíncrono lo rompería en Safari.
+   */
+  capture(caption?: string): Blob {
+    const { renderer, scene, camera, video } = this.mindar;
+    const el = this.opts.container;
+    const w = el.clientWidth;
+    const h = el.clientHeight;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const out = document.createElement('canvas');
+    out.width = Math.round(w * dpr);
+    out.height = Math.round(h * dpr);
+    const ctx = out.getContext('2d')!;
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = '#0c0c12';
+    ctx.fillRect(0, 0, w, h);
+    if (video) {
+      // MindAR posiciona el <video> con estilos para cubrir el contenedor; se reproduce el mismo recorte.
+      const s = video.style;
+      ctx.drawImage(video, parseFloat(s.left) || 0, parseFloat(s.top) || 0, parseFloat(s.width) || w, parseFloat(s.height) || h);
+    }
+    // El canvas WebGL no conserva el buffer entre cuadros: se vuelve a dibujar justo antes de copiarlo.
+    renderer.render(scene, camera);
+    ctx.drawImage(renderer.domElement, 0, 0, w, h);
+    if (caption) {
+      ctx.font = '700 12px Inter, system-ui, sans-serif';
+      const pad = 8;
+      const tw = ctx.measureText(caption).width;
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.beginPath();
+      ctx.roundRect(w - tw - pad * 2 - 12, h - 34, tw + pad * 2, 24, 12);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(caption, w - tw - pad - 12, h - 22);
+    }
+    // Conversión síncrona (dataURL → bytes) por la misma razón de arriba.
+    const dataUrl = out.toDataURL('image/jpeg', 0.92);
+    const bin = atob(dataUrl.slice(dataUrl.indexOf(',') + 1));
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new Blob([bytes], { type: 'image/jpeg' });
+  }
+
   /** Giro completo de 360° (botón Info). */
   spin(): void {
     this.spinStart = performance.now();

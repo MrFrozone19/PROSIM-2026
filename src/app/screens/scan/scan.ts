@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ScreenShell } from '../../shared/screen-shell';
 import { Icon } from '../../shared/icon';
 import { Feedback } from '../../shared/feedback';
+import { Toast } from '../../shared/toast';
+import { savePhoto } from '../../shared/save-photo';
 import { TEAM_BY_ID, TEAMS, Team } from '../../data/teams';
 import { AR_TARGETS, TARGETS_SRC } from '../../data/targets';
 import { ArEngine, CameraError } from '../../ar/ar-engine';
@@ -45,6 +47,7 @@ type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
             (back)="rescan()"
             (animationToggle)="toggleAnimation()"
             (infoOpened)="engine?.spin()"
+            (photoRequested)="takePhoto()"
             (panelChange)="engine?.setPanelOpen($event)"
           />
         } @else {
@@ -189,6 +192,7 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
   private readonly fb = inject(Feedback);
+  private readonly toast = inject(Toast);
   private destroyed = false;
 
   protected engine?: ArEngine;
@@ -244,6 +248,27 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
     this.engine?.setPanelOpen(false);
     this.team.set(null);
     this.tracking.set(false);
+  }
+
+  /** Foto de la cámara con el modelo encima; se guarda por la hoja de compartir (Fotos / Galería) o descarga. */
+  protected takePhoto(): void {
+    const t = this.team();
+    if (!this.engine || !t) return;
+    let blob: Blob;
+    try {
+      blob = this.engine.capture(`BaseDex Fan · ${t.city} ${t.name}`);
+    } catch (e) {
+      console.error(e);
+      this.fb.error();
+      this.toast.show('No se pudo tomar la foto');
+      return;
+    }
+    this.fb.shutter();
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[-:]/g, '').replace('T', '-');
+    void savePhoto(blob, `basedex-${t.id}-${stamp}.jpg`, `${t.city} ${t.name} en AR`).then((r) => {
+      if (r === 'shared') this.toast.show('Foto guardada');
+      else if (r === 'downloaded') this.toast.show('Foto descargada');
+    });
   }
 
   protected toggleAnimation(): void {

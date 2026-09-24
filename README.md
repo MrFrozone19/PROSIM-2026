@@ -63,6 +63,8 @@ Te imprime una URL `https://….trycloudflare.com` que puedes abrir desde el cel
    el indicador cambia a `TARGET LOCKED`.
 4. Desliza un dedo para girar el modelo, pellizca para escalarlo, y usa **Stop / Animate** para detener o
    reanudar su animación.
+5. **Foto** toma una captura con la cámara y el modelo (sin la interfaz) y abre la hoja de compartir: en iPhone
+   elige "Guardar imagen" y queda en Fotos; en Android elige Fotos o Galería. En computadora se descarga el JPG.
 
 Bordado en una gorra real es poco probable que reconozca el logo: el tejido deforma los bordes que usa el
 algoritmo.
@@ -106,7 +108,8 @@ de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores ti
 | Modelo 3D anclado al marcador | **Real** con three.js. El modelo es de prueba (gorra generada por `npm run model`) mientras llegan los de Diseño de ventanas |
 | Interacción con el modelo | Real: un dedo lo gira, dos dedos lo escalan; el botón Animate/Stop reanuda o detiene su animación; Info lo hace girar 360° |
 | Modo libre | Real: si el logo sale de cuadro, el modelo queda flotando frente a la cámara para seguir interactuando; la flecha vuelve a escanear |
-| Dock de la ventana AR: Animate/Stop, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos); los datos son de relleno |
+| Dock de la ventana AR: Animate/Stop, Foto, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos); los datos son de relleno |
+| Botón Foto | Real: compone el cuadro de la cámara con el modelo 3D encima (sin interfaz) y lo entrega a la hoja de compartir del sistema, donde iOS ofrece "Guardar imagen" (Fotos) y Android la galería; sin soporte para compartir archivos (escritorio) descarga el JPG. Una web no puede escribir directo en la galería |
 | `/ar` y el botón "Simular detección" | Respaldo sin cámara: el botón solo aparece si la cámara no está disponible o con `/#/scan?sim=1`, y abre la ventana AR con un logo holográfico en lugar del modelo |
 | Narración por voz en el panel Info | Real, con la síntesis de voz del navegador (`speechSynthesis`) |
 | Reproductor de `/videos` y sus 5 filtros | Real. Pixelate y Thermal se procesan en `<canvas>`; Pastel, Blur y Color Adjust con filtros CSS y capas de mezcla |

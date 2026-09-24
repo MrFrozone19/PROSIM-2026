@@ -7,7 +7,7 @@ import { TEAM_BY_ID, Team } from '../../data/teams';
 import { STANDINGS, TRIVIA } from '../../data/standings';
 import { VIDEO_CLIPS } from '../../data/videos';
 
-type DockId = 'animation' | 'info' | 'video' | 'effects' | 'stats' | 'trivia';
+type DockId = 'animation' | 'info' | 'video' | 'effects' | 'stats' | 'trivia' | 'photo';
 type Panel = 'info' | 'video' | 'stats' | 'trivia' | null;
 
 interface DockItem {
@@ -55,6 +55,11 @@ interface Particle {
       </div>
     }
 
+    <!-- destello al tomar la foto -->
+    @if (flash()) {
+      <div class="flash absolute inset-0 bg-white"></div>
+    }
+
     <!-- top-controls -->
     <div class="absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-5">
       <button
@@ -95,7 +100,7 @@ interface Particle {
       }
     </div>
     <!-- dock: fila inferior -->
-    <div class="absolute inset-x-0 bottom-3 flex justify-center gap-[46px]">
+    <div class="absolute inset-x-0 bottom-3 flex justify-center" [class]="photo() ? 'gap-[22px]' : 'gap-[46px]'">
       @for (item of bottomDock(); track item.id) {
         <ng-container *ngTemplateOutlet="dockBtn; context: { $implicit: item }" />
       }
@@ -267,6 +272,13 @@ interface Particle {
     .sheet-in {
       animation: sheet 200ms ease-out;
     }
+    .flash {
+      animation: flash 320ms ease-out forwards;
+    }
+    @keyframes flash {
+      0% { opacity: 0.9; }
+      100% { opacity: 0; }
+    }
     @keyframes sheet {
       from { transform: translateY(24px); opacity: 0; }
       to { transform: none; opacity: 1; }
@@ -279,11 +291,15 @@ export class ArHud implements OnDestroy {
   readonly animating = input(false);
   readonly status = input('AR HUB ACTIVE');
   readonly hint = input<string | null>(null);
+  /** Muestra el botón Foto (solo tiene sentido con cámara real). */
+  readonly photo = input(true);
 
   readonly back = output<void>();
   readonly animationToggle = output<void>();
   /** Se abrió el panel Info: el modelo debe girar 360°. */
   readonly infoOpened = output<void>();
+  /** Botón Foto: quien hospeda compone y guarda la imagen. */
+  readonly photoRequested = output<void>();
   /** Se abrió o cerró un panel inferior: quien hospeda puede subir el modelo para que no quede tapado. */
   readonly panelChange = output<boolean>();
 
@@ -300,8 +316,10 @@ export class ArHud implements OnDestroy {
     this.animating()
       ? { id: 'animation', label: 'Stop', icon: 'Pause' }
       : { id: 'animation', label: 'Animate', icon: 'Play' },
+    ...(this.photo() ? [{ id: 'photo', label: 'Foto', icon: 'Camera' } as DockItem] : []),
     { id: 'video', label: 'Video', icon: 'Video' },
   ]);
+  protected readonly flash = signal(false);
 
   protected readonly panel = signal<Panel>(null);
   protected readonly effectsOn = signal(false);
@@ -362,6 +380,11 @@ export class ArHud implements OnDestroy {
     switch (id) {
       case 'animation':
         this.animationToggle.emit();
+        break;
+      case 'photo':
+        this.flash.set(true);
+        this.after(350, () => this.flash.set(false));
+        this.photoRequested.emit();
         break;
       case 'effects':
         this.particles.set(this.makeParticles());
