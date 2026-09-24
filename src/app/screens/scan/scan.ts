@@ -275,6 +275,8 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
       container: this.stage().nativeElement,
       targetsSrc: TARGETS_SRC,
       targets: AR_TARGETS.map((t) => ({ index: t.index, key: t.teamId, model: t.model })),
+      // ?crop=256 permite comparar en el celular el recorte chico (más rápido) contra el de 512 (más confiable).
+      detectionCropSize: Number(this.route.snapshot.queryParamMap.get('crop')) || undefined,
       onFound: (teamId) => {
         if (!this.team()) this.fb.success();
         this.team.set(TEAM_BY_ID[teamId]);

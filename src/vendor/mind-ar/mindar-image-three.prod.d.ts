@@ -20,6 +20,10 @@ export interface MindARThreeOptions {
   filterBeta?: number | null;
   warmupTolerance?: number | null;
   missTolerance?: number | null;
+  /** Parche BaseDex: constraints extra para getUserMedia (ej. resolución ideal). */
+  videoConstraints?: MediaTrackConstraints | null;
+  /** Parche BaseDex: lado del recorte cuadrado donde se buscan marcadores (potencia de 2; por defecto ~alto/2). */
+  detectionCropSize?: number | null;
 }
 
 export class MindARThree {

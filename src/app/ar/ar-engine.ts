@@ -26,6 +26,8 @@ export interface ArEngineOptions {
   targets: ArEngineTarget[];
   onFound: (key: string) => void;
   onLost: (key: string) => void;
+  /** Lado del recorte de detección de MindAR (potencia de 2). 512 cubre lo visible en vertical; 256 es más barato. */
+  detectionCropSize?: number;
 }
 
 /** Falla al pedir la cámara (permiso rechazado o cámara ocupada), distinta de un error de carga. */
@@ -83,7 +85,13 @@ export class ArEngine {
       // Un poco más de suavizado que el valor por defecto: los logos planos dan pocos puntos y el modelo tiembla.
       filterMinCF: 0.0005,
       filterBeta: 0.01,
-      missTolerance: 8,
+      // Con 640x480 el logo en la retícula mide ~150 px en el video y da menos de 20 puntos de referencia;
+      // con 1280x720 mide ~220 px. El recorte de detección (parche propio) se amplía para que quepa completo.
+      videoConstraints: { width: { ideal: 1280 }, height: { ideal: 720 } },
+      detectionCropSize: opts.detectionCropSize ?? 512,
+      // Cuadros seguidos con el marcador antes de mostrarlo (rápido) y sin él antes de darlo por perdido (paciente).
+      warmupTolerance: 2,
+      missTolerance: 12,
     });
   }
 

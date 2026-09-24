@@ -52,23 +52,41 @@ Te imprime una URL `https://….trycloudflare.com` que puedes abrir desde el cel
 
 ## Cómo probar el escaneo
 
-1. Abre en otra pantalla (o imprime) una de las imágenes de `design/targets/`: `nyy-navy.png` o `nyy-white.png`.
+1. Abre en otra pantalla (o imprime) una de las imágenes de `design/targets/`:
+   - **`nyy-card.png` (recomendada)**: tarjeta detonadora con el logo NY, marco, rayas y texto. Tiene unos 250 puntos
+     de referencia en las escalas que ve la cámara y se reconoce rápido, de lejos y en ángulo.
+   - `nyy-navy.png` / `nyy-white.png`: el logo NY solo. Un logo plano de dos colores da ~40 puntos, así que
+     hay que ponerlo de frente, centrado en la retícula y con buena luz.
 2. Entra a la pestaña **Scan** y concede el permiso de cámara. Espera a que el indicador diga `SCANNER ACTIVE`
    (la primera vez tarda unos segundos: descarga el motor de seguimiento, ~400 kB comprimido).
-3. Apunta al logo de frente, que ocupe buena parte del cuadro y sin reflejos. Al reconocerlo aparece la gorra
-   anclada y el indicador cambia a `TARGET LOCKED`.
+3. Apunta al marcador de frente y centrado en la retícula, sin reflejos. Al reconocerlo aparece la gorra anclada y
+   el indicador cambia a `TARGET LOCKED`.
 4. Desliza un dedo para girar el modelo, pellizca para escalarlo, y usa **Stop / Animate** para detener o
    reanudar su animación.
 
-Un logo plano de dos colores da pocos puntos de referencia (~70 en la escala mayor), así que el seguimiento es
-sensible a la distancia y a la luz. Funciona mejor con el logo grande y nítido; bordado en una gorra real es poco
-probable que lo reconozca.
+Bordado en una gorra real es poco probable que reconozca el logo: el tejido deforma los bordes que usa el
+algoritmo.
+
+### Cómo detecta MindAR y qué se ajustó
+
+MindAR no busca el marcador en todo el cuadro: recorta un cuadrado de la mitad del alto del video (256 px con
+640×480 **y también con 1280×720**, porque redondea a potencia de 2) y lo mueve por 9 posiciones, una por cuadro.
+La app parcha el motor (ver `src/vendor/mind-ar/README.md`) para pedir 1280×720 a la cámara, detectar en un
+recorte de 512 px que abarca todo lo visible en vertical, y alternar el recorte central (la retícula) con los
+móviles. Además el marcador se da por encontrado tras 2 cuadros seguidos y por perdido tras 12.
+
+Para comparar en el celular, `/#/scan?crop=256` usa el recorte chico (menos trabajo por cuadro, menos alcance).
+`scripts/` no incluye el banco de pruebas, pero `window.__bdStats` acumula intentos y milisegundos de detección
+si se define antes de abrir Scan.
 
 ### Agregar o cambiar marcadores
 
 1. Pon la imagen en `design/targets/` y agrégala a `design/targets/targets.json` (el orden define el índice).
+   Una entrada puede ser una imagen tal cual, `swapFrom` (la misma imagen con fondo y figura invertidos) o
+   `card` (tarjeta generada con el logo, título y subtítulo; es la opción que mejor se reconoce).
 2. `npm run targets` recompila `src/assets/targets/targets.mind` (abre Chrome o Edge sin ventana, porque el
-   compilador de MindAR solo corre en navegador) e imprime cuántos puntos de referencia tiene cada imagen.
+   compilador de MindAR solo corre en navegador), reduce cada imagen a 640 px por lado e imprime los puntos de
+   referencia por escala. Menos de ~30 en las escalas de 150–300 px es señal de un marcador difícil.
 3. Refleja el mismo orden en `src/app/data/targets.ts`, con el equipo y el modelo `.glb` de cada índice.
 
 ## Por qué la cámara necesita HTTPS

@@ -1,4 +1,5 @@
 [
   { "team": "nyy", "file": "nyy-navy.png" },
-  { "team": "nyy", "file": "nyy-white.png", "swapFrom": "nyy-navy.png" }
+  { "team": "nyy", "file": "nyy-white.png", "swapFrom": "nyy-navy.png" },
+  { "team": "nyy", "file": "nyy-card.png", "card": { "logo": "nyy-white.png", "title": "NEW YORK YANKEES", "subtitle": "OFFICIAL FAN CARD · AL EAST" } }
 ]

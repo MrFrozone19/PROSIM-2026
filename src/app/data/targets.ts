@@ -13,4 +13,6 @@ export interface ArTarget {
 export const AR_TARGETS: ArTarget[] = [
   { index: 0, teamId: 'nyy', model: 'assets/models/cap.glb' },
   { index: 1, teamId: 'nyy', model: 'assets/models/cap.glb' },
+  // Tarjeta detonadora generada por npm run targets: muchos más puntos que el logo plano, se reconoce mejor.
+  { index: 2, teamId: 'nyy', model: 'assets/models/cap.glb' },
 ];

@@ -13579,9 +13579,11 @@ class Zb {
     warmupTolerance: p = null,
     missTolerance: m = null,
     userDeviceId: c = null,
-    environmentDeviceId: d = null
+    environmentDeviceId: d = null,
+    videoConstraints: bdVideoConstraints = null, // parche BaseDex: resolución de cámara configurable
+    detectionCropSize: bdDetectionCropSize = null // parche BaseDex: recorte de detección (potencia de 2)
   }) {
-    this.container = e, this.imageTargetSrc = t, this.maxTrack = a, this.filterMinCF = o, this.filterBeta = l, this.warmupTolerance = p, this.missTolerance = m, this.ui = new Rd({ uiLoading: r, uiScanning: n, uiError: u }), this.userDeviceId = c, this.environmentDeviceId = d, this.shouldFaceUser = !1, this.scene = new Ct(), this.cssScene = new Ct(), this.renderer = new Ti({ antialias: !0, alpha: !0 }), this.cssRenderer = new Vd({ antialias: !0 }), this.renderer.outputEncoding = Si, this.renderer.setPixelRatio(window.devicePixelRatio), this.camera = new vi(), this.anchors = [], this.renderer.domElement.style.position = "absolute", this.cssRenderer.domElement.style.position = "absolute", this.container.appendChild(this.renderer.domElement), this.container.appendChild(this.cssRenderer.domElement), window.addEventListener("resize", this.resize.bind(this));
+    this.bdVideoConstraints = bdVideoConstraints, this.bdDetectionCropSize = bdDetectionCropSize, this.container = e, this.imageTargetSrc = t, this.maxTrack = a, this.filterMinCF = o, this.filterBeta = l, this.warmupTolerance = p, this.missTolerance = m, this.ui = new Rd({ uiLoading: r, uiScanning: n, uiError: u }), this.userDeviceId = c, this.environmentDeviceId = d, this.shouldFaceUser = !1, this.scene = new Ct(), this.cssScene = new Ct(), this.renderer = new Ti({ antialias: !0, alpha: !0 }), this.cssRenderer = new Vd({ antialias: !0 }), this.renderer.outputEncoding = Si, this.renderer.setPixelRatio(window.devicePixelRatio), this.camera = new vi(), this.anchors = [], this.renderer.domElement.style.position = "absolute", this.cssRenderer.domElement.style.position = "absolute", this.container.appendChild(this.renderer.domElement), this.container.appendChild(this.cssRenderer.domElement), window.addEventListener("resize", this.resize.bind(this));
   }
   async start() {
     this.ui.showLoading(), await this._startVideo(), await this._startAR();
@@ -13614,7 +13616,7 @@ class Zb {
       }
       const a = {
         audio: !1,
-        video: {}
+        video: Object.assign({}, this.bdVideoConstraints || {}) // parche BaseDex
       };
       this.shouldFaceUser ? this.userDeviceId ? a.video.deviceId = { exact: this.userDeviceId } : a.video.facingMode = "user" : this.environmentDeviceId ? a.video.deviceId = { exact: this.environmentDeviceId } : a.video.facingMode = "environment", navigator.mediaDevices.getUserMedia(a).then((r) => {
         this.video.addEventListener("loadedmetadata", () => {
@@ -13634,6 +13636,7 @@ class Zb {
         filterMinCF: this.filterMinCF,
         filterBeta: this.filterBeta,
         warmupTolerance: this.warmupTolerance,
+        detectionCropSize: this.bdDetectionCropSize, // parche BaseDex
         missTolerance: this.missTolerance,
         maxTrack: this.maxTrack,
         onUpdate: (n) => {

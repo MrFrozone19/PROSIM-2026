@@ -53833,9 +53833,10 @@ class vC {
   }
 }
 class V4 {
-  constructor(t, e, s = !1) {
+  constructor(t, e, s = !1, bdCropSize = null) {
     this.debugMode = s, this.width = t, this.height = e;
     let o = Math.min(t, e) / 2, r = Math.pow(2, Math.round(Math.log(o) / Math.log(2)));
+    bdCropSize && (r = Math.min(bdCropSize, Math.min(t, e))), // parche BaseDex: recorte de detección configurable
     this.cropSize = r, this.detector = new vC(r, r, s), this.kernelCaches = {}, this.lastRandomIndex = 4;
   }
   detect(t) {
@@ -55183,9 +55184,10 @@ class QQ {
     warmupTolerance: i = null,
     missTolerance: a = null,
     filterMinCF: l = null,
-    filterBeta: c = null
+    filterBeta: c = null,
+    detectionCropSize: bdCropSize = null // parche BaseDex
   }) {
-    this.inputWidth = t, this.inputHeight = e, this.maxTrack = r, this.filterMinCF = l === null ? VY : l, this.filterBeta = c === null ? zY : c, this.warmupTolerance = i === null ? PY : i, this.missTolerance = a === null ? AY : a, this.cropDetector = new V4(this.inputWidth, this.inputHeight, o), this.inputLoader = new FY(this.inputWidth, this.inputHeight), this.markerDimensions = null, this.onUpdate = s, this.debugMode = o, this.processingVideo = !1, this.interestedTargetIndex = -1, this.trackingStates = [];
+    this.inputWidth = t, this.inputHeight = e, this.maxTrack = r, this.filterMinCF = l === null ? VY : l, this.filterBeta = c === null ? zY : c, this.warmupTolerance = i === null ? PY : i, this.missTolerance = a === null ? AY : a, this.cropDetector = new V4(this.inputWidth, this.inputHeight, o, bdCropSize), this.inputLoader = new FY(this.inputWidth, this.inputHeight), this.markerDimensions = null, this.onUpdate = s, this.debugMode = o, this.processingVideo = !1, this.interestedTargetIndex = -1, this.trackingStates = [];
     const u = 10, d = 1e5, h = 45 * Math.PI / 180, p = this.inputHeight / 2 / Math.tan(h / 2);
     this.projectionTransform = [
       [p, 0, this.inputWidth / 2],
@@ -55260,8 +55262,12 @@ class QQ {
     return this._glModelViewMatrix(t, e);
   }
   async _detectAndMatch(t, e) {
-    const { featurePoints: s } = this.cropDetector.detectMoving(t), { targetIndex: o, modelViewTransform: r } = await this._workerMatch(s, e);
-    return { targetIndex: o, modelViewTransform: r };
+    // parche BaseDex: el original solo usa recortes móviles (9 posiciones, una por cuadro). Se alterna con el
+    // recorte central, donde la retícula pide poner el logo, para intentar ahí 5 de cada 9 cuadros en vez de 1.
+    // window.__bdStats (opcional) acumula cuántas detecciones se intentaron y cuánto tardaron.
+    const bdT0 = performance.now(), bdCenter = (this.bdFrame = (this.bdFrame || 0) + 1) % 2 === 1;
+    const { featurePoints: s } = bdCenter ? this.cropDetector.detect(t) : this.cropDetector.detectMoving(t), { targetIndex: o, modelViewTransform: r } = await this._workerMatch(s, e);
+    return typeof window < "u" && window.__bdStats && (window.__bdStats.n = (window.__bdStats.n || 0) + 1, window.__bdStats.ms = (window.__bdStats.ms || 0) + performance.now() - bdT0, window.__bdStats.points = s.length), { targetIndex: o, modelViewTransform: r };
   }
   async _trackAndUpdate(t, e, s) {
     const { worldCoords: o, screenCoords: r } = this.tracker.track(t, e, s);
