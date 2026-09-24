@@ -6,7 +6,9 @@
 - [x] Sustituir la detección simulada por `targetFound` / `targetLost` (al perderse pasa a modo libre, sin cerrar la sesión).
 - [x] Dejar la simulación solo como respaldo (`?sim=1` o cámara no disponible).
 - [ ] Llegar a mínimo 3 equipos escaneables, cada uno con contenido propio (la segunda entrega pide 2; la final, 3).
-- [ ] Probar el logo NY con marcador físico impreso; si el seguimiento es inestable, usar como detonador una imagen con más textura (tarjeta del equipo con el logo).
+- [x] Mejorar la confiabilidad del escaneo: cámara a 720p, recorte de detección de 512 px con cuadrícula proporcional, recorte central alternado, tolerancias 2/12 y tarjeta detonadora `nyy-card.png` (ver README).
+- [ ] Probar en el celular `/#/scan` contra `/#/scan?crop=256`: si el de 512 se siente lento al escanear en un teléfono modesto, bajar el valor por defecto en `ar-engine.ts`.
+- [ ] Imprimir `nyy-card.png` (tamaño carta o media carta) para la demo; el logo plano queda como marcador secundario.
 
 ## Modelos 3D
 - [x] Modelo glTF anclado al marcador, con rotación y escala táctil, botón para detener/reanudar la animación y giro 360° en Info.

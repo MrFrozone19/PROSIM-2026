@@ -53717,6 +53717,7 @@ class vC {
    * @returns 
    */
   _applyPrune(t) {
+    const Br = this.bdBuckets || 10; // parche BaseDex: cuadrícula proporcional al recorte (ver CropDetector)
     const e = Br * Br, s = D4, o = [], r = [];
     for (let a = 0; a < e; a++) {
       r.push([]), o.push([]);
@@ -53838,6 +53839,9 @@ class V4 {
     let o = Math.min(t, e) / 2, r = Math.pow(2, Math.round(Math.log(o) / Math.log(2)));
     bdCropSize && (r = Math.min(bdCropSize, Math.min(t, e))), // parche BaseDex: recorte de detección configurable
     this.cropSize = r, this.detector = new vC(r, r, s), this.kernelCaches = {}, this.lastRandomIndex = 4;
+    // parche BaseDex: la poda de puntos usa una cuadrícula fija de 10x10 celdas con 5 puntos cada una; con un
+    // recorte grande cada marcador cae en pocas celdas y pierde puntos. Celdas de ~32 px (16x16 con 512).
+    this.detector.bdBuckets = Math.max(Br, Math.round(r / 32));
   }
   detect(t) {
     const e = Math.floor(this.height / 2 - this.cropSize / 2), s = Math.floor(this.width / 2 - this.cropSize / 2), o = this._detect(t, s, e);

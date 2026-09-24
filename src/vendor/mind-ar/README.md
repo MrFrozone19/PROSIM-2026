@@ -17,6 +17,9 @@ Cambios respecto al original, en `mindar-image-three.prod.js` (líneas marcadas 
   solo busca marcadores dentro de un recorte cuadrado de `2^round(log2(alto/2))` px, que es 256 tanto para
   640×480 como para 1280×720; con 512 el recorte abarca todo lo que se ve en pantalla en vertical y el logo se
   reconoce con el doble de detalle, a cambio de más trabajo por cuadro mientras se escanea.
+- En `controller-*.js`, la poda de puntos del detector (`_applyPrune`, 5 puntos por celda de una cuadrícula
+  fija de 10×10) usa una cuadrícula proporcional al recorte cuando lo crea el `CropDetector` (celdas de ~32 px):
+  con 512 px, un marcador que ocupa un cuarto del recorte conservaba como mucho 80 puntos y ahora hasta 320.
 - En `controller-*.js`, `_detectAndMatch` alterna el recorte central con los recortes móviles (el original solo
   usa los móviles: 9 posiciones, una por cuadro) y, si existe `window.__bdStats`, acumula intentos y tiempo de
   detección para medir rendimiento.
