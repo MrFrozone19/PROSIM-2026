@@ -16,14 +16,4 @@ export const STANDINGS: StandingRow[] = [
   { teamId: 'tex', wins: 72, losses: 67, gamesBack: '7.0', streak: 'W2' },
 ];
 
-export interface TriviaQuestion {
-  question: string;
-  options: string[];
-  answer: number;
-}
-
-export const TRIVIA: TriviaQuestion[] = [
-  { question: '¿En qué año se fundó la Liga Americana?', options: ['1876', '1901', '1920', '1947'], answer: 1 },
-  { question: '¿Qué equipo tiene más Series Mundiales ganadas?', options: ['Red Sox', 'Astros', 'Yankees', 'Tigers'], answer: 2 },
-  { question: '¿Cómo se llama el muro verde del Fenway Park?', options: ['Green Wall', 'Green Monster', 'Emerald Fence', 'Big Green'], answer: 1 },
-];
+// La trivia vive en la API (api/src/catalog.ts) para que las respuestas se validen en el servidor.

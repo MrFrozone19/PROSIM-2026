@@ -1,44 +1,49 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { ScreenShell } from '../../shared/screen-shell';
 import { Icon } from '../../shared/icon';
 import { Feedback } from '../../shared/feedback';
-import { Toast } from '../../shared/toast';
-import { Card, CARDS, RARITY, Rarity, VAULT_PROGRESS } from '../../data/cards';
-import { BADGES, TROPHIES } from '../../data/trophies';
+import { Api, CollectionBadge, CollectionCard, CollectionTrophy } from '../../core/api';
+import { Progress } from '../../core/progress';
+import { RARITY, Rarity } from '../../data/cards';
 import { TEAM_BY_ID } from '../../data/teams';
 
 type VaultTab = 'trophies' | 'cards' | 'badges';
 
-/** /vault — colección de cartas TCG, trofeos e insignias. Tocar una carta abre su detalle. */
+/**
+ * /vault — colección de cartas TCG, trofeos e insignias del usuario (API). Tocar una carta abre su detalle.
+ * Cada carta se desbloquea escaneando el logo de su equipo.
+ */
 @Component({
   selector: 'app-vault-screen',
-  imports: [ScreenShell, Icon],
+  imports: [ScreenShell, Icon, DatePipe],
   template: `
     <app-screen-shell>
       <div class="flex flex-col gap-4 pt-3">
         <!-- vault-header-stats -->
         <div class="flex items-center justify-between gap-3 rounded-row border border-line bg-surface p-3">
           <div class="flex flex-col gap-1">
-            <p class="font-sans text-[10px] font-bold leading-normal text-muted">UNLOCKED CLIPS</p>
+            <p class="font-sans text-[10px] font-bold leading-normal text-muted">UNLOCKED CARDS</p>
             <div class="flex items-center gap-1.5">
               <app-icon name="Award" [size]="18" class="text-pink" />
               <span class="font-display text-[16px] font-black leading-normal text-white"
-                >{{ progress.unlockedClips }}/{{ progress.totalClips }}</span
+                >{{ owned() }}/{{ cards().length }}</span
               >
             </div>
           </div>
           <div class="flex w-[180px] max-w-[52%] flex-col gap-1.5">
             <div class="flex justify-between font-sans text-[10px] font-bold leading-normal">
-              <span class="text-muted">VAULT TIER {{ progress.tier }}</span>
-              <span class="text-pink">{{ progress.tierProgress }}%</span>
+              <span class="text-muted">FAN LEVEL {{ me()?.level ?? 1 }}</span>
+              <span class="text-pink">{{ levelPct() }}%</span>
             </div>
             <div class="h-1.5 w-full overflow-hidden rounded-[3px] bg-white/[0.08]">
-              <div class="h-full rounded-[3px] bg-cta" [style.width.%]="progress.tierProgress"></div>
+              <div class="h-full rounded-[3px] bg-cta" [style.width.%]="levelPct()"></div>
             </div>
           </div>
         </div>
 
-        <!-- featured-unlock-banner -->
+        <!-- featured-unlock-banner: último trofeo o invitación a escanear -->
         <button
           type="button"
           (click)="promo()"
@@ -48,12 +53,18 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
           <span
             class="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[12px] border-[1.5px] border-pink bg-purple text-white"
           >
-            <app-icon name="Award" [size]="24" />
+            <app-icon [name]="latest() ? 'Award' : 'ScanLine'" [size]="24" />
           </span>
           <span class="relative flex min-w-0 flex-col gap-0.5">
-            <span class="font-sans text-[10px] font-extrabold leading-normal text-pink">LATEST AR TROPHY UNLOCKED</span>
-            <span class="font-display text-[12px] font-bold leading-normal text-white">AL EAST CHAMPIONS</span>
-            <span class="font-sans text-[10px] leading-normal text-muted">Spawn virtual ring inside AR scanner now</span>
+            @if (latest(); as t) {
+              <span class="font-sans text-[10px] font-extrabold leading-normal text-pink">LATEST AR TROPHY UNLOCKED</span>
+              <span class="font-display text-[12px] font-bold uppercase leading-normal text-white">{{ t.title }}</span>
+              <span class="truncate font-sans text-[10px] leading-normal text-muted">{{ t.description }}</span>
+            } @else {
+              <span class="font-sans text-[10px] font-extrabold leading-normal text-pink">TU COLECCIÓN EMPIEZA AQUÍ</span>
+              <span class="font-display text-[12px] font-bold leading-normal text-white">ESCANEA UN LOGO</span>
+              <span class="font-sans text-[10px] leading-normal text-muted">Cada equipo escaneado desbloquea su carta</span>
+            }
           </span>
         </button>
 
@@ -75,7 +86,7 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
         @switch (tab()) {
           @case ('cards') {
             <div class="grid grid-cols-3 gap-3">
-              @for (c of cards; track c.id) {
+              @for (c of cards(); track c.id) {
                 <button
                   type="button"
                   (click)="open(c)"
@@ -86,7 +97,13 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
                   [attr.aria-label]="c.name + ', ' + rarity(c.rarity).label"
                 >
                   @if (c.art) {
-                    <img [src]="c.art" class="absolute inset-0 h-full w-full object-cover" alt="" loading="lazy" />
+                    <img
+                      [src]="c.art"
+                      class="absolute inset-0 h-full w-full object-cover"
+                      [class]="c.obtainedAt ? '' : 'opacity-25 blur-[3px]'"
+                      alt=""
+                      loading="lazy"
+                    />
                   }
                   <div
                     class="absolute inset-0 flex flex-col justify-between p-2"
@@ -97,7 +114,7 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
                       [class]="rarity(c.rarity).glow ? 'bg-pink' : 'bg-black/[0.67]'"
                       >{{ rarity(c.rarity).label }}</span
                     >
-                    @if (!c.owned) {
+                    @if (!c.obtainedAt) {
                       <span class="absolute inset-0 flex items-center justify-center text-muted">
                         <app-icon name="Lock" [size]="22" />
                       </span>
@@ -110,15 +127,15 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
           }
           @case ('trophies') {
             <div class="flex flex-col gap-2">
-              @for (t of trophies; track t.id) {
+              @for (t of trophies(); track t.id) {
                 <div
                   class="flex items-center gap-3 rounded-row border bg-surface px-3 py-3"
-                  [class.opacity-60]="!t.unlocked"
-                  [style.border-color]="t.unlocked ? rarity(t.rarity).color + '8c' : 'rgba(255,255,255,0.08)'"
+                  [class.opacity-60]="!t.unlockedAt"
+                  [style.border-color]="t.unlockedAt ? rarity(t.rarity).color + '8c' : 'rgba(255,255,255,0.08)'"
                 >
                   <span
                     class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-display text-[13px] font-black text-white"
-                    [style.background]="t.unlocked ? medal(t.rarity) : 'rgba(255,255,255,0.1)'"
+                    [style.background]="t.unlockedAt ? medal(t.rarity) : 'rgba(255,255,255,0.1)'"
                     >{{ t.code }}</span
                   >
                   <span class="flex min-w-0 flex-1 flex-col">
@@ -127,7 +144,7 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
                   </span>
                   <span class="flex flex-col items-end gap-1">
                     <span class="font-display text-[8px] font-bold uppercase tracking-wide" [style.color]="rarity(t.rarity).color">{{ rarity(t.rarity).label }}</span>
-                    @if (t.unlocked) {
+                    @if (t.unlockedAt) {
                       <app-icon name="Check" [size]="14" class="text-[#80ed99]" />
                     } @else {
                       <app-icon name="Lock" [size]="14" class="text-muted" />
@@ -139,16 +156,16 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
           }
           @case ('badges') {
             <div class="grid grid-cols-2 gap-3">
-              @for (b of badges; track b.id) {
+              @for (b of badges(); track b.id) {
                 <div
                   class="flex items-center gap-3 rounded-row border bg-surface p-3"
-                  [class]="b.earned ? 'border-purple/60' : 'border-line opacity-60'"
+                  [class]="b.earnedAt ? 'border-purple/60' : 'border-line opacity-60'"
                 >
                   <span
                     class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-                    [class]="b.earned ? 'bg-cta text-white' : 'bg-white/10 text-muted'"
+                    [class]="b.earnedAt ? 'bg-cta text-white' : 'bg-white/10 text-muted'"
                   >
-                    <app-icon [name]="b.earned ? 'Medal' : 'Lock'" [size]="18" />
+                    <app-icon [name]="b.earnedAt ? 'Medal' : 'Lock'" [size]="18" />
                   </span>
                   <span class="flex min-w-0 flex-col">
                     <span class="truncate font-sans text-[12px] font-bold text-white">{{ b.label }}</span>
@@ -177,7 +194,7 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
           >
             <div class="relative h-44 w-full bg-ink">
               @if (c.art) {
-                <img [src]="c.art" class="h-full w-full object-cover" alt="" />
+                <img [src]="c.art" class="h-full w-full object-cover" [class]="c.obtainedAt ? '' : 'opacity-25 blur-[4px]'" alt="" />
               } @else {
                 <div class="flex h-full items-center justify-center text-muted"><app-icon name="Lock" [size]="36" /></div>
               }
@@ -199,10 +216,10 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
               <div>
                 <p class="font-display text-[18px] font-black uppercase leading-tight text-white">{{ c.name }}</p>
                 <p class="font-sans text-[11px] font-semibold uppercase tracking-wide text-muted">
-                  {{ teamName(c.teamId) }} · {{ c.owned ? c.serial : 'Bloqueada' }}
+                  {{ teamName(c.teamId) }} · {{ c.obtainedAt ? c.serial : 'Bloqueada' }}
                 </p>
               </div>
-              @if (c.owned) {
+              @if (c.obtainedAt) {
                 @for (s of statsOf(c); track s.label) {
                   <div class="flex items-center gap-3">
                     <span class="w-16 font-sans text-[11px] font-bold uppercase text-muted">{{ s.label }}</span>
@@ -213,8 +230,7 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
                   </div>
                 }
                 <p class="font-sans text-[11px] text-muted">
-                  Carta coleccionable de prototipo. Se desbloquea escaneando el logo de {{ teamName(c.teamId) }} en la
-                  ventana AR.
+                  Desbloqueada el {{ c.obtainedAt | date: 'd MMM yyyy' }} al escanear el logo de {{ teamName(c.teamId) }}.
                 </p>
               } @else {
                 <p class="font-sans text-[12px] text-muted">
@@ -243,14 +259,16 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
     }
   `,
 })
-export class VaultScreen {
+export class VaultScreen implements OnInit {
   private readonly fb = inject(Feedback);
-  private readonly toast = inject(Toast);
+  private readonly api = inject(Api);
+  private readonly router = inject(Router);
+  private readonly progress = inject(Progress);
 
-  protected readonly progress = VAULT_PROGRESS;
-  protected readonly cards = CARDS;
-  protected readonly trophies = TROPHIES;
-  protected readonly badges = BADGES;
+  protected readonly me = this.progress.me;
+  protected readonly cards = signal<CollectionCard[]>([]);
+  protected readonly trophies = signal<CollectionTrophy[]>([]);
+  protected readonly badges = signal<CollectionBadge[]>([]);
   protected readonly tabs: { id: VaultTab; label: string }[] = [
     { id: 'trophies', label: 'Trophies' },
     { id: 'cards', label: 'Cards' },
@@ -258,8 +276,26 @@ export class VaultScreen {
   ];
 
   protected readonly tab = signal<VaultTab>('cards');
-  protected readonly selected = signal<Card | null>(null);
-  protected readonly selectedRarity = computed(() => (this.selected() ? RARITY[this.selected()!.rarity] : null));
+  protected readonly selected = signal<CollectionCard | null>(null);
+  protected readonly owned = computed(() => this.cards().filter((c) => c.obtainedAt).length);
+  /** La API ordena los trofeos con el más reciente primero. */
+  protected readonly latest = computed(() => this.trophies().find((t) => t.unlockedAt) ?? null);
+  protected readonly levelPct = computed(() => {
+    const m = this.me();
+    return m ? Math.round((m.levelXp / m.levelXpMax) * 100) : 0;
+  });
+
+  ngOnInit(): void {
+    void this.progress.refresh();
+    this.api
+      .collection()
+      .then((c) => {
+        this.cards.set(c.cards);
+        this.trophies.set(c.trophies);
+        this.badges.set(c.badges);
+      })
+      .catch((e) => console.error(e));
+  }
 
   protected rarity(r: Rarity) {
     return RARITY[r];
@@ -275,7 +311,7 @@ export class VaultScreen {
     return t ? `${t.city} ${t.name}` : id.toUpperCase();
   }
 
-  protected statsOf(c: Card) {
+  protected statsOf(c: CollectionCard) {
     return [
       { label: 'Power', value: c.power },
       { label: 'Speed', value: c.speed },
@@ -288,7 +324,7 @@ export class VaultScreen {
     this.tab.set(t);
   }
 
-  protected open(c: Card): void {
+  protected open(c: CollectionCard): void {
     this.fb.tap();
     this.selected.set(c);
   }
@@ -297,8 +333,10 @@ export class VaultScreen {
     this.selected.set(null);
   }
 
+  /** Con trofeo: abre la pestaña de trofeos. Sin trofeos todavía: lleva al escáner. */
   protected promo(): void {
     this.fb.tap();
-    this.toast.show('Anillo virtual: disponible en el modo AR (próximamente)');
+    if (this.latest()) this.tab.set('trophies');
+    else void this.router.navigateByUrl('/scan');
   }
 }

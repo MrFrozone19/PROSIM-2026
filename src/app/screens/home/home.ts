@@ -4,11 +4,13 @@ import { ScreenShell } from '../../shared/screen-shell';
 import { SectionTitle } from '../../shared/section-title';
 import { Icon } from '../../shared/icon';
 import { Feedback } from '../../shared/feedback';
+import { Avatar } from '../../shared/avatar';
+import { AuthService } from '../../core/auth';
 import { Team, TEAMS } from '../../data/teams';
 
 @Component({
   selector: 'app-home-screen',
-  imports: [ScreenShell, SectionTitle, Icon, RouterLink],
+  imports: [ScreenShell, SectionTitle, Icon, RouterLink, Avatar],
   template: `
     <app-screen-shell>
       <div class="flex flex-col gap-5 pt-3">
@@ -21,7 +23,7 @@ import { Team, TEAMS } from '../../data/teams';
             class="pressable -mr-1.5 flex h-11 w-11 items-center justify-center"
             aria-label="Abrir perfil"
           >
-            <img src="assets/figma/avatar.png" width="32" height="32" class="h-8 w-8 rounded-full" alt="" />
+            <app-avatar [name]="user()?.displayName || user()?.email || ''" [photo]="user()?.photoURL ?? null" [size]="32" />
           </a>
         </header>
 
@@ -95,6 +97,7 @@ import { Team, TEAMS } from '../../data/teams';
 })
 export class HomeScreen {
   protected readonly fb = inject(Feedback);
+  protected readonly user = inject(AuthService).user;
   protected readonly teams = TEAMS;
   protected readonly selected = signal<string>('nyy');
 

@@ -1,0 +1,6 @@
+# Lo que NO se sube a Cloud Build en `gcloud run deploy --source api` (las dependencias se instalan en el Dockerfile).
+.gcloudignore
+node_modules/
+dist/
+.env
+*.log

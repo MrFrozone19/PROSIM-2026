@@ -1,32 +1,52 @@
 # BaseDex Fan — prototipo web AR (Liga Americana)
 
-Prototipo navegable en Angular de una app web de realidad aumentada con temática de beisbol de la Liga Americana.
-Proyecto Integrador de **Procesamiento de Imágenes** (LMAD, FCFM-UANL), segunda entrega.
+App web de realidad aumentada con temática de beisbol de la Liga Americana, con cuentas de usuario y progreso
+guardado en MySQL. Proyecto Integrador de **Procesamiento de Imágenes** (LMAD, FCFM-UANL).
 
-## Cómo correrlo
+**App publicada: https://basedex-fan.web.app** (pide iniciar sesión con Google o correo).
 
-Requisitos: Node 22.12+ o 24 (probado con 24.14) y npm.
+## Arquitectura
 
-```bash
-npm install
-npm start
+```
+Navegador ── Firebase Hosting (Angular, carpeta docs/)
+               └─ /api/** ──► Cloud Run: api/ (Node + Express)
+                                 └─► Cloud SQL: MySQL 8.4 (instancia basedex-db)
+Firebase Authentication: inicio de sesión (Google y correo/contraseña)
 ```
 
-Abre http://localhost:4200. El servidor escucha en todas las interfaces (`0.0.0.0`), así que también puedes
-entrar desde otro dispositivo de la misma red.
+- Proyecto de Google Cloud / Firebase: `basedex-fan`, región `us-central1`.
+- La API verifica el ID token de Firebase en cada petición y solo deja leer y modificar los datos del propio
+  usuario. Los correos de `ADMIN_EMAILS` reciben el rol `admin` (rutas `/api/admin/*`: usuarios y trivia).
+- Las reglas del juego (XP, cartas, trofeos, insignias, trivia) se calculan en el servidor: ver
+  `api/src/progress.ts` y el catálogo en `api/src/catalog.ts`. Las tablas se crean solas al arrancar la API.
+- La contraseña de MySQL vive en Secret Manager (`db-password`); Cloud Run se conecta por el conector de Cloud SQL,
+  sin redes autorizadas.
 
-Build de producción (sale a `docs/`, listo para GitHub Pages):
+## Cómo correrlo en local
+
+Requisitos: Node 22.12+ o 24 (probado con 24.14), npm y Docker Desktop.
 
 ```bash
-npm run build
+docker compose up -d          # MySQL 8.4 local en el puerto 3307
+cd api && cp .env.example .env && npm install && npm run dev   # API en :8080
+cd .. && npm install && npm start                               # app en :4200 (proxy de /api a :8080)
+```
+
+Abre http://localhost:4200. El inicio de sesión usa el proyecto real de Firebase (localhost está autorizado).
+
+## Publicar
+
+```bash
+npm run build                                   # Angular → docs/
+firebase deploy --only hosting                  # sube docs/ a basedex-fan.web.app
+gcloud run deploy basedex-api --source api --region us-central1   # solo si cambió la API (ver api/README.md)
 ```
 
 ## Cómo probarlo desde el celular
 
-### Opción A: GitHub Pages (recomendada)
+### Opción A: Firebase Hosting (recomendada)
 
-Abre https://mrfrozone19.github.io/PROSIM-2026/ en Safari (iPhone) o Chrome (Android). Es HTTPS, así que la cámara
-funciona. Cada `git push` a `main` republica el contenido de `docs/` en uno o dos minutos.
+Abre https://basedex-fan.web.app en Safari (iPhone) o Chrome (Android). Es HTTPS, así que la cámara funciona.
 
 Para que se sienta como app, agrégala a la pantalla de inicio (Compartir → "Agregar a inicio" en iOS,
 menú ⋮ → "Agregar a pantalla principal" en Android): se abre sin barra de navegador.
@@ -108,15 +128,16 @@ de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores ti
 | Modelo 3D anclado al marcador | **Real** con three.js. El modelo es de prueba (gorra generada por `npm run model`) mientras llegan los de Diseño de ventanas |
 | Interacción con el modelo | Real: un dedo lo gira, dos dedos lo escalan; el botón Animate/Stop reanuda o detiene su animación; Info lo hace girar 360° |
 | Modo libre | Real: si el logo sale de cuadro, el modelo queda flotando frente a la cámara para seguir interactuando; la flecha vuelve a escanear |
-| Dock de la ventana AR: Animate/Stop, Foto, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos); los datos son de relleno |
+| Dock de la ventana AR: Animate/Stop, Foto, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos). La trivia viene de la API y se califica en el servidor; Stats sigue siendo una tabla simulada |
+| Cuentas e inicio de sesión | **Real** con Firebase Auth (Google y correo/contraseña, recuperación de contraseña). Todas las pantallas piden sesión |
+| Colección (cartas, trofeos, insignias), nivel y XP | **Real**, guardado en MySQL. Escanear un logo por primera vez desbloquea la carta de ese equipo |
+| Perfil y leaderboard semanal | **Real**: nombre y equipo favorito editables; el leaderboard suma la XP de los últimos 7 días |
 | Botón Foto | Real: compone el cuadro de la cámara con el modelo 3D encima (sin interfaz) y lo entrega a la hoja de compartir del sistema, donde iOS ofrece "Guardar imagen" (Fotos) y Android la galería; sin soporte para compartir archivos (escritorio) descarga el JPG. Una web no puede escribir directo en la galería |
 | `/ar` y el botón "Simular detección" | Respaldo sin cámara: el botón solo aparece si la cámara no está disponible o con `/#/scan?sim=1`, y abre la ventana AR con un logo holográfico en lugar del modelo |
 | Narración por voz en el panel Info | Real, con la síntesis de voz del navegador (`speechSynthesis`) |
 | Reproductor de `/videos` y sus 5 filtros | Real. Pixelate y Thermal se procesan en `<canvas>`; Pastel, Blur y Color Adjust con filtros CSS y capas de mezcla |
 | Clips de video | Generados en el proyecto con ffmpeg a partir del arte del diseño (sin derechos de terceros) |
-| Colección de cartas, trofeos, insignias, perfil, leaderboard | Datos de relleno tipados en `src/app/data/` |
 | Minijuego en `/game` | **Placeholder** explícito; "Jugar ahora" muestra "próximamente" |
-| Login, backend, base de datos | No existen |
 
 Filtros de video permitidos por la rúbrica e implementados: desenfoque, pixelado, cámara térmica, ajuste de
 color y pastel (personalizado). **No** se implementan blanco y negro, escala de grises, sepia, exposición ni
@@ -125,21 +146,26 @@ colores invertidos.
 ## Estructura
 
 ```
+api/         backend en Node + Express (Cloud Run): auth, db (esquema), catalog, progress (reglas), index (rutas)
 src/app/
-  screens/   home, scan, ar, videos, vault, game, profile (un componente standalone por pantalla)
+  screens/   login, home, scan, ar, videos, vault, game, profile (un componente standalone por pantalla)
              ar/ar-hud es la capa de controles de la ventana AR, compartida por /scan y /ar
+  core/      firebase (config web), auth (sesión), guards, api (cliente HTTP + tipos), progress (perfil y toasts)
   ar/        ar-engine: MindAR + escena three.js (anclas, modelos, gestos, animación, modo libre)
-  shared/    screen-shell, tab-bar, icon (Lucide inline), section-title, stat-card, pill, toast, feedback
-  data/      teams, targets, videos, cards, trophies, standings (+trivia), game, profile
+  shared/    screen-shell, tab-bar, icon (Lucide inline), avatar, section-title, stat-card, pill, toast, feedback, prefs
+  data/      teams, targets, videos, cards (rarezas), standings (tabla simulada)
 src/assets/  figma/ (imágenes optimizadas a WebP), video/ (clips MP4), targets/ (.mind), models/ (.glb)
 src/vendor/  mind-ar/: MindAR 1.2.5 ya empaquetado (ver su README)
 scripts/     compile-targets (npm run targets), make-cap (npm run model), download-assets (npm run assets)
 design/raw/  respuestas crudas del MCP de Figma, una por pantalla, más el listado de assets
 design/targets/  imágenes detonadoras y su manifiesto
-docs/        build de producción (GitHub Pages)
+docs/        build de producción (lo publica Firebase Hosting)
+firebase.json  hosting: carpeta docs/, /api/** → Cloud Run, caché
+compose.yaml   MySQL local para desarrollo
 ```
 
-Rutas con hash (`/#/home`, `/#/scan`, …) para que cualquier recarga o enlace directo funcione en GitHub Pages.
+Rutas con hash (`/#/home`, `/#/scan`, …) para que cualquier recarga o enlace directo funcione en cualquier hosting
+estático.
 
 ## Sistema de diseño
 

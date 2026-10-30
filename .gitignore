@@ -19,6 +19,7 @@
 .c9/
 .classpath
 .env
+.firebase/
 .history/*
 .idea/
 .project

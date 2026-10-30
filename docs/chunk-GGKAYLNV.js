@@ -1,0 +1,1 @@
+var e="bd.arQuality";function a(){try{return localStorage.getItem(e)==="fast"?"fast":"high"}catch{return"high"}}function l(r){try{localStorage.setItem(e,r)}catch{}}function n(r){let t=r.trim().split(/\s+/).filter(Boolean);return(t.length>1?t[0][0]+t[t.length-1][0]:(t[0]??"?").slice(0,2)).toUpperCase()}export{a,l as b,n as c};

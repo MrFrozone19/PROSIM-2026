@@ -1,0 +1,1 @@
+var o={mythic:{label:"Mythic",color:"#fe2c55",glow:!0},legendary:{label:"Legendary",color:"#ddad4e",glow:!0},epic:{label:"Epic",color:"#9d4edd",glow:!0},rare:{label:"Rare",color:"#4cc9f0",glow:!1},uncommon:{label:"Uncommon",color:"#80ed99",glow:!1},common:{label:"Common",color:"#9090a8",glow:!1}};export{o as a};

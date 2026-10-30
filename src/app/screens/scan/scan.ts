@@ -6,6 +6,9 @@ import { Icon } from '../../shared/icon';
 import { Feedback } from '../../shared/feedback';
 import { Toast } from '../../shared/toast';
 import { savePhoto } from '../../shared/save-photo';
+import { getArQuality } from '../../shared/prefs';
+import { Api } from '../../core/api';
+import { Progress } from '../../core/progress';
 import { TEAM_BY_ID, TEAMS, Team } from '../../data/teams';
 import { AR_TARGETS, TARGETS_SRC } from '../../data/targets';
 import { ArEngine, CameraError } from '../../ar/ar-engine';
@@ -193,7 +196,11 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
   private readonly location = inject(Location);
   private readonly fb = inject(Feedback);
   private readonly toast = inject(Toast);
+  private readonly api = inject(Api);
+  private readonly progress = inject(Progress);
   private destroyed = false;
+  /** Momento en que empezó la búsqueda actual; da la duración del escaneo (trofeo Perfect Scan). */
+  private scanStartedAt = 0;
 
   protected engine?: ArEngine;
   protected readonly state = signal<ScanState>('loading');
@@ -248,6 +255,13 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
     this.engine?.setPanelOpen(false);
     this.team.set(null);
     this.tracking.set(false);
+    this.scanStartedAt = performance.now();
+  }
+
+  /** Registra el escaneo en la API: la primera vez desbloquea la carta del equipo; los logros se anuncian en toasts. */
+  private reportScan(teamId: string): void {
+    const ms = this.scanStartedAt ? Math.round(performance.now() - this.scanStartedAt) : null;
+    this.progress.track(this.api.scan(teamId, ms));
   }
 
   /** Foto de la cámara con el modelo encima; se guarda por la hoja de compartir (Fotos / Galería) o descarga. */
@@ -300,12 +314,17 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
       container: this.stage().nativeElement,
       targetsSrc: TARGETS_SRC,
       targets: AR_TARGETS.map((t) => ({ index: t.index, key: t.teamId, model: t.model })),
-      // ?crop=256 permite comparar en el celular el recorte chico (más rápido) contra el de 512 (más confiable).
-      detectionCropSize: Number(this.route.snapshot.queryParamMap.get('crop')) || undefined,
+      // ?crop=256 permite comparar en el celular el recorte chico (más rápido) contra el de 512 (más confiable);
+      // sin el parámetro manda la "Calidad AR" elegida en el perfil.
+      detectionCropSize:
+        Number(this.route.snapshot.queryParamMap.get('crop')) || (getArQuality() === 'fast' ? 256 : undefined),
       onFound: (teamId) => {
-        if (!this.team()) this.fb.success();
+        // Volver a anclar tras el modo libre no cuenta como un escaneo nuevo.
+        const fresh = !this.team();
+        if (fresh) this.fb.success();
         this.team.set(TEAM_BY_ID[teamId]);
         this.tracking.set(true);
+        if (fresh) this.reportScan(teamId);
       },
       onLost: () => this.tracking.set(false),
     });
@@ -314,7 +333,10 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
 
     try {
       await engine.start();
-      if (!this.destroyed && this.engine === engine) this.state.set('scanning');
+      if (!this.destroyed && this.engine === engine) {
+        this.state.set('scanning');
+        this.scanStartedAt = performance.now();
+      }
     } catch (e) {
       if (this.destroyed || this.engine !== engine) return;
       engine.stop();

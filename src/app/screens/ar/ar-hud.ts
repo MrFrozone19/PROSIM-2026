@@ -4,8 +4,10 @@ import { Icon, IconName } from '../../shared/icon';
 import { StatCard } from '../../shared/stat-card';
 import { Feedback } from '../../shared/feedback';
 import { TEAM_BY_ID, Team } from '../../data/teams';
-import { STANDINGS, TRIVIA } from '../../data/standings';
+import { STANDINGS } from '../../data/standings';
 import { VIDEO_CLIPS } from '../../data/videos';
+import { Api, TriviaQuestion } from '../../core/api';
+import { Progress } from '../../core/progress';
 
 type DockId = 'animation' | 'info' | 'video' | 'effects' | 'stats' | 'trivia' | 'photo';
 type Panel = 'info' | 'video' | 'stats' | 'trivia' | null;
@@ -212,32 +214,41 @@ interface Particle {
             </div>
           }
           @case ('trivia') {
-            <p class="font-sans text-[11px] font-semibold uppercase tracking-wide text-muted">
-              Pregunta {{ triviaIndex() + 1 }} de {{ trivia.length }}
-            </p>
-            <p class="mt-1 font-sans text-[15px] font-bold leading-snug text-white">{{ question().question }}</p>
-            <div class="mt-4 flex flex-col gap-2">
-              @for (opt of question().options; track opt; let i = $index) {
-                <button
-                  type="button"
-                  (click)="answer(i)"
-                  [disabled]="answered() !== null"
-                  class="pressable flex min-h-[44px] items-center justify-between rounded-row border px-4 text-left font-sans text-[13px] font-semibold transition-colors"
-                  [class]="optionClass(i)"
-                >
-                  {{ opt }}
-                  @if (answered() !== null && i === question().answer) {
-                    <app-icon name="Check" [size]="16" />
-                  }
-                </button>
-              }
-            </div>
-            @if (answered() !== null) {
+            @if (question(); as q) {
+              <p class="font-sans text-[11px] font-semibold uppercase tracking-wide text-muted">
+                Pregunta {{ triviaIndex() + 1 }} de {{ questions().length }}
+                @if (q.teamId === team().id) {
+                  · {{ team().name }}
+                }
+              </p>
+              <p class="mt-1 font-sans text-[15px] font-bold leading-snug text-white">{{ q.question }}</p>
+              <div class="mt-4 flex flex-col gap-2">
+                @for (opt of q.options; track opt; let i = $index) {
+                  <button
+                    type="button"
+                    (click)="answer(i)"
+                    [disabled]="answered() !== null"
+                    class="pressable flex min-h-[44px] items-center justify-between rounded-row border px-4 text-left font-sans text-[13px] font-semibold transition-colors"
+                    [class]="optionClass(i)"
+                  >
+                    {{ opt }}
+                    @if (i === correctAnswer()) {
+                      <app-icon name="Check" [size]="16" />
+                    }
+                  </button>
+                }
+              </div>
+            } @else {
+              <p class="py-6 text-center font-sans text-[12px] text-muted">
+                {{ triviaError() ? 'No se pudo cargar la trivia. Cierra y vuelve a abrir el panel.' : 'Cargando preguntas…' }}
+              </p>
+            }
+            @if (correctAnswer() !== null) {
               <p
                 class="mt-3 font-display text-[12px] font-bold"
-                [class]="answered() === question().answer ? 'text-[#80ed99]' : 'text-pink'"
+                [class]="answered() === correctAnswer() ? 'text-[#80ed99]' : 'text-pink'"
               >
-                {{ answered() === question().answer ? '¡CORRECTO!' : 'INCORRECTO' }}
+                {{ answered() === correctAnswer() ? '¡CORRECTO!' : 'INCORRECTO' }}
               </p>
               <button
                 type="button"
@@ -304,7 +315,11 @@ export class ArHud implements OnDestroy {
   readonly panelChange = output<boolean>();
 
   private readonly fb = inject(Feedback);
+  private readonly api = inject(Api);
+  private readonly progress = inject(Progress);
   private timers: ReturnType<typeof setTimeout>[] = [];
+  /** Equipo para el que ya se cargó la trivia (sus preguntas van primero). */
+  private triviaTeam = '';
 
   protected readonly leftDock: DockItem[] = [
     { id: 'trivia', label: 'Trivia', icon: 'CircleHelp' },
@@ -326,17 +341,17 @@ export class ArHud implements OnDestroy {
   protected readonly narrating = signal(false);
   protected readonly particles = signal<Particle[]>([]);
 
-  protected readonly trivia = TRIVIA;
+  /** Las preguntas llegan sin la respuesta: la API la revela al contestar. */
+  protected readonly questions = signal<TriviaQuestion[]>([]);
+  protected readonly triviaError = signal(false);
   protected readonly triviaIndex = signal(0);
   protected readonly answered = signal<number | null>(null);
-  protected readonly question = computed(() => this.trivia[this.triviaIndex()]);
+  protected readonly correctAnswer = signal<number | null>(null);
+  protected readonly question = computed(() => this.questions()[this.triviaIndex()] ?? null);
 
-  protected readonly clip = computed(() => {
-    const t = this.team();
-    const c = VIDEO_CLIPS.find((v) => v.teamId === t.id) ?? VIDEO_CLIPS[0];
-    const n = (VIDEO_CLIPS.indexOf(c) % 4) + 1;
-    return { ...c, src: `assets/video/clip-${n}.mp4`, poster: `assets/figma/clip-${n}.webp` };
-  });
+  protected readonly clip = computed(
+    () => VIDEO_CLIPS.find((v) => v.teamId === this.team().id) ?? VIDEO_CLIPS[0],
+  );
 
   protected readonly standings = computed(() => {
     const div = this.team().division;
@@ -391,14 +406,18 @@ export class ArHud implements OnDestroy {
         this.effectsOn.set(true);
         this.fb.success();
         this.after(2600, () => this.effectsOn.set(false));
+        this.progress.track(this.api.event('effect'));
         break;
       case 'info':
         this.togglePanel('info');
         if (this.panel() === 'info') this.infoOpened.emit();
         break;
+      case 'trivia':
+        this.togglePanel('trivia');
+        if (this.panel() === 'trivia') this.loadTrivia();
+        break;
       case 'video':
       case 'stats':
-      case 'trivia':
         this.togglePanel(id);
         break;
     }
@@ -414,24 +433,58 @@ export class ArHud implements OnDestroy {
     return TEAM_BY_ID[id]?.name ?? id.toUpperCase();
   }
 
-  protected answer(i: number): void {
+  protected async answer(i: number): Promise<void> {
+    const q = this.question();
+    if (!q || this.answered() !== null) return;
     this.answered.set(i);
-    if (i === this.question().answer) this.fb.success();
-    else this.fb.error();
+    try {
+      const r = await this.api.answer(q.id, i);
+      this.correctAnswer.set(r.answer);
+      if (r.correct) this.fb.success();
+      else this.fb.error();
+      this.progress.celebrate(r);
+    } catch (e) {
+      console.error(e);
+      this.answered.set(null);
+      this.fb.error();
+    }
   }
 
   protected nextQuestion(): void {
     this.fb.tap();
     this.answered.set(null);
-    this.triviaIndex.update((n) => (n + 1) % this.trivia.length);
+    this.correctAnswer.set(null);
+    this.triviaIndex.update((n) => (n + 1) % Math.max(1, this.questions().length));
   }
 
   protected optionClass(i: number): string {
     const a = this.answered();
+    const correct = this.correctAnswer();
     if (a === null) return 'border-line bg-ink text-white';
-    if (i === this.question().answer) return 'border-[#80ed99] bg-[#80ed99]/15 text-[#80ed99]';
+    if (correct === null) return i === a ? 'border-purple bg-purple/20 text-white' : 'border-line bg-ink text-muted';
+    if (i === correct) return 'border-[#80ed99] bg-[#80ed99]/15 text-[#80ed99]';
     if (i === a) return 'border-pink bg-pink/15 text-pink';
     return 'border-line bg-ink text-muted';
+  }
+
+  /** Carga la trivia del equipo en pantalla (una vez por equipo); sus preguntas vienen primero. */
+  private loadTrivia(): void {
+    const teamId = this.team().id;
+    if (this.triviaTeam === teamId && this.questions().length) return;
+    this.triviaTeam = teamId;
+    this.triviaError.set(false);
+    this.questions.set([]);
+    this.triviaIndex.set(0);
+    this.answered.set(null);
+    this.correctAnswer.set(null);
+    this.api
+      .trivia(teamId)
+      .then((qs) => this.questions.set(qs))
+      .catch((e) => {
+        console.error(e);
+        this.triviaTeam = '';
+        this.triviaError.set(true);
+      });
   }
 
   protected toggleNarration(): void {

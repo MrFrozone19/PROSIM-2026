@@ -13,6 +13,8 @@ import { ScreenShell } from '../../shared/screen-shell';
 import { Icon } from '../../shared/icon';
 import { Feedback } from '../../shared/feedback';
 import { FilterId, VIDEO_CLIPS, VIDEO_FILTERS, VideoClip } from '../../data/videos';
+import { Api } from '../../core/api';
+import { Progress } from '../../core/progress';
 
 /**
  * /videos — "AR Studio": reproductor con filtros reales sobre el <video>.
@@ -260,6 +262,8 @@ export class VideosScreen implements AfterViewInit, OnDestroy {
   private readonly fx = viewChild.required<ElementRef<HTMLCanvasElement>>('fx');
   private readonly playerBox = viewChild.required<ElementRef<HTMLDivElement>>('player');
   private readonly fb = inject(Feedback);
+  private readonly api = inject(Api);
+  private readonly fan = inject(Progress);
 
   protected readonly filters = VIDEO_FILTERS;
   protected readonly clips = VIDEO_CLIPS;
@@ -324,6 +328,8 @@ export class VideosScreen implements AfterViewInit, OnDestroy {
     this.fb.tap();
     this.filter.update((f) => (f === id ? null : id));
     this.enabled.set(true);
+    // Aplicar filtros cuenta para el trofeo Filter Freak y la insignia Editor.
+    if (this.filter() === id) this.fan.track(this.api.event('filter', id));
   }
 
   protected toggleEnabled(): void {
