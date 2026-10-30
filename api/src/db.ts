@@ -133,6 +133,23 @@ const SCHEMA = [
     INDEX (uid, type),
     FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
   )`,
+  /** Galería: fotos (escáner AR) y videos (grabadora con filtros). El archivo vive en Firebase Storage. */
+  `CREATE TABLE IF NOT EXISTS gallery_items (
+    id CHAR(36) PRIMARY KEY,
+    uid VARCHAR(128) NOT NULL,
+    kind ENUM('photo','video') NOT NULL,
+    storage_path VARCHAR(255) NOT NULL,
+    url VARCHAR(1024) NOT NULL,
+    mime VARCHAR(64) NOT NULL,
+    filter VARCHAR(16) NULL,
+    team_id VARCHAR(8) NULL,
+    duration_ms INT NULL,
+    size_bytes INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX (uid, created_at),
+    FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
+    FOREIGN KEY (team_id) REFERENCES teams(id)
+  )`,
   /** Libro de puntos: el total da el nivel y la suma de los últimos 7 días, el leaderboard semanal. */
   `CREATE TABLE IF NOT EXISTS xp_events (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

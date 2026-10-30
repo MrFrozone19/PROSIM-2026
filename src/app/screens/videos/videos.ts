@@ -8,121 +8,142 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { ScreenShell } from '../../shared/screen-shell';
 import { Icon } from '../../shared/icon';
 import { Feedback } from '../../shared/feedback';
-import { FilterId, VIDEO_CLIPS, VIDEO_FILTERS, VideoClip } from '../../data/videos';
+import { Toast } from '../../shared/toast';
+import { FxRenderer } from '../../shared/fx-renderer';
+import { FilterId, VIDEO_FILTERS } from '../../data/videos';
 import { Api } from '../../core/api';
+import { Gallery, saveErrorMessage } from '../../core/gallery';
 import { Progress } from '../../core/progress';
 
+type CamState = 'loading' | 'ready' | 'denied' | 'unsupported' | 'error';
+
+interface Recording {
+  blob: Blob;
+  url: string;
+  durationMs: number;
+  filter: FilterId | null;
+}
+
+/** Duración máxima de un clip: mantiene los archivos ligeros (~10 MB a 720p). */
+const MAX_MS = 30_000;
+
 /**
- * /videos — "AR Studio": reproductor con filtros reales sobre el <video>.
- * Blur, Pastel y Color Adjust usan filtros CSS y capas de mezcla.
- * Pixelate y Thermal se procesan por cuadro en un <canvas> superpuesto (CSS no puede pixelar ni mapear a calor).
- * No se implementan B/N, escala de grises, sepia, exposición ni invertidos (prohibidos por la rúbrica).
+ * /videos — "AR Studio": grabadora con filtros en vivo. La cámara pasa por FxRenderer (WebGL) y se graba ese
+ * lienzo con MediaRecorder, así que el filtro queda en el video. El clip se revisa y se guarda en la Galería
+ * (TCG Vault). No se implementan B/N, escala de grises, sepia, exposición ni invertidos (prohibidos por la rúbrica).
  */
 @Component({
   selector: 'app-videos-screen',
-  imports: [ScreenShell, Icon, NgTemplateOutlet],
+  imports: [ScreenShell, Icon, RouterLink],
   template: `
     <app-screen-shell>
       <div class="flex flex-col gap-4 pt-3">
-        <header class="flex flex-col gap-1">
-          <h1 class="font-display text-[20px] font-black leading-normal text-white">AR STUDIO</h1>
-          <p class="font-sans text-[12px] leading-normal text-muted">Capture and customize fan experiences</p>
+        <header class="flex items-end justify-between gap-3">
+          <div class="flex flex-col gap-1">
+            <h1 class="font-display text-[20px] font-black leading-normal text-white">AR STUDIO</h1>
+            <p class="font-sans text-[12px] leading-normal text-muted">Graba clips y aplícales filtros en vivo</p>
+          </div>
+          <a
+            routerLink="/vault"
+            [queryParams]="{ tab: 'gallery' }"
+            class="pressable flex min-h-[36px] items-center gap-1.5 rounded-pill border border-line bg-surface px-3 font-sans text-[11px] font-bold text-white"
+          >
+            <app-icon name="Images" [size]="14" class="text-pink" />
+            Galería
+          </a>
         </header>
 
-        <!-- video-player-container -->
-        <div #player class="relative h-[200px] w-full overflow-hidden rounded-row border border-line bg-surface">
-          <video
-            #vid
-            class="absolute inset-0 h-full w-full object-cover"
-            [style.filter]="cssFilter()"
-            [src]="current().src"
-            [poster]="current().poster"
-            (timeupdate)="onTime()"
-            (loadedmetadata)="onTime()"
-            (play)="playing.set(true)"
-            (pause)="playing.set(false)"
-            (click)="togglePlay()"
-            autoplay
-            muted
-            loop
-            playsinline
-          ></video>
-          <canvas
-            #fx
-            width="640"
-            height="360"
-            class="pointer-events-none absolute inset-0 h-full w-full object-cover"
-            [class.hidden]="!canvasMode()"
-            [style.image-rendering]="filter() === 'pixelate' ? 'pixelated' : 'auto'"
-          ></canvas>
-          @if (filter() === 'pastel' && applied()) {
-            <div
-              class="pointer-events-none absolute inset-0 mix-blend-soft-light"
-              [style.opacity]="0.35 + intensity() / 100 * 0.6"
-              style="background: linear-gradient(135deg, #ffd6e8 0%, #d8c7ff 50%, #c7f0ff 100%)"
-            ></div>
+        <!-- visor: el canvas es a la vez la vista previa y lo que se graba -->
+        <div class="relative h-[52dvh] min-h-[300px] w-full overflow-hidden rounded-row border border-line bg-black">
+          <video #cam class="pointer-events-none absolute h-px w-px opacity-0" playsinline muted autoplay></video>
+          <canvas #out class="absolute inset-0 h-full w-full object-contain"></canvas>
+
+          @if (state() !== 'ready') {
+            <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
+              @if (state() === 'loading') {
+                <p class="font-display text-[12px] font-bold text-white">ABRIENDO CÁMARA…</p>
+              } @else {
+                <app-icon name="CameraOff" [size]="28" class="text-pink" />
+                <p class="font-display text-[12px] font-bold text-white">
+                  {{ state() === 'denied' ? 'CÁMARA BLOQUEADA' : state() === 'unsupported' ? 'SIN SOPORTE DE GRABACIÓN' : 'NO SE PUDO ABRIR LA CÁMARA' }}
+                </p>
+                <p class="font-sans text-[11px] leading-snug text-muted">{{ stateDetail() }}</p>
+                @if (state() !== 'unsupported') {
+                  <button
+                    type="button"
+                    (click)="startCamera()"
+                    class="pressable rounded-pill bg-cta px-4 py-2 font-sans text-[12px] font-bold text-white"
+                  >
+                    Reintentar
+                  </button>
+                }
+              }
+            </div>
           }
-          <!-- player-overlay -->
-          <div class="pointer-events-none absolute inset-0 flex flex-col justify-between bg-black/[0.38] p-3">
-            <div class="flex items-start justify-between">
-              <span class="rounded-md bg-pink px-2 py-1 font-sans text-[10px] font-extrabold uppercase leading-normal text-white">
-                {{ badge() }}
+
+          <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-3">
+            <span class="rounded-md bg-pink px-2 py-1 font-sans text-[10px] font-extrabold uppercase leading-normal text-white">
+              {{ filterLabel() }}
+            </span>
+            @if (recording()) {
+              <span class="flex items-center gap-1.5 rounded-pill bg-black/70 px-2.5 py-1 font-display text-[11px] font-bold text-white">
+                <span class="h-2 w-2 animate-pulse rounded-full bg-[#ff3b30]"></span>
+                {{ elapsedLabel() }} / 0:30
               </span>
-              <button
-                type="button"
-                (click)="fullscreen()"
-                class="pressable pointer-events-auto -mr-1 -mt-1 flex h-9 w-9 items-center justify-center text-white"
-                aria-label="Pantalla completa"
-              >
-                <app-icon name="Maximize" [size]="18" />
-              </button>
-            </div>
-            <div class="flex justify-center">
-              <button
-                type="button"
-                (click)="togglePlay()"
-                class="pressable pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border-2 border-white/90 text-white shadow-[0_0_16px_rgba(255,255,255,0.35)]"
-                [attr.aria-label]="playing() ? 'Pausar' : 'Reproducir'"
-              >
-                <app-icon [name]="playing() ? 'Pause' : 'Play'" [size]="20" />
-              </button>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="font-sans text-[11px] leading-normal text-white">{{ time() }}</span>
-              <div
-                class="pointer-events-auto relative h-4 flex-1 cursor-pointer"
-                (click)="seek($event)"
-                role="slider"
-                aria-label="Progreso"
-                [attr.aria-valuenow]="progress()"
-              >
-                <div class="absolute inset-x-0 top-1.5 h-1 rounded-sm bg-white/[0.19]">
-                  <div class="h-full rounded-sm bg-purple" [style.width.%]="progress()"></div>
-                </div>
-                <div
-                  class="absolute top-1 h-2.5 w-2.5 -translate-x-1/2 rounded-full bg-white"
-                  [style.left.%]="progress()"
-                ></div>
-              </div>
-              <span class="font-sans text-[11px] leading-normal text-muted">{{ current().duration }}</span>
-            </div>
+            }
+            <button
+              type="button"
+              (click)="flip()"
+              [disabled]="recording() || state() !== 'ready'"
+              class="pressable pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white disabled:opacity-40"
+              aria-label="Cambiar de cámara"
+            >
+              <app-icon name="RefreshCw" [size]="18" />
+            </button>
+          </div>
+
+          <!-- botón de grabar -->
+          <div class="absolute inset-x-0 bottom-4 flex justify-center">
+            <button
+              type="button"
+              (click)="toggleRecord()"
+              [disabled]="state() !== 'ready'"
+              class="pressable flex h-[68px] w-[68px] items-center justify-center rounded-full border-4 border-white/90 bg-black/30 disabled:opacity-40"
+              [attr.aria-label]="recording() ? 'Detener grabación' : 'Grabar'"
+            >
+              <span
+                class="bg-[#ff3b30] transition-all duration-150"
+                [class]="recording() ? 'h-6 w-6 rounded-md' : 'h-[50px] w-[50px] rounded-full'"
+              ></span>
+            </button>
           </div>
         </div>
 
-        <!-- filters-section -->
+        <!-- filtros -->
         <section class="flex flex-col gap-2">
           <p class="font-sans text-[11px] font-bold leading-normal text-muted">AR RENDER ENGINE FILTERS</p>
           <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              (click)="pick(null)"
+              [disabled]="recording()"
+              [attr.aria-pressed]="filter() === null"
+              class="pressable min-h-[36px] rounded-row border px-3 py-2 font-sans text-[11px] font-bold leading-normal text-white transition-colors disabled:opacity-50"
+              [class]="filter() === null ? 'border-pink bg-purple' : 'border-line bg-surface'"
+            >
+              Sin filtro
+            </button>
             @for (f of filters; track f.id) {
               <button
                 type="button"
                 (click)="pick(f.id)"
+                [disabled]="recording()"
                 [attr.aria-pressed]="filter() === f.id"
-                class="pressable min-h-[36px] rounded-row border px-3 py-2 font-sans text-[11px] font-bold leading-normal text-white transition-colors"
+                class="pressable min-h-[36px] rounded-row border px-3 py-2 font-sans text-[11px] font-bold leading-normal text-white transition-colors disabled:opacity-50"
                 [class]="filter() === f.id ? 'border-pink bg-purple' : 'border-line bg-surface'"
               >
                 {{ f.label }}
@@ -131,39 +152,13 @@ import { Progress } from '../../core/progress';
           </div>
           @if (filter(); as f) {
             <div class="mt-1 flex flex-col gap-3 rounded-row border border-line bg-surface p-3">
-              <div class="flex items-center justify-between">
-                <span class="font-sans text-[12px] font-semibold text-white">{{ filterLabel() }}</span>
-                <label class="flex items-center gap-2 font-sans text-[11px] font-semibold text-muted">
-                  {{ enabled() ? 'Activo' : 'Apagado' }}
-                  <button
-                    type="button"
-                    role="switch"
-                    [attr.aria-checked]="enabled()"
-                    (click)="toggleEnabled()"
-                    class="relative h-6 w-11 rounded-pill transition-colors"
-                    [class]="enabled() ? 'bg-pink' : 'bg-white/20'"
-                  >
-                    <span
-                      class="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform"
-                      [class]="enabled() ? 'translate-x-[22px]' : 'translate-x-0.5'"
-                    ></span>
-                  </button>
-                </label>
-              </div>
               @if (f === 'color') {
                 @for (c of colorControls; track c.key) {
                   <label class="flex flex-col gap-1">
                     <span class="flex justify-between font-sans text-[11px] text-muted">
                       <span>{{ c.label }}</span><span>{{ color()[c.key] }}%</span>
                     </span>
-                    <input
-                      type="range"
-                      min="50"
-                      max="150"
-                      [value]="color()[c.key]"
-                      (input)="setColor(c.key, $event)"
-                      class="range"
-                    />
+                    <input type="range" min="50" max="150" [value]="color()[c.key]" (input)="setColor(c.key, $event)" class="range" />
                   </label>
                 }
               } @else {
@@ -174,58 +169,57 @@ import { Progress } from '../../core/progress';
                   <input type="range" min="0" max="100" [value]="intensity()" (input)="setIntensity($event)" class="range" />
                 </label>
               }
-              <button
-                type="button"
-                (pointerdown)="compare.set(true)"
-                (pointerup)="compare.set(false)"
-                (pointercancel)="compare.set(false)"
-                (pointerleave)="compare.set(false)"
-                class="pressable flex min-h-[40px] items-center justify-center gap-2 rounded-pill border border-line font-sans text-[12px] font-bold text-white"
-                [class.bg-white/10]="compare()"
-              >
-                <app-icon [name]="compare() ? 'EyeOff' : 'Eye'" [size]="16" class="text-pink" />
-                {{ compare() ? 'Mostrando original' : 'Mantén presionado para comparar' }}
-              </button>
             </div>
           }
+          @if (recording()) {
+            <p class="font-sans text-[11px] text-muted">El filtro queda fijo durante la grabación; la intensidad sí se puede mover.</p>
+          }
         </section>
-
-        <!-- favoritos -->
-        <section class="flex flex-col gap-3">
-          <p class="font-sans text-[11px] font-bold leading-normal text-muted">YOUR FAVORITE CLIPS</p>
-          <div class="grid grid-cols-2 gap-3">
-            @for (c of favorites; track c.id) {
-              <ng-container *ngTemplateOutlet="card; context: { $implicit: c }" />
-            }
-          </div>
-        </section>
-        <section class="flex flex-col gap-3">
-          <p class="font-sans text-[11px] font-bold leading-normal text-muted">ALL RECORDED CLIPS</p>
-          <div class="grid grid-cols-2 gap-3">
-            @for (c of clips; track c.id) {
-              <ng-container *ngTemplateOutlet="card; context: { $implicit: c }" />
-            }
-          </div>
-        </section>
-
-        <ng-template #card let-c>
-          <button
-            type="button"
-            (click)="select(c)"
-            class="pressable relative h-[130px] overflow-hidden rounded-[12px] border bg-surface text-left transition-colors"
-            [class]="current().id === c.id ? 'border-pink' : 'border-line'"
-          >
-            <img [src]="c.poster" class="absolute inset-0 h-full w-full object-cover" alt="" loading="lazy" />
-            <div class="absolute inset-0 flex flex-col justify-between bg-black/[0.44] p-2.5">
-              <div class="flex items-start justify-between text-white">
-                <app-icon [name]="current().id === c.id && playing() ? 'Pause' : 'Play'" [size]="16" />
-                <span class="font-sans text-[10px] leading-normal">{{ c.duration }}</span>
-              </div>
-              <p class="truncate font-sans text-[11px] font-bold leading-normal text-white">{{ c.title }}</p>
-            </div>
-          </button>
-        </ng-template>
       </div>
+
+      <!-- revisión del clip grabado -->
+      @if (take(); as t) {
+        <div class="fixed inset-0 z-50 bg-black/70" aria-hidden="true"></div>
+        <section
+          class="sheet-in fixed inset-x-0 bottom-0 z-50 max-h-[90%] overflow-y-auto rounded-t-[32px] border-t border-line bg-surface px-5 pt-3"
+          style="padding-bottom: calc(24px + env(safe-area-inset-bottom))"
+          role="dialog"
+          aria-label="Revisar clip"
+        >
+          <div class="mx-auto mb-3 h-1 w-9 rounded-full bg-white/20"></div>
+          <h2 class="mb-3 font-display text-[16px] font-black uppercase text-white">Tu clip</h2>
+          <video
+            [src]="t.url"
+            class="max-h-[50dvh] w-full rounded-row border border-line bg-black object-contain"
+            controls
+            autoplay
+            loop
+            playsinline
+          ></video>
+          <p class="mt-2 font-sans text-[11px] text-muted">
+            {{ formatMs(t.durationMs) }} · {{ t.filter ? labelOf(t.filter) : 'Sin filtro' }} · {{ sizeLabel(t.blob.size) }}
+          </p>
+          <div class="mt-4 flex gap-3">
+            <button
+              type="button"
+              (click)="discard()"
+              [disabled]="saving()"
+              class="pressable flex h-12 flex-1 items-center justify-center rounded-cta border border-line font-display text-[12px] font-bold text-white disabled:opacity-50"
+            >
+              DESCARTAR
+            </button>
+            <button
+              type="button"
+              (click)="save()"
+              [disabled]="saving()"
+              class="pressable flex h-12 flex-[2] items-center justify-center gap-2 rounded-cta bg-cta font-display text-[12px] font-bold text-white disabled:opacity-70"
+            >
+              <app-icon name="Images" [size]="16" />
+              {{ saving() ? 'SUBIENDO ' + uploadPct() + '%' : 'GUARDAR EN GALERÍA' }}
+            </button>
+          </div>
+        </section>
+      }
     </app-screen-shell>
   `,
   styles: `
@@ -255,86 +249,133 @@ import { Progress } from '../../core/progress';
       background: #fff;
       border: 3px solid #9d4edd;
     }
+    .sheet-in {
+      animation: sheet 200ms ease-out;
+    }
+    @keyframes sheet {
+      from { transform: translateY(24px); opacity: 0; }
+      to { transform: none; opacity: 1; }
+    }
   `,
 })
 export class VideosScreen implements AfterViewInit, OnDestroy {
-  private readonly vid = viewChild.required<ElementRef<HTMLVideoElement>>('vid');
-  private readonly fx = viewChild.required<ElementRef<HTMLCanvasElement>>('fx');
-  private readonly playerBox = viewChild.required<ElementRef<HTMLDivElement>>('player');
+  private readonly cam = viewChild.required<ElementRef<HTMLVideoElement>>('cam');
+  private readonly out = viewChild.required<ElementRef<HTMLCanvasElement>>('out');
   private readonly fb = inject(Feedback);
+  private readonly toast = inject(Toast);
   private readonly api = inject(Api);
+  private readonly gallery = inject(Gallery);
   private readonly fan = inject(Progress);
 
   protected readonly filters = VIDEO_FILTERS;
-  protected readonly clips = VIDEO_CLIPS;
-  protected readonly favorites = VIDEO_CLIPS.filter((c) => c.favorite);
   protected readonly colorControls = [
     { key: 'brightness' as const, label: 'Brillo' },
     { key: 'contrast' as const, label: 'Contraste' },
     { key: 'saturation' as const, label: 'Saturación' },
   ];
 
-  protected readonly current = signal<VideoClip>(VIDEO_CLIPS[0]);
-  protected readonly playing = signal(false);
-  protected readonly progress = signal(0);
-  protected readonly time = signal('0:00');
-
+  protected readonly state = signal<CamState>('loading');
+  protected readonly stateDetail = signal('');
+  protected readonly facing = signal<'environment' | 'user'>('environment');
   protected readonly filter = signal<FilterId | null>('thermal');
-  protected readonly enabled = signal(true);
-  protected readonly compare = signal(false);
   protected readonly intensity = signal(60);
   protected readonly color = signal({ brightness: 110, contrast: 115, saturation: 130 });
+  protected readonly recording = signal(false);
+  protected readonly elapsed = signal(0);
+  protected readonly take = signal<Recording | null>(null);
+  protected readonly saving = signal(false);
+  protected readonly uploadPct = signal(0);
 
-  /** El filtro se aplica salvo que esté apagado o se esté comparando con el original. */
-  protected readonly applied = computed(() => this.filter() !== null && this.enabled() && !this.compare());
-  protected readonly canvasMode = computed(
-    () => this.applied() && (this.filter() === 'pixelate' || this.filter() === 'thermal'),
-  );
-  protected readonly filterLabel = computed(() => this.filters.find((f) => f.id === this.filter())?.label ?? '');
-  protected readonly badge = computed(() =>
-    this.applied() ? `${this.filterLabel()} filter` : this.filter() ? 'Original' : 'Sin filtro',
-  );
-
-  protected readonly cssFilter = computed(() => {
-    if (!this.applied()) return 'none';
-    const k = this.intensity() / 100;
-    switch (this.filter()) {
-      case 'blur':
-        return `blur(${(k * 10).toFixed(1)}px)`;
-      case 'pastel':
-        return `saturate(${(1 + 0.4 * k).toFixed(2)}) brightness(${(1 + 0.15 * k).toFixed(2)}) contrast(${(1 - 0.3 * k).toFixed(2)}) blur(${(k * 0.8).toFixed(1)}px)`;
-      case 'color': {
-        const c = this.color();
-        return `brightness(${c.brightness / 100}) contrast(${c.contrast / 100}) saturate(${c.saturation / 100})`;
-      }
-      default:
-        return 'none';
-    }
+  protected readonly filterLabel = computed(() => {
+    const f = this.filter();
+    return f ? `${this.labelOf(f)} filter` : 'Sin filtro';
   });
+  protected readonly elapsedLabel = computed(() => this.formatMs(this.elapsed()));
 
+  private stream?: MediaStream;
+  private renderer?: FxRenderer;
+  private recorder?: MediaRecorder;
+  private chunks: Blob[] = [];
+  private recordStart = 0;
+  private recordFilter: FilterId | null = null;
+  private tick?: ReturnType<typeof setInterval>;
   private raf = 0;
-  private readonly small = document.createElement('canvas');
-  private readonly thermalLut = this.buildThermalLut();
+  private destroyed = false;
 
   ngAfterViewInit(): void {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      this.state.set('unsupported');
+      this.stateDetail.set('Abre la app por HTTPS en Safari (iOS 15+) o Chrome actualizados.');
+      return;
+    }
+    try {
+      this.renderer = new FxRenderer(this.out().nativeElement);
+    } catch (e) {
+      console.error(e);
+      this.state.set('unsupported');
+      this.stateDetail.set('Este navegador no tiene WebGL, que se usa para aplicar los filtros.');
+      return;
+    }
     this.loop();
+    void this.startCamera();
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     cancelAnimationFrame(this.raf);
+    clearInterval(this.tick);
+    if (this.recorder?.state === 'recording') this.recorder.stop();
+    this.stopStream();
+    this.renderer?.dispose();
+    const t = this.take();
+    if (t) URL.revokeObjectURL(t.url);
   }
 
-  protected pick(id: FilterId): void {
-    this.fb.tap();
-    this.filter.update((f) => (f === id ? null : id));
-    this.enabled.set(true);
-    // Aplicar filtros cuenta para el trofeo Filter Freak y la insignia Editor.
-    if (this.filter() === id) this.fan.track(this.api.event('filter', id));
+  /** Abre la cámara (con micrófono si se permite; si no, solo video). */
+  protected async startCamera(): Promise<void> {
+    this.stopStream();
+    this.state.set('loading');
+    const video = { facingMode: { ideal: this.facing() }, width: { ideal: 1280 }, height: { ideal: 720 } };
+    try {
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video, audio: true });
+      } catch {
+        stream = await navigator.mediaDevices.getUserMedia({ video, audio: false });
+      }
+      if (this.destroyed) {
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
+      this.stream = stream;
+      const el = this.cam().nativeElement;
+      el.srcObject = stream;
+      await el.play();
+      this.state.set('ready');
+    } catch (e) {
+      console.error(e);
+      const name = (e as DOMException)?.name;
+      if (name === 'NotAllowedError' || name === 'SecurityError') {
+        this.state.set('denied');
+        this.stateDetail.set('Permite el acceso a la cámara en los ajustes del navegador para grabar clips.');
+      } else {
+        this.state.set('error');
+        this.stateDetail.set('Revisa que ninguna otra app esté usando la cámara.');
+      }
+    }
   }
 
-  protected toggleEnabled(): void {
+  protected flip(): void {
     this.fb.tap();
-    this.enabled.update((v) => !v);
+    this.facing.update((f) => (f === 'environment' ? 'user' : 'environment'));
+    void this.startCamera();
+  }
+
+  protected pick(id: FilterId | null): void {
+    this.fb.tap();
+    this.filter.set(id);
+    // Probar filtros cuenta para el trofeo Filter Freak.
+    if (id) this.fan.track(this.api.event('filter', id));
   }
 
   protected setIntensity(e: Event): void {
@@ -346,115 +387,131 @@ export class VideosScreen implements AfterViewInit, OnDestroy {
     this.color.update((c) => ({ ...c, [key]: v }));
   }
 
-  protected select(c: VideoClip): void {
+  protected toggleRecord(): void {
+    if (this.recording()) this.stopRecording();
+    else this.startRecording();
+  }
+
+  protected discard(): void {
     this.fb.tap();
-    if (this.current().id === c.id) {
-      this.togglePlay();
+    const t = this.take();
+    if (t) URL.revokeObjectURL(t.url);
+    this.take.set(null);
+  }
+
+  protected async save(): Promise<void> {
+    const t = this.take();
+    if (!t) return;
+    this.fb.tap();
+    this.saving.set(true);
+    this.uploadPct.set(0);
+    try {
+      const reward = await this.gallery.save('video', t.blob, {
+        filter: t.filter,
+        durationMs: t.durationMs,
+        onProgress: (f) => this.uploadPct.set(Math.round(f * 100)),
+      });
+      URL.revokeObjectURL(t.url);
+      this.take.set(null);
+      this.fb.success();
+      this.toast.show('Clip guardado en tu Galería');
+      this.fan.celebrate(reward);
+    } catch (e) {
+      console.error(e);
+      this.fb.error();
+      this.toast.show(saveErrorMessage(e), 3500);
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  protected labelOf(id: FilterId): string {
+    return this.filters.find((f) => f.id === id)?.label ?? id;
+  }
+
+  protected formatMs(ms: number): string {
+    const s = Math.floor(ms / 1000);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  }
+
+  protected sizeLabel(bytes: number): string {
+    return bytes > 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.round(bytes / 1024)} kB`;
+  }
+
+  private startRecording(): void {
+    const canvas = this.out().nativeElement;
+    const mimeType = pickMime();
+    let rec: MediaRecorder;
+    try {
+      const out = canvas.captureStream(30);
+      this.stream?.getAudioTracks().forEach((t) => out.addTrack(t));
+      rec = new MediaRecorder(out, { mimeType, videoBitsPerSecond: 2_500_000 });
+    } catch (e) {
+      console.error(e);
+      this.fb.error();
+      this.toast.show('Este navegador no puede grabar el lienzo con filtros.', 3000);
       return;
     }
-    this.current.set(c);
-    this.progress.set(0);
-    queueMicrotask(() => void this.vid().nativeElement.play().catch(() => undefined));
-  }
-
-  protected togglePlay(): void {
-    const v = this.vid().nativeElement;
-    if (v.paused) void v.play().catch(() => undefined);
-    else v.pause();
-  }
-
-  protected seek(e: MouseEvent): void {
-    const v = this.vid().nativeElement;
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
-    if (v.duration) v.currentTime = ratio * v.duration;
-  }
-
-  protected fullscreen(): void {
     this.fb.tap();
-    const box = this.playerBox().nativeElement;
-    const v = this.vid().nativeElement as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
-    if (document.fullscreenElement) void document.exitFullscreen();
-    else if (box.requestFullscreen) void box.requestFullscreen();
-    else v.webkitEnterFullscreen?.();
+    this.chunks = [];
+    this.recordFilter = this.filter();
+    rec.ondataavailable = (e) => {
+      if (e.data.size) this.chunks.push(e.data);
+    };
+    rec.onstop = () => this.finishRecording(rec.mimeType || mimeType);
+    rec.start(250);
+    this.recorder = rec;
+    this.recordStart = performance.now();
+    this.elapsed.set(0);
+    this.recording.set(true);
+    this.tick = setInterval(() => {
+      const ms = performance.now() - this.recordStart;
+      this.elapsed.set(ms);
+      if (ms >= MAX_MS) this.stopRecording();
+    }, 200);
   }
 
-  protected onTime(): void {
-    const v = this.vid().nativeElement;
-    const t = v.currentTime || 0;
-    this.progress.set(v.duration ? (t / v.duration) * 100 : 0);
-    this.time.set(`${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`);
+  private stopRecording(): void {
+    clearInterval(this.tick);
+    if (this.recorder?.state === 'recording') this.recorder.stop();
+    this.recording.set(false);
+    this.fb.shutter();
   }
 
-  /** Bucle de render para los filtros que necesitan procesar píxeles. */
+  private finishRecording(mimeType: string): void {
+    if (this.destroyed) return;
+    const durationMs = Math.min(MAX_MS, Math.round(performance.now() - this.recordStart));
+    const blob = new Blob(this.chunks, { type: mimeType.split(';')[0] });
+    this.chunks = [];
+    if (!blob.size) {
+      this.toast.show('La grabación salió vacía. Intenta de nuevo.');
+      return;
+    }
+    this.take.set({ blob, url: URL.createObjectURL(blob), durationMs, filter: this.recordFilter });
+  }
+
+  private stopStream(): void {
+    this.stream?.getTracks().forEach((t) => t.stop());
+    this.stream = undefined;
+  }
+
+  /** Dibuja cada cuadro de la cámara con el filtro actual. */
   private loop = (): void => {
     this.raf = requestAnimationFrame(this.loop);
-    if (!this.canvasMode()) return;
-    const v = this.vid().nativeElement;
-    if (v.readyState < 2) return;
-    const out = this.fx().nativeElement;
-    const ctx = out.getContext('2d');
-    if (!ctx) return;
-    const k = this.intensity() / 100;
-
-    if (this.filter() === 'pixelate') {
-      const block = 2 + Math.round(k * 26);
-      const w = Math.max(8, Math.round(out.width / block));
-      const h = Math.max(4, Math.round(out.height / block));
-      this.small.width = w;
-      this.small.height = h;
-      const sctx = this.small.getContext('2d')!;
-      sctx.drawImage(v, 0, 0, w, h);
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(this.small, 0, 0, w, h, 0, 0, out.width, out.height);
-      return;
-    }
-
-    // thermal: luma → paleta de calor, mezclada con el original según la intensidad
-    const w = 160;
-    const h = 90;
-    this.small.width = w;
-    this.small.height = h;
-    const sctx = this.small.getContext('2d', { willReadFrequently: true })!;
-    sctx.drawImage(v, 0, 0, w, h);
-    const img = sctx.getImageData(0, 0, w, h);
-    const d = img.data;
-    const lut = this.thermalLut;
-    const mix = 0.35 + 0.65 * k;
-    for (let i = 0; i < d.length; i += 4) {
-      const r = d[i];
-      const g = d[i + 1];
-      const b = d[i + 2];
-      const l = (r * 299 + g * 587 + b * 114) / 1000;
-      const j = Math.min(255, Math.round(l * (0.8 + 0.6 * k))) * 3;
-      d[i] = r + (lut[j] - r) * mix;
-      d[i + 1] = g + (lut[j + 1] - g) * mix;
-      d[i + 2] = b + (lut[j + 2] - b) * mix;
-    }
-    sctx.putImageData(img, 0, 0);
-    ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(this.small, 0, 0, w, h, 0, 0, out.width, out.height);
+    const v = this.cam().nativeElement;
+    if (!this.renderer || v.readyState < 2) return;
+    const c = this.color();
+    this.renderer.render(v, {
+      filter: this.filter(),
+      intensity: this.intensity() / 100,
+      color: { brightness: c.brightness / 100, contrast: c.contrast / 100, saturation: c.saturation / 100 },
+      mirror: this.facing() === 'user',
+    });
   };
+}
 
-  /** Paleta térmica: negro → azul → morado → rojo → naranja → amarillo → blanco. */
-  private buildThermalLut(): Uint8ClampedArray {
-    const stops: [number, number, number][] = [
-      [8, 8, 40],
-      [20, 30, 200],
-      [157, 78, 221],
-      [247, 37, 133],
-      [255, 110, 40],
-      [255, 220, 60],
-      [255, 255, 255],
-    ];
-    const lut = new Uint8ClampedArray(256 * 3);
-    for (let i = 0; i < 256; i++) {
-      const pos = (i / 255) * (stops.length - 1);
-      const a = Math.floor(pos);
-      const b = Math.min(stops.length - 1, a + 1);
-      const t = pos - a;
-      for (let c = 0; c < 3; c++) lut[i * 3 + c] = stops[a][c] + (stops[b][c] - stops[a][c]) * t;
-    }
-    return lut;
-  }
+/** MP4 primero (lo reproducen iPhone y Android); WebM como respaldo en navegadores que no graban MP4. */
+function pickMime(): string {
+  const options = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'];
+  return options.find((m) => MediaRecorder.isTypeSupported(m)) ?? '';
 }

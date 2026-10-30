@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://basedex-fan.web.app", "https://basedex-fan.firebaseapp.com", "http://localhost:4200"],
+    "method": ["GET", "HEAD"],
+    "responseHeader": ["Content-Type", "Content-Length", "Range"],
+    "maxAgeSeconds": 3600
+  }
+]

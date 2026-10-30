@@ -43,7 +43,7 @@ export const BADGES: { id: string; label: string; description: string }[] = [
   { id: 'b1', label: 'Rookie', description: 'Primera sesión AR' },
   { id: 'b2', label: 'Collector', description: '5 cartas desbloqueadas' },
   { id: 'b3', label: 'Scout', description: '3 equipos escaneados' },
-  { id: 'b4', label: 'Editor', description: '10 clips con filtro' },
+  { id: 'b4', label: 'Editor', description: 'Guarda 3 videos grabados con filtro' },
   { id: 'b5', label: 'MVP', description: 'Top 3 semanal' },
   { id: 'b6', label: 'Historian', description: 'Trivia perfecta' },
 ];

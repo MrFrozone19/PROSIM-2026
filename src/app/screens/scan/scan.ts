@@ -5,9 +5,9 @@ import { ScreenShell } from '../../shared/screen-shell';
 import { Icon } from '../../shared/icon';
 import { Feedback } from '../../shared/feedback';
 import { Toast } from '../../shared/toast';
-import { savePhoto } from '../../shared/save-photo';
 import { getArQuality } from '../../shared/prefs';
 import { Api } from '../../core/api';
+import { Gallery, saveErrorMessage } from '../../core/gallery';
 import { Progress } from '../../core/progress';
 import { TEAM_BY_ID, TEAMS, Team } from '../../data/teams';
 import { AR_TARGETS, TARGETS_SRC } from '../../data/targets';
@@ -198,6 +198,7 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
   private readonly toast = inject(Toast);
   private readonly api = inject(Api);
   private readonly progress = inject(Progress);
+  private readonly gallery = inject(Gallery);
   private destroyed = false;
   /** Momento en que empezó la búsqueda actual; da la duración del escaneo (trofeo Perfect Scan). */
   private scanStartedAt = 0;
@@ -264,8 +265,8 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
     this.progress.track(this.api.scan(teamId, ms));
   }
 
-  /** Foto de la cámara con el modelo encima; se guarda por la hoja de compartir (Fotos / Galería) o descarga. */
-  protected takePhoto(): void {
+  /** Foto de la cámara con el modelo encima; se sube a la Galería del TCG Vault. */
+  protected async takePhoto(): Promise<void> {
     const t = this.team();
     if (!this.engine || !t) return;
     let blob: Blob;
@@ -278,11 +279,16 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
       return;
     }
     this.fb.shutter();
-    const stamp = new Date().toISOString().slice(0, 19).replace(/[-:]/g, '').replace('T', '-');
-    void savePhoto(blob, `basedex-${t.id}-${stamp}.jpg`, `${t.city} ${t.name} en AR`).then((r) => {
-      if (r === 'shared') this.toast.show('Foto guardada');
-      else if (r === 'downloaded') this.toast.show('Foto descargada');
-    });
+    this.toast.show('Guardando foto…', 10_000);
+    try {
+      const reward = await this.gallery.save('photo', blob, { teamId: t.id });
+      this.toast.show('Foto guardada en tu Galería');
+      this.progress.celebrate(reward);
+    } catch (e) {
+      console.error(e);
+      this.fb.error();
+      this.toast.show(saveErrorMessage(e), 3500);
+    }
   }
 
   protected toggleAnimation(): void {

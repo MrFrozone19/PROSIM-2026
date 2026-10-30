@@ -3,8 +3,10 @@ import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { pool } from './db.js';
 
-// Solo se verifican tokens de Firebase Auth: basta el projectId, la firma se valida con las llaves públicas de Google.
-initializeApp({ projectId: process.env['FIREBASE_PROJECT_ID'] ?? 'basedex-fan' });
+// Los tokens de Firebase Auth se validan con las llaves públicas de Google (basta el projectId). Storage usa las
+// credenciales del entorno: la cuenta de servicio en Cloud Run, o `gcloud auth application-default login` en local.
+const projectId = process.env['FIREBASE_PROJECT_ID'] ?? 'basedex-fan';
+initializeApp({ projectId, storageBucket: process.env['STORAGE_BUCKET'] ?? `${projectId}.firebasestorage.app` });
 
 const ADMIN_EMAILS = new Set(
   (process.env['ADMIN_EMAILS'] ?? '')

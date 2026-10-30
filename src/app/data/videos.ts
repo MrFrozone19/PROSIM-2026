@@ -1,3 +1,4 @@
+/** Clips promocionales del botón Video de la ventana AR (la sección Videos ahora es la grabadora). */
 export interface VideoClip {
   id: string;
   title: string;

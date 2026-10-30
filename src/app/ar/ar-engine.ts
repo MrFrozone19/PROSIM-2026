@@ -149,8 +149,8 @@ export class ArEngine {
 
   /**
    * Foto de lo que se ve: cuadro de la cámara (con el mismo encuadre que en pantalla) y el modelo 3D encima,
-   * sin la interfaz. Es síncrona a propósito: la hoja de compartir del sistema solo se puede abrir dentro del
-   * gesto del usuario, y un toBlob asíncrono lo rompería en Safari.
+   * sin la interfaz. El canvas WebGL se vuelve a dibujar justo antes de copiarlo, así que la conversión tiene
+   * que ser inmediata (toDataURL); la foto se sube después a la Galería.
    */
   capture(caption?: string): Blob {
     const { renderer, scene, camera, video } = this.mindar;

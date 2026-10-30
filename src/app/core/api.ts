@@ -87,6 +87,30 @@ export interface TriviaQuestion {
   options: string[];
 }
 
+export interface GalleryItem {
+  id: string;
+  kind: 'photo' | 'video';
+  url: string;
+  mime: string;
+  /** Filtro con el que se grabó el video (null = sin filtro, o foto). */
+  filter: string | null;
+  /** Equipo escaneado cuando se tomó la foto. */
+  teamId: string | null;
+  durationMs: number | null;
+  sizeBytes: number;
+  createdAt: string;
+}
+
+export interface NewGalleryItem {
+  id: string;
+  kind: 'photo' | 'video';
+  mime: string;
+  url: string;
+  filter?: string | null;
+  teamId?: string | null;
+  durationMs?: number | null;
+}
+
 export interface Leaderboard {
   entries: { rank: number; name: string; photoUrl: string | null; points: number; me: boolean }[];
   me: { points: number; rank: number | null };
@@ -118,4 +142,8 @@ export class Api {
     this.send<Reward & { correct: boolean; answer: number }>('POST', `trivia/${questionId}/answer`, { option });
   event = (type: 'effect' | 'filter', value?: string) =>
     this.send<Reward>('POST', 'events', { type, value });
+
+  gallery = () => this.get<GalleryItem[]>('gallery');
+  addGalleryItem = (item: NewGalleryItem) => this.send<Reward>('POST', 'gallery', item);
+  deleteGalleryItem = (id: string) => this.send<{ ok: true }>('DELETE', `gallery/${id}`);
 }

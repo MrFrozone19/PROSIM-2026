@@ -132,11 +132,12 @@ de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores ti
 | Cuentas e inicio de sesión | **Real** con Firebase Auth (Google y correo/contraseña, recuperación de contraseña). Todas las pantallas piden sesión |
 | Colección (cartas, trofeos, insignias), nivel y XP | **Real**, guardado en MySQL. Escanear un logo por primera vez desbloquea la carta de ese equipo |
 | Perfil y leaderboard semanal | **Real**: nombre y equipo favorito editables; el leaderboard suma la XP de los últimos 7 días |
-| Botón Foto | Real: compone el cuadro de la cámara con el modelo 3D encima (sin interfaz) y lo entrega a la hoja de compartir del sistema, donde iOS ofrece "Guardar imagen" (Fotos) y Android la galería; sin soporte para compartir archivos (escritorio) descarga el JPG. Una web no puede escribir directo en la galería |
+| Botón Foto | Real: compone el cuadro de la cámara con el modelo 3D encima (sin interfaz) y lo guarda en la **Galería** de la app (TCG Vault → Galería) |
+| Galería (TCG Vault) | **Real**: fotos del escáner y clips grabados en Videos, guardados por cuenta en Firebase Storage (`gallery/{uid}/`, ver `storage.rules`) y registrados en MySQL. Desde el visor se comparten o descargan al teléfono, o se eliminan |
 | `/ar` y el botón "Simular detección" | Respaldo sin cámara: el botón solo aparece si la cámara no está disponible o con `/#/scan?sim=1`, y abre la ventana AR con un logo holográfico en lugar del modelo |
 | Narración por voz en el panel Info | Real, con la síntesis de voz del navegador (`speechSynthesis`) |
-| Reproductor de `/videos` y sus 5 filtros | Real. Pixelate y Thermal se procesan en `<canvas>`; Pastel, Blur y Color Adjust con filtros CSS y capas de mezcla |
-| Clips de video | Generados en el proyecto con ffmpeg a partir del arte del diseño (sin derechos de terceros) |
+| `/videos` (AR Studio): grabadora con 5 filtros | **Real**: la cámara pasa por un shader WebGL (`shared/fx-renderer.ts`) con el filtro elegido y ese lienzo se graba con `MediaRecorder` (MP4, o WebM si el navegador no graba MP4), así que el filtro queda en el video. Máximo 30 s; se revisa y se guarda en la Galería |
+| Clips del botón Video de la ventana AR | Generados en el proyecto con ffmpeg a partir del arte del diseño (sin derechos de terceros) |
 | Minijuego en `/game` | **Placeholder** explícito; "Jugar ahora" muestra "próximamente" |
 
 Filtros de video permitidos por la rúbrica e implementados: desenfoque, pixelado, cámara térmica, ajuste de

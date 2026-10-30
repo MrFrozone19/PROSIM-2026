@@ -1,4 +1,7 @@
 {
+  "storage": {
+    "rules": "storage.rules"
+  },
   "hosting": {
     "public": "docs",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "3rdpartylicenses.txt", "prerendered-routes.json"],
@@ -23,6 +26,10 @@
       {
         "source": "/assets/**",
         "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400" }]
+      },
+      {
+        "regex": "^/$",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
       },
       {
         "source": "/index.html",

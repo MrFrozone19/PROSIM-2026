@@ -8,6 +8,8 @@ export const firebaseApp = initializeApp({
   apiKey: 'AIzaSyCMnAb0BSDsPdul7bjTSa8F9Q5kiPaHYhc',
   authDomain: 'basedex-fan.firebaseapp.com',
   projectId: 'basedex-fan',
+  // Sin este dato el SDK de Storage falla al instante (storage/no-default-bucket) y la Galería no puede subir.
+  storageBucket: 'basedex-fan.firebasestorage.app',
   appId: '1:302188601961:web:b9e6fc85330b5a561d78f8',
   messagingSenderId: '302188601961',
 });

@@ -1,15 +1,19 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ScreenShell } from '../../shared/screen-shell';
 import { Icon } from '../../shared/icon';
 import { Feedback } from '../../shared/feedback';
-import { Api, CollectionBadge, CollectionCard, CollectionTrophy } from '../../core/api';
+import { Toast } from '../../shared/toast';
+import { shareFile } from '../../shared/share-file';
+import { VIDEO_FILTERS } from '../../data/videos';
+import { Api, CollectionBadge, CollectionCard, CollectionTrophy, GalleryItem } from '../../core/api';
 import { Progress } from '../../core/progress';
 import { RARITY, Rarity } from '../../data/cards';
 import { TEAM_BY_ID } from '../../data/teams';
 
-type VaultTab = 'trophies' | 'cards' | 'badges';
+type VaultTab = 'trophies' | 'cards' | 'badges' | 'gallery';
+type GalleryKind = 'all' | 'photo' | 'video';
 
 /**
  * /vault — colección de cartas TCG, trofeos e insignias del usuario (API). Tocar una carta abre su detalle.
@@ -17,7 +21,7 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
  */
 @Component({
   selector: 'app-vault-screen',
-  imports: [ScreenShell, Icon, DatePipe],
+  imports: [ScreenShell, Icon, DatePipe, RouterLink],
   template: `
     <app-screen-shell>
       <div class="flex flex-col gap-4 pt-3">
@@ -69,7 +73,7 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
         </button>
 
         <!-- category-tabs -->
-        <div class="flex gap-2">
+        <div class="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5">
           @for (t of tabs; track t.id) {
             <button
               type="button"
@@ -175,8 +179,127 @@ type VaultTab = 'trophies' | 'cards' | 'badges';
               }
             </div>
           }
+          @case ('gallery') {
+            <div class="flex gap-2">
+              @for (k of kinds; track k.id) {
+                <button
+                  type="button"
+                  (click)="kind.set(k.id)"
+                  [attr.aria-pressed]="kind() === k.id"
+                  class="pressable min-h-[32px] rounded-pill border px-3 font-sans text-[11px] font-semibold transition-colors"
+                  [class]="kind() === k.id ? 'border-pink bg-pink/20 text-white' : 'border-line bg-surface text-muted'"
+                >
+                  {{ k.label }} · {{ countOf(k.id) }}
+                </button>
+              }
+            </div>
+            @if (!galleryLoaded()) {
+              <div class="grid grid-cols-3 gap-2">
+                @for (i of [1, 2, 3]; track i) {
+                  <div class="aspect-[3/4] animate-pulse rounded-[12px] border border-line bg-surface"></div>
+                }
+              </div>
+            } @else if (!shown().length) {
+              <div class="flex flex-col gap-2 rounded-row border border-dashed border-line bg-surface p-4">
+                <p class="font-sans text-[12px] text-muted">Aquí aparecen tus fotos del escáner AR y tus clips grabados.</p>
+                <div class="flex gap-2">
+                  <a routerLink="/scan" class="pressable flex min-h-[36px] items-center gap-1.5 rounded-pill bg-cta px-3 font-sans text-[11px] font-bold text-white">
+                    <app-icon name="Camera" [size]="14" /> Tomar foto
+                  </a>
+                  <a routerLink="/videos" class="pressable flex min-h-[36px] items-center gap-1.5 rounded-pill border border-line px-3 font-sans text-[11px] font-bold text-white">
+                    <app-icon name="Video" [size]="14" /> Grabar clip
+                  </a>
+                </div>
+              </div>
+            } @else {
+              <div class="grid grid-cols-3 gap-2">
+                @for (g of shown(); track g.id) {
+                  <button
+                    type="button"
+                    (click)="openItem(g)"
+                    class="pressable relative aspect-[3/4] overflow-hidden rounded-[12px] border border-line bg-surface"
+                    [attr.aria-label]="g.kind === 'photo' ? 'Foto' : 'Video'"
+                  >
+                    @if (g.kind === 'photo') {
+                      <img [src]="g.url" class="absolute inset-0 h-full w-full object-cover" loading="lazy" alt="" />
+                    } @else {
+                      <video
+                        [src]="g.url + '#t=0.1'"
+                        class="absolute inset-0 h-full w-full object-cover"
+                        preload="metadata"
+                        muted
+                        playsinline
+                      ></video>
+                      <span class="absolute inset-0 flex items-center justify-center">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white">
+                          <app-icon name="Play" [size]="14" />
+                        </span>
+                      </span>
+                    }
+                    <span
+                      class="absolute left-1.5 top-1.5 rounded-[4px] px-1.5 py-0.5 font-sans text-[8px] font-bold uppercase text-white"
+                      [class]="g.filter ? 'bg-pink' : 'bg-black/70'"
+                      >{{ tagOf(g) }}</span
+                    >
+                    @if (g.durationMs) {
+                      <span class="absolute bottom-1.5 right-1.5 rounded-[4px] bg-black/70 px-1.5 py-0.5 font-sans text-[9px] font-semibold text-white">{{
+                        duration(g.durationMs)
+                      }}</span>
+                    }
+                  </button>
+                }
+              </div>
+            }
+          }
         }
       </div>
+
+      <!-- visor de la galería -->
+      @if (viewing(); as g) {
+        <div class="fixed inset-0 z-50 flex flex-col bg-black/95" role="dialog" aria-label="Galería">
+          <div class="flex items-center justify-between px-4 pb-2" style="padding-top: calc(12px + env(safe-area-inset-top))">
+            <div class="flex flex-col">
+              <span class="font-display text-[13px] font-bold uppercase text-white">{{ tagOf(g) }}</span>
+              <span class="font-sans text-[11px] text-muted">
+                {{ g.createdAt | date: 'd MMM yyyy, HH:mm' }}{{ g.teamId ? ' · ' + teamName(g.teamId) : '' }}
+              </span>
+            </div>
+            <button
+              type="button"
+              (click)="closeItem()"
+              class="pressable flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white"
+              aria-label="Cerrar"
+            >
+              <app-icon name="X" [size]="18" />
+            </button>
+          </div>
+          <div class="flex min-h-0 flex-1 items-center justify-center px-3">
+            @if (g.kind === 'photo') {
+              <img [src]="g.url" class="max-h-full max-w-full rounded-row object-contain" alt="" />
+            } @else {
+              <video [src]="g.url" class="max-h-full max-w-full rounded-row" controls autoplay loop playsinline></video>
+            }
+          </div>
+          <div class="flex gap-3 px-4 pt-3" style="padding-bottom: calc(16px + env(safe-area-inset-bottom))">
+            <button
+              type="button"
+              (click)="removeItem(g)"
+              [disabled]="busy()"
+              class="pressable flex h-12 flex-1 items-center justify-center gap-2 rounded-cta border border-pink/60 font-display text-[12px] font-bold text-pink disabled:opacity-50"
+            >
+              <app-icon name="Trash2" [size]="16" /> ELIMINAR
+            </button>
+            <button
+              type="button"
+              (click)="shareItem(g)"
+              [disabled]="!viewBlob() || busy()"
+              class="pressable flex h-12 flex-[2] items-center justify-center gap-2 rounded-cta bg-cta font-display text-[12px] font-bold text-white disabled:opacity-60"
+            >
+              <app-icon name="Share2" [size]="16" /> {{ viewBlob() ? 'COMPARTIR / GUARDAR' : 'PREPARANDO…' }}
+            </button>
+          </div>
+        </div>
+      }
 
       <!-- detalle de carta -->
       @if (selected(); as c) {
@@ -264,6 +387,7 @@ export class VaultScreen implements OnInit {
   private readonly api = inject(Api);
   private readonly router = inject(Router);
   private readonly progress = inject(Progress);
+  private readonly toast = inject(Toast);
 
   protected readonly me = this.progress.me;
   protected readonly cards = signal<CollectionCard[]>([]);
@@ -273,9 +397,29 @@ export class VaultScreen implements OnInit {
     { id: 'trophies', label: 'Trophies' },
     { id: 'cards', label: 'Cards' },
     { id: 'badges', label: 'Badges' },
+    { id: 'gallery', label: 'Galería' },
+  ];
+  protected readonly kinds: { id: GalleryKind; label: string }[] = [
+    { id: 'all', label: 'Todo' },
+    { id: 'photo', label: 'Fotos' },
+    { id: 'video', label: 'Videos' },
   ];
 
-  protected readonly tab = signal<VaultTab>('cards');
+  protected readonly tab = signal<VaultTab>(
+    (inject(ActivatedRoute).snapshot.queryParamMap.get('tab') as VaultTab | null) ?? 'cards',
+  );
+
+  // Galería
+  protected readonly galleryItems = signal<GalleryItem[]>([]);
+  protected readonly galleryLoaded = signal(false);
+  protected readonly kind = signal<GalleryKind>('all');
+  protected readonly shown = computed(() =>
+    this.kind() === 'all' ? this.galleryItems() : this.galleryItems().filter((g) => g.kind === this.kind()),
+  );
+  protected readonly viewing = signal<GalleryItem | null>(null);
+  /** El archivo se descarga al abrir el visor para que Compartir se llame directo desde el toque (requisito de Safari). */
+  protected readonly viewBlob = signal<Blob | null>(null);
+  protected readonly busy = signal(false);
   protected readonly selected = signal<CollectionCard | null>(null);
   protected readonly owned = computed(() => this.cards().filter((c) => c.obtainedAt).length);
   /** La API ordena los trofeos con el más reciente primero. */
@@ -295,6 +439,68 @@ export class VaultScreen implements OnInit {
         this.badges.set(c.badges);
       })
       .catch((e) => console.error(e));
+    this.api
+      .gallery()
+      .then((items) => this.galleryItems.set(items))
+      .catch((e) => console.error(e))
+      .finally(() => this.galleryLoaded.set(true));
+  }
+
+  protected countOf(k: GalleryKind): number {
+    return k === 'all' ? this.galleryItems().length : this.galleryItems().filter((g) => g.kind === k).length;
+  }
+
+  protected tagOf(g: GalleryItem): string {
+    if (g.kind === 'photo') return 'Foto AR';
+    return g.filter ? (VIDEO_FILTERS.find((f) => f.id === g.filter)?.label ?? g.filter) : 'Video';
+  }
+
+  protected duration(ms: number): string {
+    const s = Math.round(ms / 1000);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  }
+
+  protected openItem(g: GalleryItem): void {
+    this.fb.tap();
+    this.viewing.set(g);
+    this.viewBlob.set(null);
+    fetch(g.url)
+      .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((b) => {
+        if (this.viewing()?.id === g.id) this.viewBlob.set(b);
+      })
+      .catch((e) => console.error(e));
+  }
+
+  protected closeItem(): void {
+    this.viewing.set(null);
+    this.viewBlob.set(null);
+  }
+
+  protected async shareItem(g: GalleryItem): Promise<void> {
+    const blob = this.viewBlob();
+    if (!blob) return;
+    const ext = g.mime === 'image/jpeg' ? 'jpg' : g.mime === 'video/webm' ? 'webm' : 'mp4';
+    const r = await shareFile(blob, `basedex-${g.id.slice(0, 8)}.${ext}`, 'BaseDex Fan');
+    if (r === 'downloaded') this.toast.show('Descargado');
+  }
+
+  protected async removeItem(g: GalleryItem): Promise<void> {
+    this.fb.tap();
+    if (!confirm(g.kind === 'photo' ? '¿Eliminar esta foto?' : '¿Eliminar este clip?')) return;
+    this.busy.set(true);
+    try {
+      await this.api.deleteGalleryItem(g.id);
+      this.galleryItems.update((items) => items.filter((i) => i.id !== g.id));
+      this.closeItem();
+      this.toast.show('Eliminado de la Galería');
+    } catch (e) {
+      console.error(e);
+      this.fb.error();
+      this.toast.show('No se pudo eliminar. Intenta de nuevo.');
+    } finally {
+      this.busy.set(false);
+    }
   }
 
   protected rarity(r: Rarity) {

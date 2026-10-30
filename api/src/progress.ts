@@ -67,7 +67,6 @@ interface Stats {
   teamsScanned: Set<string>;
   fastScan: boolean;
   effects: number;
-  filterUses: number;
   filtersDistinct: number;
   correctAnswers: number;
   questionsMastered: number;
@@ -77,6 +76,7 @@ interface Stats {
   eastTeams: string[];
   weeklyRank: number | null;
   weeklyPlayers: number;
+  filteredVideos: number;
 }
 
 async function statsOf(uid: string): Promise<Stats> {
@@ -84,11 +84,11 @@ async function statsOf(uid: string): Promise<Stats> {
     const [rows] = await pool.query<RowDataPacket[]>(sql, params);
     return rows;
   };
-  const [scans, teams, act, trivia, active, cards, east, players, weekly] = await Promise.all([
+  const [scans, teams, act, trivia, active, cards, east, players, videos, weekly] = await Promise.all([
     one('SELECT COUNT(*) AS n, COALESCE(MIN(duration_ms) < 1000, 0) AS fast FROM scans WHERE uid = ?'),
     one('SELECT DISTINCT team_id FROM scans WHERE uid = ?'),
     one(
-      `SELECT SUM(type = 'effect') AS effects, SUM(type = 'filter') AS filters,
+      `SELECT SUM(type = 'effect') AS effects,
          COUNT(DISTINCT CASE WHEN type = 'filter' THEN value END) AS distinctFilters
        FROM activity WHERE uid = ?`,
     ),
@@ -107,6 +107,7 @@ async function statsOf(uid: string): Promise<Stats> {
       `SELECT COUNT(DISTINCT uid) AS n FROM xp_events WHERE created_at >= UTC_TIMESTAMP() - INTERVAL 7 DAY`,
       [],
     ),
+    one(`SELECT COUNT(*) AS n FROM gallery_items WHERE uid = ? AND kind = 'video' AND filter IS NOT NULL`),
     weeklyStanding(uid),
   ]);
   return {
@@ -114,7 +115,6 @@ async function statsOf(uid: string): Promise<Stats> {
     teamsScanned: new Set(teams.map((r) => r['team_id'] as string)),
     fastScan: Number(scans[0]['fast']) === 1,
     effects: Number(act[0]['effects'] ?? 0),
-    filterUses: Number(act[0]['filters'] ?? 0),
     filtersDistinct: Number(act[0]['distinctFilters'] ?? 0),
     correctAnswers: Number(trivia[0]['correct'] ?? 0),
     questionsMastered: Number(trivia[0]['mastered'] ?? 0),
@@ -124,6 +124,7 @@ async function statsOf(uid: string): Promise<Stats> {
     eastTeams: east.map((r) => r['id'] as string),
     weeklyRank: weekly.rank,
     weeklyPlayers: Number(players[0]['n']),
+    filteredVideos: Number(videos[0]['n']),
   };
 }
 
@@ -141,7 +142,7 @@ const BADGE_RULES: Record<string, (s: Stats) => boolean> = {
   b1: (s) => s.scans >= 1,
   b2: (s) => s.cardsOwned >= 5,
   b3: (s) => s.teamsScanned.size >= 3,
-  b4: (s) => s.filterUses >= 10,
+  b4: (s) => s.filteredVideos >= 3,
   // Con menos de 3 jugadores en la semana cualquiera sería "top 3": no cuenta.
   b5: (s) => s.weeklyPlayers >= 3 && s.weeklyRank !== null && s.weeklyRank <= 3,
   b6: (s) => s.activeQuestions > 0 && s.questionsMastered >= s.activeQuestions,

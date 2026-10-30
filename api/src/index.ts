@@ -2,6 +2,7 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { requireAdmin, requireUser } from './auth.js';
 import { migrate, pool } from './db.js';
+import { deleteUserFiles, gallery } from './gallery.js';
 import { XP, levelOf, reward, totalXp, weeklyStanding } from './progress.js';
 
 const FILTERS = new Set(['pixelate', 'thermal', 'pastel', 'blur', 'color']);
@@ -91,11 +92,17 @@ api.patch('/me', async (req, res) => {
   res.json({ ok: true });
 });
 
-/** Borra todos los datos del usuario (las tablas de progreso caen en cascada). La cuenta de Firebase la borra el front. */
+/**
+ * Borra todos los datos del usuario: archivos de la galería y filas (las tablas de progreso caen en cascada).
+ * La cuenta de Firebase la borra el front.
+ */
 api.delete('/me', async (req, res) => {
+  await deleteUserFiles(uidOf(req));
   await pool.query('DELETE FROM users WHERE uid = ?', [uidOf(req)]);
   res.json({ ok: true });
 });
+
+api.use('/gallery', gallery);
 
 // ---------- Colección (Vault) ----------
 

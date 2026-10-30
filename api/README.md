@@ -26,6 +26,8 @@ Todas menos `/api/health` exigen `Authorization: Bearer <ID token de Firebase>`.
 | `GET /api/trivia?teamId=` · `POST /api/trivia/:id/answer` | Preguntas (sin respuesta) · contestar |
 | `POST /api/events` | `effect` o `filter` (cuentan para logros) |
 | `GET /api/leaderboard` | Top 10 de XP de los últimos 7 días |
+| `GET /api/gallery` · `POST /api/gallery` · `DELETE /api/gallery/:id` | Galería: listar, registrar un archivo ya subido a Storage (se verifica que exista), eliminar (también de Storage) |
+| `DELETE /api/me` | Borra los datos y archivos del usuario |
 | `GET /api/admin/users` · `POST/PUT/DELETE /api/admin/trivia` | Solo rol admin (`ADMIN_EMAILS`) |
 
 ## Publicar en Cloud Run
