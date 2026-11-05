@@ -3,7 +3,10 @@ import type { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { requireAdmin, requireUser } from './auth.js';
 import { migrate, pool } from './db.js';
 import { deleteUserFiles, gallery } from './gallery.js';
-import { XP, levelOf, reward, totalXp, weeklyStanding } from './progress.js';
+import { XP, levelOf, reward, totalXp, weeklyStanding, weeklyLeaderboard } from './progress.js';
+import { game } from './game.js';
+import { answerTrivia, triviaSummary, TriviaError } from './trivia.js';
+import { withUserTransaction } from './transactions.js';
 
 const FILTERS = new Set(['pixelate', 'thermal', 'pastel', 'blur', 'color']);
 /** Escanear el mismo logo otra vez solo da XP si pasó este tiempo desde el último escaneo de ese equipo. */
@@ -21,8 +24,14 @@ api.get('/health', (_req, res) => {
   res.json({ ok: true });
 });
 
+// Solo se publica el conteo del catálogo, sin preguntas, respuestas ni datos de usuarios.
+api.get('/trivia/summary', async (_req, res) => {
+  res.json(await triviaSummary());
+});
+
 // Todo lo que sigue requiere sesión.
 api.use(requireUser);
+api.use('/game', game);
 
 const uidOf = (req: Request) => req.user!.uid;
 
@@ -78,12 +87,14 @@ api.patch('/me', async (req, res) => {
   const params: unknown[] = [];
   if (displayName !== undefined) {
     const name = typeof displayName === 'string' ? displayName.trim() : '';
-    if (name.length < 2 || name.length > 40) return bad(res, 'El nombre debe tener de 2 a 40 caracteres');
+    if (name.length < 2 || name.length > 40)
+      return bad(res, 'El nombre debe tener de 2 a 40 caracteres');
     sets.push('display_name = ?');
     params.push(name);
   }
   if (favoriteTeam !== undefined) {
-    if (favoriteTeam !== null && !(await teamExists(favoriteTeam))) return bad(res, 'Equipo inválido');
+    if (favoriteTeam !== null && !(await teamExists(favoriteTeam)))
+      return bad(res, 'Equipo inválido');
     sets.push('favorite_team = ?');
     params.push(favoriteTeam);
   }
@@ -138,33 +149,42 @@ api.post('/scans', async (req, res) => {
   const uid = uidOf(req);
   const { teamId, durationMs } = req.body ?? {};
   if (!(await teamExists(teamId))) return bad(res, 'Equipo inválido');
-  const ms = Number.isFinite(durationMs) ? Math.max(0, Math.min(600_000, Math.round(durationMs))) : null;
+  const ms = Number.isFinite(durationMs)
+    ? Math.max(0, Math.min(600_000, Math.round(durationMs)))
+    : null;
 
-  const [[prev]] = await pool.query<RowDataPacket[]>(
-    `SELECT COUNT(*) AS total,
+  const result = await withUserTransaction(uid, async (db) => {
+    const [[prev]] = await db.query<RowDataPacket[]>(
+      `SELECT COUNT(*) AS total,
        SUM(created_at >= UTC_TIMESTAMP() - INTERVAL ? MINUTE) AS recent
      FROM scans WHERE uid = ? AND team_id = ?`,
-    [RESCAN_COOLDOWN_MIN, uid, teamId],
-  );
-  await pool.query('INSERT INTO scans (uid, team_id, duration_ms) VALUES (?, ?, ?)', [uid, teamId, ms]);
-
-  const first = Number(prev['total']) === 0;
-  let card = null;
-  if (first) {
-    const [cards] = await pool.query<RowDataPacket[]>(
-      'SELECT id, name, rarity FROM cards WHERE team_id = ? ORDER BY sort LIMIT 1',
-      [teamId],
+      [RESCAN_COOLDOWN_MIN, uid, teamId],
     );
-    if (cards[0]) {
-      const [r] = await pool.query<ResultSetHeader>(
-        'INSERT IGNORE INTO user_cards (uid, card_id) VALUES (?, ?)',
-        [uid, cards[0]['id']],
+    await db.query('INSERT INTO scans (uid, team_id, duration_ms) VALUES (?, ?, ?)', [
+      uid,
+      teamId,
+      ms,
+    ]);
+
+    const first = Number(prev['total']) === 0;
+    let card = null;
+    if (first) {
+      const [cards] = await db.query<RowDataPacket[]>(
+        'SELECT id, name, rarity FROM cards WHERE team_id = ? ORDER BY sort LIMIT 1',
+        [teamId],
       );
-      if (r.affectedRows) card = cards[0] as { id: string; name: string; rarity: string };
+      if (cards[0]) {
+        const [r] = await db.query<ResultSetHeader>(
+          'INSERT IGNORE INTO user_cards (uid, card_id) VALUES (?, ?)',
+          [uid, cards[0]['id']],
+        );
+        if (r.affectedRows) card = cards[0] as { id: string; name: string; rarity: string };
+      }
     }
-  }
-  const xp = first ? XP.firstScanOfTeam : Number(prev['recent'] ?? 0) > 0 ? 0 : XP.repeatScan;
-  res.json({ firstScanOfTeam: first, ...(await reward(uid, xp, `scan:${teamId}`, card)) });
+    const xp = first ? XP.firstScanOfTeam : Number(prev['recent'] ?? 0) > 0 ? 0 : XP.repeatScan;
+    return { firstScanOfTeam: first, ...(await reward(uid, xp, `scan:${teamId}`, card, db)) };
+  });
+  res.json(result);
 });
 
 api.get('/trivia', async (req, res) => {
@@ -179,28 +199,15 @@ api.get('/trivia', async (req, res) => {
 });
 
 api.post('/trivia/:id/answer', async (req, res) => {
-  const uid = uidOf(req);
-  const id = Number(req.params['id']);
-  const option = Number(req.body?.option);
-  const [[q]] = await pool.query<RowDataPacket[]>(
-    'SELECT answer, JSON_LENGTH(options) AS n FROM trivia_questions WHERE id = ? AND active',
-    [id],
-  );
-  if (!q) return void res.status(404).json({ error: 'Pregunta no encontrada' });
-  if (!Number.isInteger(option) || option < 0 || option >= Number(q['n'])) return bad(res, 'Opción inválida');
-
-  const correct = option === Number(q['answer']);
-  const [[before]] = await pool.query<RowDataPacket[]>(
-    'SELECT COUNT(*) AS n FROM trivia_answers WHERE uid = ? AND question_id = ? AND correct',
-    [uid, id],
-  );
-  await pool.query(
-    'INSERT INTO trivia_answers (uid, question_id, chosen, correct) VALUES (?, ?, ?, ?)',
-    [uid, id, option, correct],
-  );
-  // Solo la primera respuesta correcta de cada pregunta da XP, para que no se pueda farmear.
-  const xp = correct && Number(before['n']) === 0 ? XP.triviaFirstCorrect : 0;
-  res.json({ correct, answer: Number(q['answer']), ...(await reward(uid, xp, `trivia:${id}`)) });
+  try {
+    res.json(await answerTrivia(uidOf(req), Number(req.params['id']), Number(req.body?.option)));
+  } catch (error) {
+    if (error instanceof TriviaError) {
+      res.status(error.status).json({ error: error.message });
+      return;
+    }
+    throw error;
+  }
 });
 
 api.post('/events', async (req, res) => {
@@ -209,39 +216,26 @@ api.post('/events', async (req, res) => {
   if (type === 'filter' && !FILTERS.has(value)) return bad(res, 'Filtro inválido');
   if (type !== 'effect' && type !== 'filter') return bad(res, 'Evento inválido');
 
-  const [[prev]] = await pool.query<RowDataPacket[]>(
-    'SELECT COUNT(*) AS n FROM activity WHERE uid = ? AND type = ?',
-    [uid, type],
-  );
-  await pool.query('INSERT INTO activity (uid, type, value) VALUES (?, ?, ?)', [
-    uid,
-    type,
-    type === 'filter' ? value : null,
-  ]);
-  const xp = type === 'effect' && Number(prev['n']) === 0 ? XP.firstEffect : 0;
-  res.json(await reward(uid, xp, `event:${type}`));
+  const result = await withUserTransaction(uid, async (db) => {
+    const [[prev]] = await db.query<RowDataPacket[]>(
+      'SELECT COUNT(*) AS n FROM activity WHERE uid = ? AND type = ?',
+      [uid, type],
+    );
+    await db.query('INSERT INTO activity (uid, type, value) VALUES (?, ?, ?)', [
+      uid,
+      type,
+      type === 'filter' ? value : null,
+    ]);
+    const xp = type === 'effect' && Number(prev['n']) === 0 ? XP.firstEffect : 0;
+    return reward(uid, xp, `event:${type}`, null, db);
+  });
+  res.json(result);
 });
 
 // ---------- Leaderboard ----------
 
 api.get('/leaderboard', async (req, res) => {
-  const uid = uidOf(req);
-  const [rows] = await pool.query<RowDataPacket[]>(
-    `SELECT u.uid, u.display_name AS name, u.photo_url AS photoUrl, SUM(x.amount) AS points
-     FROM xp_events x JOIN users u ON u.uid = x.uid
-     WHERE x.created_at >= UTC_TIMESTAMP() - INTERVAL 7 DAY
-     GROUP BY u.uid ORDER BY points DESC, MIN(x.created_at) LIMIT 10`,
-  );
-  res.json({
-    entries: rows.map((r, i) => ({
-      rank: i + 1,
-      name: r['name'],
-      photoUrl: r['photoUrl'],
-      points: Number(r['points']),
-      me: r['uid'] === uid,
-    })),
-    me: await weeklyStanding(uid),
-  });
+  res.json(await weeklyLeaderboard(uidOf(req)));
 });
 
 // ---------- Administración ----------
@@ -295,7 +289,9 @@ admin.put('/trivia/:id', async (req, res) => {
 
 /** Se desactiva en lugar de borrar, para no perder las respuestas ya registradas. */
 admin.delete('/trivia/:id', async (req, res) => {
-  await pool.query('UPDATE trivia_questions SET active = FALSE WHERE id = ?', [Number(req.params['id'])]);
+  await pool.query('UPDATE trivia_questions SET active = FALSE WHERE id = ?', [
+    Number(req.params['id']),
+  ]);
   res.json({ ok: true });
 });
 

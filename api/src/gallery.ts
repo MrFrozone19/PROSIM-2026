@@ -3,6 +3,7 @@ import { getStorage } from 'firebase-admin/storage';
 import type { RowDataPacket } from 'mysql2/promise';
 import { pool } from './db.js';
 import { reward } from './progress.js';
+import { withUserTransaction } from './transactions.js';
 
 /**
  * Galería del usuario. El front sube el archivo directo a Firebase Storage (gallery/{uid}/{id}.{ext}, protegido por
@@ -11,7 +12,11 @@ import { reward } from './progress.js';
 export const gallery = express.Router();
 
 const FILTERS = new Set(['pixelate', 'thermal', 'pastel', 'blur', 'color']);
-const EXT: Record<string, string> = { 'image/jpeg': 'jpg', 'video/mp4': 'mp4', 'video/webm': 'webm' };
+const EXT: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'video/mp4': 'mp4',
+  'video/webm': 'webm',
+};
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 const bucket = () => getStorage().bucket();
@@ -54,14 +59,30 @@ gallery.post('/', async (req, res) => {
   if (!exists) return bad('El archivo no está en Storage');
   const [meta] = await file.getMetadata();
 
-  const ms = Number.isFinite(durationMs) ? Math.max(0, Math.min(600_000, Math.round(durationMs))) : null;
-  await pool.query(
-    `INSERT INTO gallery_items (id, uid, kind, storage_path, url, mime, filter, team_id, duration_ms, size_bytes)
+  const ms = Number.isFinite(durationMs)
+    ? Math.max(0, Math.min(600_000, Math.round(durationMs)))
+    : null;
+  const rewards = await withUserTransaction(uid, async (db) => {
+    await db.query(
+      `INSERT INTO gallery_items (id, uid, kind, storage_path, url, mime, filter, team_id, duration_ms, size_bytes)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, uid, kind, path, url, mime, filter ?? null, teamId ?? null, kind === 'video' ? ms : null, Number(meta.size ?? 0)],
-  );
-  // Guardar no da XP por sí mismo (se podría farmear), pero cuenta para la insignia Editor.
-  res.status(201).json(await reward(uid, 0, 'gallery'));
+      [
+        id,
+        uid,
+        kind,
+        path,
+        url,
+        mime,
+        filter ?? null,
+        teamId ?? null,
+        kind === 'video' ? ms : null,
+        Number(meta.size ?? 0),
+      ],
+    );
+    // Guardar no da XP por sí mismo (se podría farmear), pero cuenta para la insignia Editor.
+    return reward(uid, 0, 'gallery', null, db);
+  });
+  res.status(201).json(rewards);
 });
 
 gallery.delete('/:id', async (req, res) => {

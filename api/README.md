@@ -16,7 +16,7 @@ Al arrancar crea las tablas que falten y sincroniza el catálogo (`src/catalog.t
 
 ## Rutas
 
-Todas menos `/api/health` exigen `Authorization: Bearer <ID token de Firebase>`.
+Todas menos `/api/health` y `/api/trivia/summary` exigen `Authorization: Bearer <ID token de Firebase>`.
 
 | Método y ruta | Qué hace |
 |---|---|
@@ -24,6 +24,10 @@ Todas menos `/api/health` exigen `Authorization: Bearer <ID token de Firebase>`.
 | `GET /api/collection` | Cartas, trofeos e insignias con lo que el usuario ya tiene |
 | `POST /api/scans` | Registra un escaneo; el primero de cada equipo desbloquea su carta |
 | `GET /api/trivia?teamId=` · `POST /api/trivia/:id/answer` | Preguntas (sin respuesta) · contestar |
+| `GET /api/trivia/summary` | Conteo público del catálogo activo por equipo y de preguntas generales; no expone preguntas ni respuestas |
+| `GET /api/game` | Récord, victorias, XP de partidas disponible y desglose semanal de la misma XP del leaderboard |
+| `POST /api/game/start` | Crea una partida de Diamond Flight con ID, semilla y versión de reglas |
+| `POST /api/game/:id/finish` | Recibe `{ flaps: number[] }`, valida la partida y guarda puntos, logros y resultado una sola vez |
 | `POST /api/events` | `effect` o `filter` (cuentan para logros) |
 | `GET /api/leaderboard` | Top 10 de XP de los últimos 7 días |
 | `GET /api/gallery` · `POST /api/gallery` · `DELETE /api/gallery/:id` | Galería: listar, registrar un archivo ya subido a Storage (se verifica que exista), eliminar (también de Storage) |
@@ -43,3 +47,17 @@ gcloud run deploy basedex-api --source api --region us-central1 \
 
 `--allow-unauthenticated` es necesario para que Firebase Hosting pueda llamar al servicio; la autorización real la
 hace la API con el token de Firebase.
+
+## Partidas y pruebas
+
+`game_runs` se crea automáticamente mediante la migración aditiva. El servidor calcula el resultado usando
+`game-physics.ts`, módulo puro compartido con la interfaz. Se otorgan 10 XP por obstáculo y 50 por victoria,
+con un máximo de 300 XP de partidas en las últimas 24 horas. Los trofeos First Flight y Arcade Champion
+agregan 50 XP cada uno al desbloquearse; Aviator y Two-Way Star son insignias.
+
+Las acciones que entregan puntos se serializan por usuario y se liquidan en una transacción. Repetir el envío
+de una partida finalizada no repite puntos ni logros; la trivia solo da XP por la primera respuesta correcta
+a cada pregunta, incluso con peticiones concurrentes. Los IDs y recompensas existentes se conservan.
+
+`npm test` ejecuta las pruebas de física y del catálogo de 77 preguntas. Las pruebas de integración requieren
+`RUN_DB_TESTS=1` y una base exclusiva `basedex_test` en `127.0.0.1:3308`; se niegan a usar Cloud SQL o la base habitual.

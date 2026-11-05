@@ -21,10 +21,13 @@
 - [ ] Narraciones grabadas (audio) en lugar de `speechSynthesis`, o mantener la síntesis como respaldo.
 - [ ] Videos definitivos por equipo para la galería (hoy son clips Ken Burns generados del arte del diseño).
 - [x] Estadísticas simuladas de los 15 equipos, con cinco equipos por división.
-- [x] Al menos tres preguntas propias por equipo, más preguntas generales de la liga, calificadas en la API.
+- [x] 75 preguntas repartidas entre equipos (5 por cada uno), más 2 generales: 77 en total, calificadas en la API.
 
 ## Modo bonus y juego
-- [ ] Definir la mecánica del minijuego de `/game` (hoy es placeholder) o consolidar el TCG Vault como modo bonus.
+- [x] Diamond Flight: juego estilo Flappy Bird con pelota, controles táctiles/teclado, pausa y meta de 10 obstáculos.
+- [x] Unificar trivia, arcade, escaneos y logros en la misma XP y clasificación semanal.
+- [x] Guardar partidas y validar su resultado en el servidor, sin duplicar recompensas al reintentar.
+- [x] Trofeos First Flight / Arcade Champion e insignias Aviator / Two-Way Star.
 - [x] Persistir cartas desbloqueadas y progreso por cuenta en MySQL mediante la API.
 
 ## Calidad y entrega

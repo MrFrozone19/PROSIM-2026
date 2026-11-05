@@ -155,11 +155,51 @@ de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores ti
 | Narración por voz en el panel Info | Real, con la síntesis de voz del navegador (`speechSynthesis`) |
 | `/videos` (AR Studio): grabadora con 5 filtros | **Real**: la cámara pasa por un shader WebGL (`shared/fx-renderer.ts`) con el filtro elegido y ese lienzo se graba con `MediaRecorder` (MP4, o WebM si el navegador no graba MP4), así que el filtro queda en el video. Máximo 30 s; se revisa y se guarda en la Galería |
 | Clips del botón Video de la ventana AR | Generados en el proyecto con ffmpeg a partir del arte del diseño (sin derechos de terceros) |
-| Minijuego en `/game` | **Placeholder** explícito; "Jugar ahora" muestra "próximamente" |
+| Minijuego en `/game` | **Real**: Diamond Flight, juego de pelota estilo Flappy Bird. Meta de 10 obstáculos, controles táctiles/teclado, pausa, partidas guardadas y recompensas conectadas a la misma clasificación de XP |
 
 Filtros de video permitidos por la rúbrica e implementados: desenfoque, pixelado, cámara térmica, ajuste de
 color y pastel (personalizado). **No** se implementan blanco y negro, escala de grises, sepia, exposición ni
 colores invertidos.
+
+## Trivia, Diamond Flight y clasificación
+
+El catálogo base contiene **77 preguntas**: **5 para cada uno de los 15 equipos (75)** y **2 generales**.
+`GET /api/trivia/summary` permite consultar el conteo activo real en MySQL, incluyendo cambios del administrador;
+solo publica cantidades, sin respuestas ni información de usuarios. En Fan Arcade también se puede desplegar el conteo por equipo.
+
+Todo suma al mismo libro `xp_events`: los escaneos, la primera respuesta correcta de cada pregunta, las partidas
+y los trofeos. El perfil usa la XP acumulada para el nivel y la clasificación muestra la de los últimos siete días.
+Fan Arcade incluye un desglose semanal de Trivia, Arcade, Explorar y Logros. Los empates comparten posición.
+
+Diamond Flight se juega tocando el escenario, con Espacio o flecha arriba. Cada toque eleva la pelota; hay que
+cruzar diez obstáculos sin tocar las torres ni el suelo. El botón de pausa, P o Escape pausa la partida;
+al cambiar de aplicación se pausa automáticamente. Al terminar se guarda el resultado y aparece la opción de volver a jugar.
+
+| Acción | Recompensa |
+|---|---|
+| Acertar por primera vez una pregunta | 50 XP; los reintentos no repiten los puntos |
+| Superar un obstáculo | 10 XP al finalizar la partida |
+| Completar los diez obstáculos | 50 XP extra (150 XP de partida en total) |
+| Primera victoria | Trofeo First Flight y 50 XP adicionales |
+| Cinco victorias | Trofeo Arcade Champion y 50 XP adicionales |
+| 50 obstáculos acumulados | Insignia Aviator |
+| Una victoria y cinco preguntas diferentes dominadas | Insignia Two-Way Star |
+
+Las partidas entregan hasta 300 XP en una ventana móvil de 24 horas; se puede seguir jugando y obteniendo
+logros después del límite. Las recompensas de trivia, escaneos y trofeos conservan sus propias reglas.
+Trivia Rookie exige diez preguntas distintas; Historian exige dominar todas las preguntas activas.
+
+El servidor crea cada partida con una semilla y vuelve a simular los saltos recibidos con la física compartida
+en `api/src/game-physics.ts`; no acepta un score declarado por el navegador. La liquidación y las recompensas
+usan una transacción por usuario. Un reintento del mismo resultado devuelve el guardado sin volver a otorgar XP.
+Las partidas pendientes expiran a los diez minutos y una partida nueva reemplaza a la pendiente anterior.
+Si se cambia la física, hay que incrementar `FLIGHT.version` y publicar API y frontend juntos.
+
+Pruebas: `npm test` dentro de `api/` comprueba el catálogo, colisiones y repeticiones en cien niveles.
+`ng test --watch=false` comprueba la interfaz, pausa y reintentos. Para las pruebas de integración, usar una
+base **local y exclusiva** `basedex_test` en `127.0.0.1:3308`, establecer `RUN_DB_TESTS=1` y las variables `DB_*`,
+y ejecutar `npm test` en `api/`. El archivo `api/test/rewards-db.test.ts` impide ejecutarlas contra otra base.
+Estas pruebas verifican migraciones, concurrencia, puntuación, clasificación, límites, recompensas y rollback.
 
 ## Estructura
 

@@ -48,9 +48,11 @@ export const TROPHIES: { id: string; code: string; title: string; description: s
   { id: 't1', code: 'AE', title: 'AL East Champs', description: 'Escanea a todos los equipos del Este', rarity: 'mythic' },
   { id: 't2', code: 'PS', title: 'Perfect Scan', description: 'Reconoce un logo en menos de un segundo', rarity: 'legendary' },
   { id: 't3', code: 'FH', title: 'First Homerun', description: 'Activa tu primer efecto de celebración', rarity: 'epic' },
-  { id: 't4', code: 'TR', title: 'Trivia Rookie', description: 'Responde 10 trivias correctamente', rarity: 'rare' },
+  { id: 't4', code: 'TR', title: 'Trivia Rookie', description: 'Domina 10 preguntas diferentes', rarity: 'rare' },
   { id: 't5', code: 'FF', title: 'Filter Freak', description: 'Aplica los cinco filtros a un video', rarity: 'rare' },
   { id: 't6', code: 'PC', title: 'Pennant Chase', description: 'Colecciona una carta de cada división', rarity: 'legendary' },
+  { id: 't7', code: 'DF', title: 'First Flight', description: 'Gana tu primera partida de Diamond Flight', rarity: 'rare' },
+  { id: 't8', code: 'AC', title: 'Arcade Champion', description: 'Gana 5 partidas de Diamond Flight', rarity: 'legendary' },
 ];
 
 export const BADGES: { id: string; label: string; description: string }[] = [
@@ -60,6 +62,8 @@ export const BADGES: { id: string; label: string; description: string }[] = [
   { id: 'b4', label: 'Editor', description: 'Guarda 3 videos grabados con filtro' },
   { id: 'b5', label: 'MVP', description: 'Top 3 semanal' },
   { id: 'b6', label: 'Historian', description: 'Trivia perfecta' },
+  { id: 'b7', label: 'Aviator', description: 'Supera 50 obstáculos en Diamond Flight' },
+  { id: 'b8', label: 'Two-Way Star', description: 'Gana una partida y domina 5 preguntas diferentes' },
 ];
 
 interface TriviaSeed { id: number; teamId: string | null; question: string; options: string[]; answer: number }
@@ -111,5 +115,43 @@ export const TRIVIA: TriviaSeed[] = [
       { id: TRIVIA_BASE[team.id], teamId: team.id, question: `¿Cuál es el estadio de ${title}?`, options, answer: options.indexOf(team.stadium) },
       { id: TRIVIA_BASE[team.id] + 1, teamId: team.id, question: `¿En qué división de la Liga Americana juega ${title}?`, options: divisions, answer: divisions.indexOf(team.division) },
     ];
+  }),
+  // Dos preguntas adicionales por equipo, salvo Boston, que ya tenía una pregunta histórica extra.
+  // Los IDs originales se conservan para no perder respuestas ni sobrescribir ediciones del administrador.
+  ...TEAMS.flatMap((team, index): TriviaSeed[] => {
+    const title = `${team.city} ${team.name}`.trim();
+    const years = [team.founded, team.founded + 7, team.founded + 16, team.founded + 25];
+    const offset = (index + 1) % 4;
+    const options = [...years.slice(offset), ...years.slice(0, offset)].map(String);
+    const questions: TriviaSeed[] = [{
+      id: TRIVIA_BASE[team.id] + 3, teamId: team.id,
+      question: `¿En qué año disputó su primera temporada de Grandes Ligas la franquicia de ${title}?`,
+      options, answer: options.indexOf(String(team.founded)),
+    }];
+    if (team.id !== 'bos') {
+      const logos: Record<string, [string, string[]]> = {
+        nyy: ['Las letras N y Y entrelazadas', ['Una estrella', 'Una corona', 'Una pelota con alas']],
+        hou: ['Una H sobre una estrella', ['Una corona', 'Un pájaro', 'Un ancla']],
+        tor: ['Un arrendajo azul y una hoja de arce', ['Un oso y un bate', 'Un tigre y una pelota', 'Un ángel y una estrella']],
+        bal: ['La cabeza sonriente de un oriole', ['Una corona azul', 'Un elefante verde', 'Un oso con gorra']],
+        tex: ['La letra T', ['Las letras KC', 'La letra D', 'Las letras TC']],
+        det: ['La letra D en estilo inglés antiguo', ['Una estrella naranja', 'Una corona azul', 'Un elefante verde']],
+        cle: ['La letra C', ['Las letras TB', 'Una corona', 'La letra A con un halo']],
+        tb: ['Las letras T y B', ['Las letras K y C', 'Las letras T y C', 'Las letras N y Y']],
+        cws: ['La palabra Sox en letras entrelazadas', ['Una estrella con una H', 'La letra D', 'Un pájaro con una hoja']],
+        kc: ['Las letras K y C', ['Las letras T y B', 'La letra D', 'Las letras T y C']],
+        min: ['Las letras T y C entrelazadas', ['Una estrella con una H', 'La letra A con un halo', 'La palabra Sox']],
+        ath: ["Las letras A’s", ['Una corona azul', 'La letra D', 'Las letras T y B']],
+        laa: ['La letra A con un halo', ['Un ancla con una S', 'Una estrella con una H', 'Una corona con KC']],
+        sea: ['Una S con una rosa de los vientos', ['Una letra A con halo', 'Un oso con gorra', 'Una cabeza de tigre']],
+      };
+      const [correct, others] = logos[team.id];
+      const choices = [...others];
+      const answer = (index + 2) % 4;
+      choices.splice(answer, 0, correct);
+      questions.push({id: TRIVIA_BASE[team.id] + 4, teamId: team.id,
+        question: `¿Qué aparece en el logo de gorra de ${title} usado en este escáner?`, options: choices, answer});
+    }
+    return questions;
   }),
 ];

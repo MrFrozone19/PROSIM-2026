@@ -31,7 +31,14 @@ export interface Me {
   levelXp: number;
   levelXpMax: number;
   weekly: { points: number; rank: number | null };
-  counts: { cards: number; cardsTotal: number; trophies: number; badges: number; scans: number; teamsScanned: number };
+  counts: {
+    cards: number;
+    cardsTotal: number;
+    trophies: number;
+    badges: number;
+    scans: number;
+    teamsScanned: number;
+  };
 }
 
 export interface CollectionCard {
@@ -87,6 +94,42 @@ export interface TriviaQuestion {
   options: string[];
 }
 
+export interface TriviaSummary {
+  total: number;
+  general: number;
+  teams: { teamId: string; abbr: string; name: string; count: number }[];
+}
+
+export interface GameSession {
+  id: string;
+  seed: number;
+  rulesVersion: number;
+}
+export interface GameStats {
+  runs: number;
+  wins: number;
+  bestScore: number;
+  gates: number;
+  xp24h: number;
+  xpRemaining: number;
+}
+export interface GameStatus {
+  rules: { version: number; target: number; xpPerGate: number; winXp: number; xpLimit24h: number };
+  stats: GameStats;
+  weekly: {
+    trivia: number;
+    game: number;
+    achievements: number;
+    exploration: number;
+    total: number;
+  };
+}
+export interface GameResult extends Reward {
+  duplicate: boolean;
+  run: { score: number; won: boolean; xpEarned: number };
+  stats: GameStats;
+}
+
 export interface GalleryItem {
   id: string;
   kind: 'photo' | 'video';
@@ -135,11 +178,20 @@ export class Api {
   collection = () => this.get<Collection>('collection');
   leaderboard = () => this.get<Leaderboard>('leaderboard');
   trivia = (teamId: string) => this.get<TriviaQuestion[]>('trivia', { teamId });
+  triviaSummary = () => this.get<TriviaSummary>('trivia/summary');
+  gameStatus = () => this.get<GameStatus>('game');
+  startGame = () => this.send<GameSession>('POST', 'game/start');
+  finishGame = (id: string, flaps: number[]) =>
+    this.send<GameResult>('POST', `game/${id}/finish`, { flaps });
 
   scan = (teamId: string, durationMs: number | null) =>
     this.send<Reward & { firstScanOfTeam: boolean }>('POST', 'scans', { teamId, durationMs });
   answer = (questionId: number, option: number) =>
-    this.send<Reward & { correct: boolean; answer: number }>('POST', `trivia/${questionId}/answer`, { option });
+    this.send<Reward & { correct: boolean; answer: number }>(
+      'POST',
+      `trivia/${questionId}/answer`,
+      { option },
+    );
   event = (type: 'effect' | 'filter', value?: string) =>
     this.send<Reward>('POST', 'events', { type, value });
 

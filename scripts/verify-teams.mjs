@@ -72,8 +72,8 @@ for (const team of front) {
     `${team.id}: carta faltante o duplicada`,
   );
   assert.ok(
-    TRIVIA.filter((q) => q.teamId === team.id).length >= 3,
-    `${team.id}: menos de tres preguntas`,
+    TRIVIA.filter((q) => q.teamId === team.id).length === 5,
+    `${team.id}: debe tener cinco preguntas`,
   );
   assert.equal(STANDINGS.filter((s) => s.teamId === team.id).length, 1);
   await readFile(resolve(root, 'src', team.logo));

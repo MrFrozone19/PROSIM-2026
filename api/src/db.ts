@@ -161,6 +161,22 @@ const SCHEMA = [
     INDEX (created_at),
     FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
   )`,
+  /** Una partida solo puede liquidarse una vez; el servidor conserva el resultado validado. */
+  `CREATE TABLE IF NOT EXISTS game_runs (
+    id CHAR(36) PRIMARY KEY,
+    uid VARCHAR(128) NOT NULL,
+    seed INT UNSIGNED NOT NULL,
+    rules_version SMALLINT NOT NULL,
+    status ENUM('pending','finished','abandoned') NOT NULL DEFAULT 'pending',
+    score SMALLINT NOT NULL DEFAULT 0,
+    won BOOLEAN NOT NULL DEFAULT FALSE,
+    frames INT NOT NULL DEFAULT 0,
+    xp_granted INT NOT NULL DEFAULT 0,
+    started_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    finished_at DATETIME(3) NULL,
+    INDEX (uid, finished_at),
+    FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE
+  )`,
 ];
 
 /** Crea las tablas que falten y sincroniza el catálogo definido en catalog.ts. */
