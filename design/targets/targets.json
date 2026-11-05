@@ -1,5 +1,80 @@
 [
-  { "team": "nyy", "file": "nyy-navy.png" },
-  { "team": "nyy", "file": "nyy-white.png", "swapFrom": "nyy-navy.png" },
-  { "team": "nyy", "file": "nyy-card.png", "card": { "logo": "nyy-white.png", "title": "NEW YORK YANKEES", "subtitle": "OFFICIAL FAN CARD · AL EAST" } }
+  {
+    "team": "nyy",
+    "file": "nyy-navy.png"
+  },
+  {
+    "team": "nyy",
+    "file": "nyy-white.png",
+    "swapFrom": "nyy-navy.png"
+  },
+  {
+    "team": "nyy",
+    "file": "nyy-card.png",
+    "card": {
+      "logo": "nyy-white.png",
+      "title": "NEW YORK YANKEES",
+      "subtitle": "OFFICIAL FAN CARD · AL EAST"
+    }
+  },
+  {
+    "team": "nyy",
+    "file": "nyy-logo.png"
+  },
+  {
+    "team": "bos",
+    "file": "bos-logo.png"
+  },
+  {
+    "team": "hou",
+    "file": "hou-logo.png"
+  },
+  {
+    "team": "tor",
+    "file": "tor-logo.png"
+  },
+  {
+    "team": "bal",
+    "file": "bal-logo.png"
+  },
+  {
+    "team": "tex",
+    "file": "tex-logo.png"
+  },
+  {
+    "team": "det",
+    "file": "det-logo.png"
+  },
+  {
+    "team": "cle",
+    "file": "cle-logo.png"
+  },
+  {
+    "team": "tb",
+    "file": "tb-logo.png"
+  },
+  {
+    "team": "cws",
+    "file": "cws-logo.png"
+  },
+  {
+    "team": "kc",
+    "file": "kc-logo.png"
+  },
+  {
+    "team": "min",
+    "file": "min-logo.png"
+  },
+  {
+    "team": "ath",
+    "file": "ath-logo.png"
+  },
+  {
+    "team": "laa",
+    "file": "laa-logo.png"
+  },
+  {
+    "team": "sea",
+    "file": "sea-logo.png"
+  }
 ]

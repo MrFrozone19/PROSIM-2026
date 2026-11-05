@@ -24,7 +24,7 @@ Firebase Authentication: inicio de sesión (Google y correo/contraseña)
 
 ## Cómo correrlo en local
 
-Requisitos: Node 22.12+ o 24 (probado con 24.14), npm y Docker Desktop.
+Requisitos: Node 22.18+ o 24 (probado con 24.14), npm y Docker Desktop. Las herramientas de equipos leen TypeScript con el soporte nativo de Node.
 
 ```bash
 docker compose up -d          # MySQL 8.4 local en el puerto 3307
@@ -73,18 +73,25 @@ Te imprime una URL `https://….trycloudflare.com` que puedes abrir desde el cel
 ## Cómo probar el escaneo
 
 1. Abre en otra pantalla (o imprime) una de las imágenes de `design/targets/`:
+   - **`<equipo>-logo.png`**: los logos de los 15 equipos (por ejemplo, `bos-logo.png`, `sea-logo.png` o `kc-logo.png`).
+     Son las variantes oficiales de gorra sobre fondo claro; son las imágenes que el escáner está entrenado para reconocer.
    - **`nyy-card.png` (recomendada)**: tarjeta detonadora con el logo NY, marco, rayas y texto. Tiene unos 250 puntos
      de referencia en las escalas que ve la cámara y se reconoce rápido, de lejos y en ángulo.
    - `nyy-navy.png` / `nyy-white.png`: el logo NY solo. Un logo plano de dos colores da ~40 puntos, así que
      hay que ponerlo de frente, centrado en la retícula y con buena luz.
 2. Entra a la pestaña **Scan** y concede el permiso de cámara. Espera a que el indicador diga `SCANNER ACTIVE`
    (la primera vez tarda unos segundos: descarga el motor de seguimiento, ~400 kB comprimido).
-3. Apunta al marcador de frente y centrado en la retícula, sin reflejos. Al reconocerlo aparece la gorra anclada y
+3. Apunta al marcador de frente y centrado en la retícula, sin reflejos. Al reconocerlo aparece un cubo con el logo del equipo al frente y
    el indicador cambia a `TARGET LOCKED`.
 4. Desliza un dedo para girar el modelo, pellizca para escalarlo, y usa **Stop / Animate** para detener o
    reanudar su animación.
-5. **Foto** toma una captura con la cámara y el modelo (sin la interfaz) y abre la hoja de compartir: en iPhone
-   elige "Guardar imagen" y queda en Fotos; en Android elige Fotos o Galería. En computadora se descarga el JPG.
+5. **Foto** guarda una captura con la cámara y el modelo (sin la interfaz) en TCG Vault → Galería; desde ahí se comparte o descarga.
+
+Hay 18 marcadores para 15 equipos: se conservan los tres originales de los Yankees y se añade un logo oficial por equipo.
+El archivo `.mind` ocupa aproximadamente 3 MB y los 15 cubos GLB juntos, menos de 500 kB. La detección se probó
+con todos los candidatos simultáneamente, a 280 y 400 px, de frente y con una ligera rotación (72 casos), usando
+el detector real de MindAR. El matcher elige el candidato con más correspondencias geométricas para reducir confusiones entre logos.
+La fiabilidad en cámaras físicas, iluminación variable, bordados y otros diseños de logo debe comprobarse en el dispositivo.
 
 Bordado en una gorra real es poco probable que reconozca el logo: el tejido deforma los bordes que usa el
 algoritmo.
@@ -98,8 +105,8 @@ recorte de 512 px que abarca todo lo visible en vertical, y alternar el recorte 
 móviles. Además el marcador se da por encontrado tras 2 cuadros seguidos y por perdido tras 12.
 
 Para comparar en el celular, `/#/scan?crop=256` usa el recorte chico (menos trabajo por cuadro, menos alcance).
-`scripts/` no incluye el banco de pruebas, pero `window.__bdStats` acumula intentos y milisegundos de detección
-si se define antes de abrir Scan.
+`npm run teams:recognition` prueba el reconocimiento con imágenes locales y renderiza los cubos en `tmp/team-check/cubes.png`.
+`window.__bdStats` acumula intentos y milisegundos de detección si se define antes de abrir Scan.
 
 ### Agregar o cambiar marcadores
 
@@ -109,7 +116,17 @@ si se define antes de abrir Scan.
 2. `npm run targets` recompila `src/assets/targets/targets.mind` (abre Chrome o Edge sin ventana, porque el
    compilador de MindAR solo corre en navegador), reduce cada imagen a 640 px por lado e imprime los puntos de
    referencia por escala. Menos de ~30 en las escalas de 150–300 px es señal de un marcador difícil.
-3. Refleja el mismo orden en `src/app/data/targets.ts`, con el equipo y el modelo `.glb` de cada índice.
+3. El comando genera también `src/app/data/targets.ts`, con los mismos índices y `assets/models/cube-<equipo>.glb`.
+   El URL del `.mind` incluye una versión para evitar reutilizar marcadores anteriores desde la caché.
+
+Para regenerar los logos y los cubos: `npm run teams:assets` y después `npm run targets`. Los SVGs locales se
+reutilizan; `npm run teams:assets -- --refresh` vuelve a descargarlos desde MLB. `npm run teams:check` comprueba
+que frontend, API, marcadores, modelos, cartas y trivia cubran los mismos 15 equipos. `ng test --watch=false`
+comprueba el cambio de equipo con peticiones de trivia pendientes.
+
+Los datos de equipos y las nuevas preguntas se sincronizan con MySQL al iniciar la API, mediante la migración
+idempotente existente. Se conservan los IDs de las cartas y preguntas originales y las ediciones de trivia del administrador.
+Para actualizar la versión publicada se deben desplegar **la API y Hosting**; compilar localmente no modifica Firebase.
 
 ## Por qué la cámara necesita HTTPS
 
@@ -124,8 +141,8 @@ de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores ti
 |---|---|
 | Navegación entre las 7 pantallas, tab bar, transiciones | Real |
 | Cámara trasera en `/scan` (permiso concedido / rechazado / sin soporte / error de carga) | Real |
-| Reconocimiento de marcadores en `/scan` | **Real** con MindAR (image tracking). Por ahora un equipo: el logo "NY" de los Yankees, en sus dos versiones (blanco sobre azul y azul sobre blanco) |
-| Modelo 3D anclado al marcador | **Real** con three.js. El modelo es de prueba (gorra generada por `npm run model`) mientras llegan los de Diseño de ventanas |
+| Reconocimiento de marcadores en `/scan` | **Real** con MindAR: los 15 equipos de la Liga Americana, con sus logos oficiales sobre fondo claro; se conservan los marcadores anteriores de NYY |
+| Modelo 3D anclado al marcador | **Real** con three.js. Un cubo GLB provisional por equipo, con su logo al frente y animación suave, generado por `npm run teams:assets` |
 | Interacción con el modelo | Real: un dedo lo gira, dos dedos lo escalan; el botón Animate/Stop reanuda o detiene su animación; Info lo hace girar 360° |
 | Modo libre | Real: si el logo sale de cuadro, el modelo queda flotando frente a la cámara para seguir interactuando; la flecha vuelve a escanear |
 | Dock de la ventana AR: Animate/Stop, Foto, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos). La trivia viene de la API y se califica en el servidor; Stats sigue siendo una tabla simulada |
@@ -157,7 +174,7 @@ src/app/
   data/      teams, targets, videos, cards (rarezas), standings (tabla simulada)
 src/assets/  figma/ (imágenes optimizadas a WebP), video/ (clips MP4), targets/ (.mind), models/ (.glb)
 src/vendor/  mind-ar/: MindAR 1.2.5 ya empaquetado (ver su README)
-scripts/     compile-targets (npm run targets), make-cap (npm run model), download-assets (npm run assets)
+scripts/     prepare-teams, compile-targets, verify-teams, verify-recognition; make-cap y download-assets
 design/raw/  respuestas crudas del MCP de Figma, una por pantalla, más el listado de assets
 design/targets/  imágenes detonadoras y su manifiesto
 docs/        build de producción (lo publica Firebase Hosting)
@@ -181,3 +198,14 @@ desde Google Fonts. Iconos Lucide de trazo 2px generados inline desde el paquete
 - Logo "NY" de los New York Yankees: marca registrada de su titular, usada solo como imagen detonadora con fines
   académicos. Archivo tomado de [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:NewYorkYankees_caplogo.svg).
 - La gorra de prueba (`cap.glb`) es un modelo propio generado con `scripts/make-cap.mjs`.
+- Los logos en `src/assets/logos/` provienen de `https://www.mlbstatic.com/team-logos/team-cap-on-light/<MLB_ID>.svg`.
+  Son marcas de sus titulares y se usan como detonadores y texturas con fines académicos. Los cubos son geometría propia.
+- Equipos, divisiones y estadios: [catálogo público de MLB para 2026](https://statsapi.mlb.com/api/v1/teams?sportId=1&season=2026)
+  y [directorio oficial](https://www.mlb.com/team), consultados el 5 de noviembre de 2026. Los Athletics se muestran
+  con su nombre actual, sin "Oakland". Los títulos tienen corte de referencia hasta 2025; las posiciones siguen siendo simuladas.
+- Referencias de trivia nueva: historias oficiales de [Rays](https://www.mlb.com/rays/history/timeline),
+  [White Sox](https://www.mlb.com/whitesox/history/timeline), [Royals](https://www.mlb.com/royals/history/timeline-1960s),
+  [Athletics](https://www.mlb.com/athletics/history/timeline-1900s), [Angels](https://www.mlb.com/angels/history/timeline),
+  [Mariners](https://www.mlb.com/mariners/history/ballparks),
+  [Guardians](https://www.mlb.com/guardians/news/cleveland-indians-change-name-to-guardians) y
+  [Tigers](https://www.mlb.com/press-release/detroit-tigers-honor-club-heritage-with-unified-olde-english-d-on-caps-265320510).

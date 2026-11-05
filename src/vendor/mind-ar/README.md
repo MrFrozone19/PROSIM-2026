@@ -23,3 +23,7 @@ Cambios respecto al original, en `mindar-image-three.prod.js` (líneas marcadas 
 - En `controller-*.js`, `_detectAndMatch` alterna el recorte central con los recortes móviles (el original solo
   usa los móviles: 9 posiciones, una por cuadro) y, si existe `window.__bdStats`, acumula intentos y tiempo de
   detección para medir rendimiento.
+- El worker de matching compara todos los marcadores candidatos y elige la coincidencia con mayor número de
+  correspondencias geométricas (inliers), en vez de detenerse en la primera. Con los 15 equipos, un logo pequeño
+  de Detroit podía confundirse con Houston por el orden del catálogo. Parche reproducible:
+  `node scripts/patch-mindar-matcher.mjs`; las pruebas de `npm run teams:recognition` cubren ese caso.

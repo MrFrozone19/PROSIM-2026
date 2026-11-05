@@ -1,5 +1,7 @@
 export interface Team {
   id: string;
+  /** Identificador de MLB para descargar el logo oficial. */
+  mlbId: number;
   abbr: string;
   city: string;
   name: string;
@@ -9,20 +11,27 @@ export interface Team {
   founded: number;
   titles: number;
   stadium: string;
-  /** Ruta del logo (solo los equipos con arte en el diseño). */
-  logo?: string;
+  /** Logo local; también se usa en el frente del cubo provisional. */
+  logo: string;
 }
 
-/** Equipos de la Liga Americana usados como canales y marcadores AR (datos de relleno). */
+/** Los 15 equipos de la Liga Americana. Fundado = primera temporada de la franquicia. */
 export const TEAMS: Team[] = [
-  { id: 'nyy', abbr: 'NYY', city: 'New York', name: 'Yankees', mascot: 'Pinstripe', division: 'AL East', color: '#1c2f6b', founded: 1901, titles: 27, stadium: 'Yankee Stadium', logo: 'assets/figma/logo-nyy.webp' },
-  { id: 'bos', abbr: 'BOS', city: 'Boston', name: 'Red Sox', mascot: 'Wally the Green Monster', division: 'AL East', color: '#bd3039', founded: 1901, titles: 9, stadium: 'Fenway Park', logo: 'assets/figma/logo-bos.webp' },
-  { id: 'hou', abbr: 'HOU', city: 'Houston', name: 'Astros', mascot: 'Orbit', division: 'AL West', color: '#eb6e1f', founded: 1962, titles: 2, stadium: 'Daikin Park', logo: 'assets/figma/logo-hou.webp' },
-  { id: 'tor', abbr: 'TOR', city: 'Toronto', name: 'Blue Jays', mascot: 'Ace the Blue Jay', division: 'AL East', color: '#134a8e', founded: 1977, titles: 2, stadium: 'Rogers Centre', logo: 'assets/figma/logo-tor.webp' },
-  { id: 'bal', abbr: 'BAL', city: 'Baltimore', name: 'Orioles', mascot: 'The Oriole Bird', division: 'AL East', color: '#df4601', founded: 1901, titles: 3, stadium: 'Camden Yards', logo: 'assets/figma/logo-bal.webp' },
-  { id: 'tex', abbr: 'TEX', city: 'Texas', name: 'Rangers', mascot: 'Rangers Captain', division: 'AL West', color: '#003278', founded: 1961, titles: 1, stadium: 'Globe Life Field' },
-  { id: 'det', abbr: 'DET', city: 'Detroit', name: 'Tigers', mascot: 'Paws', division: 'AL Central', color: '#0c2340', founded: 1901, titles: 4, stadium: 'Comerica Park' },
-  { id: 'cle', abbr: 'CLE', city: 'Cleveland', name: 'Guardians', mascot: 'Slider', division: 'AL Central', color: '#e50022', founded: 1901, titles: 2, stadium: 'Progressive Field' },
+  { id: 'nyy', mlbId: 147, abbr: 'NYY', city: 'New York', name: 'Yankees', mascot: 'Pinstripe', division: 'AL East', color: '#1c2f6b', founded: 1903, titles: 27, stadium: 'Yankee Stadium', logo: 'assets/logos/nyy.png' },
+  { id: 'bos', mlbId: 111, abbr: 'BOS', city: 'Boston', name: 'Red Sox', mascot: 'Wally the Green Monster', division: 'AL East', color: '#bd3039', founded: 1901, titles: 9, stadium: 'Fenway Park', logo: 'assets/logos/bos.png' },
+  { id: 'hou', mlbId: 117, abbr: 'HOU', city: 'Houston', name: 'Astros', mascot: 'Orbit', division: 'AL West', color: '#eb6e1f', founded: 1962, titles: 2, stadium: 'Daikin Park', logo: 'assets/logos/hou.png' },
+  { id: 'tor', mlbId: 141, abbr: 'TOR', city: 'Toronto', name: 'Blue Jays', mascot: 'Ace the Blue Jay', division: 'AL East', color: '#134a8e', founded: 1977, titles: 2, stadium: 'Rogers Centre', logo: 'assets/logos/tor.png' },
+  { id: 'bal', mlbId: 110, abbr: 'BAL', city: 'Baltimore', name: 'Orioles', mascot: 'The Oriole Bird', division: 'AL East', color: '#df4601', founded: 1901, titles: 3, stadium: 'Oriole Park at Camden Yards', logo: 'assets/logos/bal.png' },
+  { id: 'tex', mlbId: 140, abbr: 'TEX', city: 'Texas', name: 'Rangers', mascot: 'Rangers Captain', division: 'AL West', color: '#003278', founded: 1961, titles: 1, stadium: 'Globe Life Field', logo: 'assets/logos/tex.png' },
+  { id: 'det', mlbId: 116, abbr: 'DET', city: 'Detroit', name: 'Tigers', mascot: 'Paws', division: 'AL Central', color: '#0c2340', founded: 1901, titles: 4, stadium: 'Comerica Park', logo: 'assets/logos/det.png' },
+  { id: 'cle', mlbId: 114, abbr: 'CLE', city: 'Cleveland', name: 'Guardians', mascot: 'Slider', division: 'AL Central', color: '#e50022', founded: 1901, titles: 2, stadium: 'Progressive Field', logo: 'assets/logos/cle.png' },
+  { id: 'tb', mlbId: 139, abbr: 'TB', city: 'Tampa Bay', name: 'Rays', mascot: 'Raymond', division: 'AL East', color: '#092c5c', founded: 1998, titles: 0, stadium: 'Tropicana Field', logo: 'assets/logos/tb.png' },
+  { id: 'cws', mlbId: 145, abbr: 'CWS', city: 'Chicago', name: 'White Sox', mascot: 'Southpaw', division: 'AL Central', color: '#27251f', founded: 1901, titles: 3, stadium: 'Rate Field', logo: 'assets/logos/cws.png' },
+  { id: 'kc', mlbId: 118, abbr: 'KC', city: 'Kansas City', name: 'Royals', mascot: 'Sluggerrr', division: 'AL Central', color: '#004687', founded: 1969, titles: 2, stadium: 'Kauffman Stadium', logo: 'assets/logos/kc.png' },
+  { id: 'min', mlbId: 142, abbr: 'MIN', city: 'Minnesota', name: 'Twins', mascot: 'T.C. Bear', division: 'AL Central', color: '#002b5c', founded: 1901, titles: 3, stadium: 'Target Field', logo: 'assets/logos/min.png' },
+  { id: 'ath', mlbId: 133, abbr: 'ATH', city: '', name: 'Athletics', mascot: 'Stomper', division: 'AL West', color: '#003831', founded: 1901, titles: 9, stadium: 'Sutter Health Park', logo: 'assets/logos/ath.png' },
+  { id: 'laa', mlbId: 108, abbr: 'LAA', city: 'Los Angeles', name: 'Angels', mascot: 'Rally Monkey', division: 'AL West', color: '#ba0021', founded: 1961, titles: 1, stadium: 'Angel Stadium', logo: 'assets/logos/laa.png' },
+  { id: 'sea', mlbId: 136, abbr: 'SEA', city: 'Seattle', name: 'Mariners', mascot: 'Mariner Moose', division: 'AL West', color: '#005c5c', founded: 1977, titles: 0, stadium: 'T-Mobile Park', logo: 'assets/logos/sea.png' },
 ];
 
 export const TEAM_BY_ID: Record<string, Team> = Object.fromEntries(TEAMS.map((t) => [t.id, t]));

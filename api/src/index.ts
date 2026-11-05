@@ -171,8 +171,9 @@ api.get('/trivia', async (req, res) => {
   const teamId = typeof req.query['teamId'] === 'string' ? req.query['teamId'] : null;
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT id, team_id AS teamId, question, options FROM trivia_questions
-     WHERE active ORDER BY (team_id <=> ?) DESC, (team_id IS NULL) DESC, id`,
-    [teamId],
+     WHERE active AND (? IS NULL OR team_id = ? OR team_id IS NULL)
+     ORDER BY (team_id <=> ?) DESC, (team_id IS NULL) DESC, id`,
+    [teamId, teamId, teamId],
   );
   res.json(rows);
 });

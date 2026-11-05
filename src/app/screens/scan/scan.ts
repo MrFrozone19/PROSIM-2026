@@ -141,7 +141,7 @@ type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
               <div class="h-1 w-[140px] overflow-hidden rounded-sm bg-white/[0.13]">
                 <div class="loader-fill h-full w-20 rounded-sm bg-pink"></div>
               </div>
-              <p class="mt-1 text-center font-sans text-[10px] text-muted/80">Marcadores activos: {{ activeTeams }}</p>
+              <p class="mt-1 text-center font-sans text-[10px] text-muted/80">15 equipos de la Liga Americana · {{ activeTeams }}</p>
               @if (canSimulate()) {
                 <button
                   type="button"
@@ -212,7 +212,7 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
   protected readonly tracking = signal(false);
   protected readonly animating = signal(true);
 
-  protected readonly activeTeams = [...new Set(AR_TARGETS.map((t) => TEAM_BY_ID[t.teamId]?.name ?? t.teamId))].join(', ');
+  protected readonly activeTeams = [...new Set(AR_TARGETS.map((t) => TEAM_BY_ID[t.teamId]?.abbr ?? t.teamId))].join(' · ');
 
   protected readonly statusLabel = computed(() => {
     switch (this.state()) {
@@ -326,7 +326,7 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
         Number(this.route.snapshot.queryParamMap.get('crop')) || (getArQuality() === 'fast' ? 256 : undefined),
       onFound: (teamId) => {
         // Volver a anclar tras el modo libre no cuenta como un escaneo nuevo.
-        const fresh = !this.team();
+        const fresh = this.team()?.id !== teamId;
         if (fresh) this.fb.success();
         this.team.set(TEAM_BY_ID[teamId]);
         this.tracking.set(true);

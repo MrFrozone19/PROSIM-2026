@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, OnDestroy, computed, inject, input, output, signal } from '@angular/core';
+import { Component, OnDestroy, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { Icon, IconName } from '../../shared/icon';
 import { StatCard } from '../../shared/stat-card';
 import { Feedback } from '../../shared/feedback';
@@ -85,9 +85,9 @@ interface Particle {
           {{ team().city }} {{ team().name }}
         </span>
         <span class="h-1 w-1 rounded-full bg-muted"></span>
-        <span class="font-sans text-[11px] font-semibold uppercase leading-normal text-muted">Official mascot</span>
+        <span class="font-sans text-[11px] font-semibold uppercase leading-normal text-muted">{{ team().abbr }} · {{ team().division }}</span>
       </div>
-      <p class="font-display text-[22px] font-black uppercase leading-normal text-white">{{ team().mascot }}</p>
+      <p class="font-display text-[22px] font-black uppercase leading-normal text-white">{{ team().name }}</p>
       @if (hint(); as h) {
         <p class="mt-1 w-fit rounded-pill border border-line bg-black/60 px-2.5 py-1 font-sans text-[10px] font-semibold text-white/85">
           {{ h }}
@@ -158,7 +158,7 @@ interface Particle {
           @case ('info') {
             <div class="grid grid-cols-2 gap-3">
               <app-stat-card label="Fundado" [value]="team().founded" />
-              <app-stat-card label="Títulos" [value]="team().titles" hint="Series Mundiales" />
+              <app-stat-card label="Títulos" [value]="team().titles" hint="Series Mundiales · hasta 2025" />
               <app-stat-card label="Estadio" [value]="team().stadium" />
               <app-stat-card label="División" [value]="team().division" />
             </div>
@@ -173,11 +173,12 @@ interface Particle {
             </button>
           }
           @case ('video') {
+            @if (clip(); as videoClip) {
             <div class="overflow-hidden rounded-row border border-line bg-black">
               <video
                 class="aspect-video w-full"
-                [src]="clip().src"
-                [poster]="clip().poster"
+                [src]="videoClip.src"
+                [poster]="videoClip.poster"
                 controls
                 autoplay
                 muted
@@ -185,8 +186,11 @@ interface Particle {
                 playsinline
               ></video>
             </div>
-            <p class="mt-3 font-sans text-[13px] font-bold text-white">{{ clip().title }}</p>
-            <p class="font-sans text-[11px] text-muted">{{ clip().duration }} · {{ team().city }} {{ team().name }}</p>
+            <p class="mt-3 font-sans text-[13px] font-bold text-white">{{ videoClip.title }}</p>
+            <p class="font-sans text-[11px] text-muted">{{ videoClip.duration }} · {{ team().city }} {{ team().name }}</p>
+            } @else {
+              <p class="py-6 text-center font-sans text-[13px] text-muted">El video de {{ team().name }} estará disponible próximamente.</p>
+            }
           }
           @case ('stats') {
             <p class="mb-2 font-sans text-[11px] font-semibold uppercase tracking-wide text-muted">
@@ -318,8 +322,21 @@ export class ArHud implements OnDestroy {
   private readonly api = inject(Api);
   private readonly progress = inject(Progress);
   private timers: ReturnType<typeof setTimeout>[] = [];
-  /** Equipo para el que ya se cargó la trivia (sus preguntas van primero). */
+  /** Equipo para el que ya se cargó su trivia y las preguntas generales de la liga. */
   private triviaTeam = '';
+  private triviaRequest = 0;
+  // Si se detecta otro equipo sin salir del escáner, descarta paneles y respuestas del anterior.
+  private readonly resetForTeam = effect(() => {
+    this.team();
+    untracked(() => {
+      this.closePanel();
+      this.triviaRequest++;
+      this.triviaTeam = '';
+      this.questions.set([]);
+      this.answered.set(null);
+      this.correctAnswer.set(null);
+    });
+  });
 
   protected readonly leftDock: DockItem[] = [
     { id: 'trivia', label: 'Trivia', icon: 'CircleHelp' },
@@ -350,18 +367,18 @@ export class ArHud implements OnDestroy {
   protected readonly question = computed(() => this.questions()[this.triviaIndex()] ?? null);
 
   protected readonly clip = computed(
-    () => VIDEO_CLIPS.find((v) => v.teamId === this.team().id) ?? VIDEO_CLIPS[0],
+    () => VIDEO_CLIPS.find((v) => v.teamId === this.team().id) ?? null,
   );
 
   protected readonly standings = computed(() => {
     const div = this.team().division;
     const rows = STANDINGS.filter((r) => TEAM_BY_ID[r.teamId]?.division === div);
-    return rows.length ? rows : STANDINGS;
+    return rows;
   });
 
   protected readonly narration = computed(() => {
     const t = this.team();
-    return `${t.mascot} es la mascota oficial de los ${t.name} de ${t.city}, fundados en ${t.founded}. Juegan en ${t.stadium}, en la ${t.division}, y suman ${t.titles} ${t.titles === 1 ? 'título' : 'títulos'} de Serie Mundial.`;
+    return `${`${t.city} ${t.name}`.trim()}: la franquicia comenzó a jugar en ${t.founded}. Su estadio es ${t.stadium}, pertenece a la ${t.division} y hasta 2025 suma ${t.titles} ${t.titles === 1 ? 'título' : 'títulos'} de Serie Mundial. El cubo con su logo es un modelo provisional.`;
   });
 
   protected readonly panelTitle = computed(() => {
@@ -436,15 +453,18 @@ export class ArHud implements OnDestroy {
   protected async answer(i: number): Promise<void> {
     const q = this.question();
     if (!q || this.answered() !== null) return;
+    const request = this.triviaRequest;
     this.answered.set(i);
     try {
       const r = await this.api.answer(q.id, i);
+      if (request !== this.triviaRequest) return;
       this.correctAnswer.set(r.answer);
       if (r.correct) this.fb.success();
       else this.fb.error();
       this.progress.celebrate(r);
     } catch (e) {
       console.error(e);
+      if (request !== this.triviaRequest) return;
       this.answered.set(null);
       this.fb.error();
     }
@@ -472,6 +492,7 @@ export class ArHud implements OnDestroy {
     const teamId = this.team().id;
     if (this.triviaTeam === teamId && this.questions().length) return;
     this.triviaTeam = teamId;
+    const request = ++this.triviaRequest;
     this.triviaError.set(false);
     this.questions.set([]);
     this.triviaIndex.set(0);
@@ -479,9 +500,12 @@ export class ArHud implements OnDestroy {
     this.correctAnswer.set(null);
     this.api
       .trivia(teamId)
-      .then((qs) => this.questions.set(qs))
+      .then((qs) => {
+        if (request === this.triviaRequest) this.questions.set(qs);
+      })
       .catch((e) => {
         console.error(e);
+        if (request !== this.triviaRequest) return;
         this.triviaTeam = '';
         this.triviaError.set(true);
       });

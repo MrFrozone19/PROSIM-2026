@@ -10,12 +10,10 @@
 //   con texto y rayas, que aporta muchos más puntos de referencia que un logo plano de dos colores.
 // Antes de compilar, cada imagen se reduce a MAX_SIZE px por lado: la cámara nunca ve el marcador más grande que
 // el recorte de detección (512 px), así que las escalas mayores solo harían más lento el emparejamiento.
-import { createServer } from 'node:http';
-import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { extname, join, resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+import { requestBody, runBrowserTask } from './browser-task.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const targetsDir = join(root, 'design/targets');
@@ -23,19 +21,6 @@ const vendorDir = join(root, 'src/vendor/mind-ar');
 const outFile = join(root, 'src/assets/targets/targets.mind');
 const manifest = JSON.parse(await readFile(join(targetsDir, 'targets.json'), 'utf8'));
 const MAX_SIZE = 640;
-
-const browser = [
-  process.env.BROWSER_PATH,
-  'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  '/usr/bin/google-chrome',
-  '/usr/bin/chromium',
-].find((p) => p && existsSync(p));
-if (!browser) {
-  console.error('No encontré Chrome ni Edge. Define BROWSER_PATH con la ruta del ejecutable.');
-  process.exit(1);
-}
 
 const page = `<!doctype html><meta charset="utf-8"><script type="module">
 import { Compiler } from '/mind/mindar-image.prod.js';
@@ -128,7 +113,8 @@ try {
     const scales = data[i].matchingData.map((k) => Math.round(k.width) + 'px:' + (k.maximaPoints.length + k.minimaPoints.length));
     await log('target ' + i + ' (' + manifest[i].team + ', ' + manifest[i].file + '): ' + data[i].matchingData.reduce((a, k) => a + k.maximaPoints.length + k.minimaPoints.length, 0) + ' puntos de referencia; por escala ' + scales.join(' '));
   }
-  await fetch('/save-mind', { method: 'POST', body: await compiler.exportData() });
+  const saved = await fetch('/save-mind', { method: 'POST', body: await compiler.exportData() });
+  if (!saved.ok) throw new Error(await saved.text());
   await fetch('/done', { method: 'POST', body: 'ok' });
 } catch (e) {
   await fetch('/done', { method: 'POST', body: 'ERROR: ' + (e?.stack || e) });
@@ -136,36 +122,19 @@ try {
 </script>`;
 
 const mime = { '.js': 'text/javascript', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
-const body = (req) =>
-  new Promise((ok) => {
-    const chunks = [];
-    req.on('data', (c) => chunks.push(c)).on('end', () => ok(Buffer.concat(chunks)));
-  });
-
-let finish;
-const finished = new Promise((ok) => (finish = ok));
-
-const server = createServer(async (req, res) => {
-  const url = new URL(req.url, 'http://localhost');
+let compiled;
+await runBrowserTask(page, async (req, res, url) => {
   try {
     if (req.method === 'POST') {
-      const data = await body(req);
-      if (url.pathname === '/log') console.log(data.toString());
-      else if (url.pathname === '/save-image') {
+      const data = await requestBody(req);
+      if (url.pathname === '/save-image') {
         const name = url.searchParams.get('name').replace(/[\\/]/g, '');
         await writeFile(join(targetsDir, name), data);
         console.log(`generada design/targets/${name}`);
       } else if (url.pathname === '/save-mind') {
-        await mkdir(resolve(outFile, '..'), { recursive: true });
-        await writeFile(outFile, data);
-        console.log(`escrito ${outFile} (${(data.length / 1024).toFixed(0)} kB)`);
-      } else if (url.pathname === '/done') finish(data.toString());
+        compiled = data;
+      }
       res.end('ok');
-      return;
-    }
-    if (url.pathname === '/') {
-      res.setHeader('content-type', 'text/html');
-      res.end(page);
       return;
     }
     const [, kind, name] = url.pathname.split('/');
@@ -178,24 +147,22 @@ const server = createServer(async (req, res) => {
     res.end(String(e.message));
   }
 });
+if (!compiled) throw new Error('El compilador no produjo targets.mind');
+await mkdir(resolve(outFile, '..'), { recursive: true });
+await writeFile(outFile, compiled);
+// El mapa de índices se genera desde el mismo manifiesto que el archivo .mind.
+const mapping = manifest.map((t, index) => ({index, teamId:t.team, model:`assets/models/cube-${t.team}.glb`}));
+const version = createHash('sha256').update(compiled).digest('hex').slice(0, 12);
+await writeFile(join(root, 'src/app/data/targets.ts'), `/** Generado por npm run targets desde design/targets/targets.json. No editar los índices a mano. */
+export const TARGETS_SRC = 'assets/targets/targets.mind?v=${version}';
 
-await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
-const { port } = server.address();
-const profile = await mkdtemp(join(tmpdir(), 'basedex-targets-'));
-const child = spawn(
-  browser,
-  ['--headless=new', '--no-first-run', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', `--user-data-dir=${profile}`, `http://127.0.0.1:${port}/`],
-  { stdio: 'ignore' },
-);
-
-const timeout = setTimeout(() => finish('ERROR: tiempo agotado (10 min)'), 10 * 60 * 1000);
-const result = await finished;
-clearTimeout(timeout);
-child.kill();
-server.close();
-await rm(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 }).catch(() => undefined);
-if (result !== 'ok') {
-  console.error(result);
-  process.exit(1);
+export interface ArTarget {
+  index: number;
+  teamId: string;
+  /** Cubo provisional por equipo; puede sustituirse por un GLB definitivo. */
+  model: string;
 }
-console.log('listo');
+
+export const AR_TARGETS: ArTarget[] = ${JSON.stringify(mapping, null, 2)};
+`);
+console.log(`listo: ${mapping.length} marcadores, ${new Set(mapping.map((t) => t.teamId)).size} equipos; ${(compiled.length / 1024).toFixed(0)} kB`);
