@@ -1,0 +1,166 @@
+{
+  "models": [
+    {
+      "id": "bat-metal",
+      "label": "Bate metálico",
+      "kind": "bat",
+      "teams": [
+        "nyy",
+        "det",
+        "cws"
+      ],
+      "source": "baseball bat/Baseball-Bat-01.obj",
+      "bytes": 69620,
+      "triangles": 2944,
+      "materials": 2,
+      "textures": 0,
+      "animations": [
+        "Exhibition"
+      ],
+      "dimensions": [
+        0.09746299684047699,
+        1,
+        0.09746301174163818
+      ],
+      "src": "assets/models/imported/bat-metal-f1e34252f356.glb"
+    },
+    {
+      "id": "bat-wood",
+      "label": "Bate de madera clara",
+      "kind": "bat",
+      "teams": [
+        "tex",
+        "ath"
+      ],
+      "source": "baseball bat/Baseball-Bat-02.obj",
+      "bytes": 69712,
+      "triangles": 2944,
+      "materials": 2,
+      "textures": 0,
+      "animations": [
+        "Exhibition"
+      ],
+      "dimensions": [
+        0.10409692952777869,
+        1,
+        0.10409692952777869
+      ],
+      "src": "assets/models/imported/bat-wood-e57dd19d654a.glb"
+    },
+    {
+      "id": "bat-dark",
+      "label": "Bate de madera oscura",
+      "kind": "bat",
+      "teams": [
+        "bos",
+        "bal"
+      ],
+      "source": "baseball bat/Baseball-Bat-03.obj",
+      "bytes": 75532,
+      "triangles": 3200,
+      "materials": 2,
+      "textures": 0,
+      "animations": [
+        "Exhibition"
+      ],
+      "dimensions": [
+        0.13873624345636396,
+        1,
+        0.13873624345636398
+      ],
+      "src": "assets/models/imported/bat-dark-0b4f9a303288.glb"
+    },
+    {
+      "id": "ball-classic",
+      "label": "Pelota clásica",
+      "kind": "ball",
+      "teams": [
+        "tor",
+        "cle",
+        "min",
+        "laa"
+      ],
+      "source": "baseball cap/Baseball-Ball-01.obj",
+      "bytes": 40948,
+      "triangles": 1536,
+      "materials": 2,
+      "textures": 0,
+      "animations": [
+        "Exhibition"
+      ],
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "src": "assets/models/imported/ball-classic-9f8916f67268.glb"
+    },
+    {
+      "id": "ball-dark",
+      "label": "Pelota oscura",
+      "kind": "ball",
+      "teams": [
+        "sea"
+      ],
+      "source": "baseball cap/Baseball-Ball-02.obj",
+      "bytes": 25684,
+      "triangles": 1024,
+      "materials": 2,
+      "textures": 0,
+      "animations": [
+        "Exhibition"
+      ],
+      "dimensions": [
+        0.9999902284147855,
+        1,
+        0.9999950780163362
+      ],
+      "src": "assets/models/imported/ball-dark-b1a79d00b96c.glb"
+    },
+    {
+      "id": "ball-gold",
+      "label": "Pelota dorada",
+      "kind": "ball",
+      "teams": [
+        "hou",
+        "tb"
+      ],
+      "source": "baseball cap/Baseball-Ball-03.obj",
+      "bytes": 35604,
+      "triangles": 450,
+      "materials": 2,
+      "textures": 0,
+      "animations": [
+        "Exhibition"
+      ],
+      "dimensions": [
+        0.8421751750056075,
+        1,
+        0.8509162404262562
+      ],
+      "src": "assets/models/imported/ball-gold-0471f77b87c7.glb"
+    },
+    {
+      "id": "dice-gold",
+      "label": "Dado dorado",
+      "kind": "die",
+      "teams": [
+        "kc"
+      ],
+      "source": "dados/dado_v2.obj",
+      "bytes": 123788,
+      "triangles": 1740,
+      "materials": 3,
+      "textures": 1,
+      "animations": [
+        "Exhibition"
+      ],
+      "dimensions": [
+        1,
+        1,
+        1
+      ],
+      "src": "assets/models/imported/dice-gold-0c528638037b.glb"
+    }
+  ]
+}

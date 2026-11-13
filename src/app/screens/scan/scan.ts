@@ -10,7 +10,7 @@ import { Api } from '../../core/api';
 import { Gallery, saveErrorMessage } from '../../core/gallery';
 import { Progress } from '../../core/progress';
 import { TEAM_BY_ID, TEAMS, Team } from '../../data/teams';
-import { AR_TARGETS, TARGETS_SRC } from '../../data/targets';
+import { AR_TARGETS, TARGETS_SRC, modelForTeam } from '../../data/targets';
 import { ArEngine, CameraError } from '../../ar/ar-engine';
 import { ArHud } from '../ar/ar-hud';
 
@@ -44,6 +44,7 @@ type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
           <div class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/60 to-transparent"></div>
           <app-ar-hud
             [team]="t"
+            [modelLabel]="modelForTeam(t.id).label"
             [animating]="animating()"
             [status]="tracking() ? 'TARGET LOCKED' : 'AR HUB ACTIVE'"
             [hint]="tracking() ? 'Desliza para girar · pellizca para escalar' : 'Modo libre · apunta al logo para anclarlo'"
@@ -204,6 +205,7 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
   private scanStartedAt = 0;
 
   protected engine?: ArEngine;
+  protected readonly modelForTeam = modelForTeam;
   protected readonly state = signal<ScanState>('loading');
   protected readonly errorDetail = signal('');
   /** Equipo cuyo modelo está en pantalla; null mientras se sigue escaneando. */

@@ -2,6 +2,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve, relative, isAbsolute, extname, join } from 'node:path';
 import { TEAMS } from '../src/app/data/teams.ts';
+import { modelForTeam } from '../src/app/data/targets.ts';
 import { requestBody, runBrowserTask } from './browser-task.mjs';
 
 const root = resolve(import.meta.dirname, '..');
@@ -15,6 +16,7 @@ import {Controller} from '/mind/mindar-image.prod.js';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 const manifest = ${JSON.stringify(manifest)}, teams = ${JSON.stringify(TEAMS)};
+const models = ${JSON.stringify(Object.fromEntries(TEAMS.map((team) => [team.id, modelForTeam(team.id)])))};
 const log = (s) => fetch('/log',{method:'POST',body:s});
 const load = async (url) => { const i = new Image(); i.src=url; await i.decode(); return i; };
 try {
@@ -45,14 +47,14 @@ try {
   await log('OK: sin detección en cuadro vacío');
   controller.dispose(); controller.worker.terminate();
 
-  // Carga cada GLB con el loader de producción y renderiza una hoja de revisión de las 15 texturas.
+  // Carga cada asignación con el loader de producción y renderiza los 15 equipos.
   const sheet=document.createElement('canvas');sheet.width=1500;sheet.height=900;
   const ctx=sheet.getContext('2d');ctx.fillStyle='#0c0c12';ctx.fillRect(0,0,1500,900);
   const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(280,230);
   const camera=new THREE.PerspectiveCamera(35,280/230,0.1,100);camera.position.set(1.4,1.0,3.3);camera.lookAt(0,0,0);
   const loader=new GLTFLoader();
   for (const [i,team] of teams.entries()) {
-    const gltf=await loader.loadAsync('/models/cube-'+team.id+'.glb');
+    const gltf=await loader.loadAsync('/models/'+models[team.id].src.replace('assets/models/',''));
     const scene=new THREE.Scene();scene.background=new THREE.Color('#141420');
     scene.add(new THREE.HemisphereLight(0xffffff,0x30304a,2.2));
     const light=new THREE.DirectionalLight(0xffffff,2.6);light.position.set(1.5,2.5,3);scene.add(light,gltf.scene);
@@ -72,7 +74,7 @@ try {
 await runBrowserTask(page, async (req, res, url) => {
   if (req.method === 'POST' && (url.pathname === '/sheet' || url.pathname === '/report')) {
     await writeFile(
-      join(output, url.pathname === '/sheet' ? 'cubes.png' : 'recognition.json'),
+      join(output, url.pathname === '/sheet' ? 'models.png' : 'recognition.json'),
       await requestBody(req),
     );
     res.end('ok');
@@ -106,5 +108,5 @@ await runBrowserTask(page, async (req, res, url) => {
   res.end(await readFile(file));
 });
 console.log(
-  'OK: reconocimiento frontal/rotado de todos los marcadores y render de 15 cubos. Reporte en tmp/team-check/.',
+  'OK: reconocimiento frontal/rotado de todos los marcadores y render de los modelos de 15 equipos. Reporte en tmp/team-check/.',
 );

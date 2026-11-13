@@ -1,102 +1,101 @@
-/** Generado por npm run targets desde design/targets/targets.json. No editar los índices a mano. */
+/** Generado por npm run targets / models:import. No editar los índices a mano. */
+import importedModels from '../../assets/models/imported/catalog.json' with { type: 'json' };
+
 export const TARGETS_SRC = 'assets/targets/targets.mind?v=0f4f27637387';
+
+export interface TeamModel {
+  id: string;
+  label: string;
+  src: string;
+  placeholder: boolean;
+}
+
+export function modelForTeam(teamId: string): TeamModel {
+  const model = importedModels.models.find((entry) => entry.teams.includes(teamId));
+  return model
+    ? { id: model.id, label: model.label, src: model.src, placeholder: false }
+    : { id: 'cube-' + teamId, label: 'Modelo provisional', src: 'assets/models/cube-' + teamId + '.glb', placeholder: true };
+}
 
 export interface ArTarget {
   index: number;
   teamId: string;
-  /** Cubo provisional por equipo; puede sustituirse por un GLB definitivo. */
   model: string;
 }
 
 export const AR_TARGETS: ArTarget[] = [
   {
     "index": 0,
-    "teamId": "nyy",
-    "model": "assets/models/cube-nyy.glb"
+    "teamId": "nyy"
   },
   {
     "index": 1,
-    "teamId": "nyy",
-    "model": "assets/models/cube-nyy.glb"
+    "teamId": "nyy"
   },
   {
     "index": 2,
-    "teamId": "nyy",
-    "model": "assets/models/cube-nyy.glb"
+    "teamId": "nyy"
   },
   {
     "index": 3,
-    "teamId": "nyy",
-    "model": "assets/models/cube-nyy.glb"
+    "teamId": "nyy"
   },
   {
     "index": 4,
-    "teamId": "bos",
-    "model": "assets/models/cube-bos.glb"
+    "teamId": "bos"
   },
   {
     "index": 5,
-    "teamId": "hou",
-    "model": "assets/models/cube-hou.glb"
+    "teamId": "hou"
   },
   {
     "index": 6,
-    "teamId": "tor",
-    "model": "assets/models/cube-tor.glb"
+    "teamId": "tor"
   },
   {
     "index": 7,
-    "teamId": "bal",
-    "model": "assets/models/cube-bal.glb"
+    "teamId": "bal"
   },
   {
     "index": 8,
-    "teamId": "tex",
-    "model": "assets/models/cube-tex.glb"
+    "teamId": "tex"
   },
   {
     "index": 9,
-    "teamId": "det",
-    "model": "assets/models/cube-det.glb"
+    "teamId": "det"
   },
   {
     "index": 10,
-    "teamId": "cle",
-    "model": "assets/models/cube-cle.glb"
+    "teamId": "cle"
   },
   {
     "index": 11,
-    "teamId": "tb",
-    "model": "assets/models/cube-tb.glb"
+    "teamId": "tb"
   },
   {
     "index": 12,
-    "teamId": "cws",
-    "model": "assets/models/cube-cws.glb"
+    "teamId": "cws"
   },
   {
     "index": 13,
-    "teamId": "kc",
-    "model": "assets/models/cube-kc.glb"
+    "teamId": "kc"
   },
   {
     "index": 14,
-    "teamId": "min",
-    "model": "assets/models/cube-min.glb"
+    "teamId": "min"
   },
   {
     "index": 15,
-    "teamId": "ath",
-    "model": "assets/models/cube-ath.glb"
+    "teamId": "ath"
   },
   {
     "index": 16,
-    "teamId": "laa",
-    "model": "assets/models/cube-laa.glb"
+    "teamId": "laa"
   },
   {
     "index": 17,
-    "teamId": "sea",
-    "model": "assets/models/cube-sea.glb"
+    "teamId": "sea"
   }
-];
+].map((target) => ({
+  ...target, model: modelForTeam(target.teamId).src,
+}));

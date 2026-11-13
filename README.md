@@ -81,14 +81,14 @@ Te imprime una URL `https://….trycloudflare.com` que puedes abrir desde el cel
      hay que ponerlo de frente, centrado en la retícula y con buena luz.
 2. Entra a la pestaña **Scan** y concede el permiso de cámara. Espera a que el indicador diga `SCANNER ACTIVE`
    (la primera vez tarda unos segundos: descarga el motor de seguimiento, ~400 kB comprimido).
-3. Apunta al marcador de frente y centrado en la retícula, sin reflejos. Al reconocerlo aparece un cubo con el logo del equipo al frente y
+3. Apunta al marcador de frente y centrado en la retícula, sin reflejos. Al reconocerlo aparece el bate, pelota o dado asignado al equipo y
    el indicador cambia a `TARGET LOCKED`.
 4. Desliza un dedo para girar el modelo, pellizca para escalarlo, y usa **Stop / Animate** para detener o
    reanudar su animación.
 5. **Foto** guarda una captura con la cámara y el modelo (sin la interfaz) en TCG Vault → Galería; desde ahí se comparte o descarga.
 
 Hay 18 marcadores para 15 equipos: se conservan los tres originales de los Yankees y se añade un logo oficial por equipo.
-El archivo `.mind` ocupa aproximadamente 3 MB y los 15 cubos GLB juntos, menos de 500 kB. La detección se probó
+El archivo `.mind` ocupa aproximadamente 3 MB y los siete GLB recibidos, compartidos entre los 15 equipos, suman menos de 500 kB. La detección se probó
 con todos los candidatos simultáneamente, a 280 y 400 px, de frente y con una ligera rotación (72 casos), usando
 el detector real de MindAR. El matcher elige el candidato con más correspondencias geométricas para reducir confusiones entre logos.
 La fiabilidad en cámaras físicas, iluminación variable, bordados y otros diseños de logo debe comprobarse en el dispositivo.
@@ -105,7 +105,7 @@ recorte de 512 px que abarca todo lo visible en vertical, y alternar el recorte 
 móviles. Además el marcador se da por encontrado tras 2 cuadros seguidos y por perdido tras 12.
 
 Para comparar en el celular, `/#/scan?crop=256` usa el recorte chico (menos trabajo por cuadro, menos alcance).
-`npm run teams:recognition` prueba el reconocimiento con imágenes locales y renderiza los cubos en `tmp/team-check/cubes.png`.
+`npm run teams:recognition` prueba el reconocimiento con imágenes locales y renderiza los modelos por equipo en `tmp/team-check/models.png`.
 `window.__bdStats` acumula intentos y milisegundos de detección si se define antes de abrir Scan.
 
 ### Agregar o cambiar marcadores
@@ -116,13 +116,17 @@ Para comparar en el celular, `/#/scan?crop=256` usa el recorte chico (menos trab
 2. `npm run targets` recompila `src/assets/targets/targets.mind` (abre Chrome o Edge sin ventana, porque el
    compilador de MindAR solo corre en navegador), reduce cada imagen a 640 px por lado e imprime los puntos de
    referencia por escala. Menos de ~30 en las escalas de 150–300 px es señal de un marcador difícil.
-3. El comando genera también `src/app/data/targets.ts`, con los mismos índices y `assets/models/cube-<equipo>.glb`.
+3. El comando genera también `src/app/data/targets.ts`, con los mismos índices y los modelos de `src/assets/models/imported/catalog.json` (cubo de respaldo si falta una asignación).
    El URL del `.mind` incluye una versión para evitar reutilizar marcadores anteriores desde la caché.
 
-Para regenerar los logos y los cubos: `npm run teams:assets` y después `npm run targets`. Los SVGs locales se
+Para regenerar los logos y los cubos de respaldo: `npm run teams:assets` y después `npm run targets`. Los SVGs locales se
 reutilizan; `npm run teams:assets -- --refresh` vuelve a descargarlos desde MLB. `npm run teams:check` comprueba
 que frontend, API, marcadores, modelos, cartas y trivia cubran los mismos 15 equipos. `ng test --watch=false`
 comprueba el cambio de equipo con peticiones de trivia pendientes.
+
+Los modelos recibidos y su distribución están en [design/models/README.md](design/models/README.md).
+`npm run models:import` convierte las fuentes OBJ/MTL conservando los originales y actualiza las asignaciones;
+no requiere recompilar los marcadores. Una actualización que solo cambia modelos se publica únicamente en Hosting.
 
 Los datos de equipos y las nuevas preguntas se sincronizan con MySQL al iniciar la API, mediante la migración
 idempotente existente. Se conservan los IDs de las cartas y preguntas originales y las ediciones de trivia del administrador.
@@ -142,7 +146,7 @@ de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores ti
 | Navegación entre las 7 pantallas, tab bar, transiciones | Real |
 | Cámara trasera en `/scan` (permiso concedido / rechazado / sin soporte / error de carga) | Real |
 | Reconocimiento de marcadores en `/scan` | **Real** con MindAR: los 15 equipos de la Liga Americana, con sus logos oficiales sobre fondo claro; se conservan los marcadores anteriores de NYY |
-| Modelo 3D anclado al marcador | **Real** con three.js. Un cubo GLB provisional por equipo, con su logo al frente y animación suave, generado por `npm run teams:assets` |
+| Modelo 3D anclado al marcador | **Real** con three.js. Siete modelos recibidos (tres bates, tres pelotas y un dado), distribuidos entre los 15 equipos; materiales y textura incrustada, con movimiento de exhibición. Importados con `npm run models:import` |
 | Interacción con el modelo | Real: un dedo lo gira, dos dedos lo escalan; el botón Animate/Stop reanuda o detiene su animación; Info lo hace girar 360° |
 | Modo libre | Real: si el logo sale de cuadro, el modelo queda flotando frente a la cámara para seguir interactuando; la flecha vuelve a escanear |
 | Dock de la ventana AR: Animate/Stop, Foto, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos). La trivia viene de la API y se califica en el servidor; Stats sigue siendo una tabla simulada |

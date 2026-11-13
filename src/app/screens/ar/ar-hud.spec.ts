@@ -44,6 +44,21 @@ function setup() {
 afterEach(() => TestBed.resetTestingModule());
 
 describe('Contenido AR al reconocer otro equipo', () => {
+  it('actualiza la descripción del modelo al cambiar de equipo', () => {
+    const { fixture, click, text } = setup();
+    fixture.componentRef.setInput('modelLabel', 'Bate metálico');
+    fixture.detectChanges();
+    click('Info');
+    expect(text()).toContain('En realidad aumentada se muestra: Bate metálico.');
+    fixture.componentRef.setInput('team', TEAM_BY_ID['kc']);
+    fixture.componentRef.setInput('modelLabel', 'Dado dorado');
+    fixture.detectChanges();
+    click('Info');
+    expect(text()).toContain('En realidad aumentada se muestra: Dado dorado.');
+    expect(text()).not.toContain('Bate metálico');
+    expect(text()).not.toContain('El cubo con su logo');
+  });
+
   it('muestra la división completa del nuevo equipo y no le atribuye un video ajeno', () => {
     const { fixture, click, text } = setup();
     fixture.componentRef.setInput('team', TEAM_BY_ID['tb']);

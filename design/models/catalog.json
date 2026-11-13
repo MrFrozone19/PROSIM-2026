@@ -1,0 +1,67 @@
+{
+  "models": [
+    {
+      "id": "bat-metal",
+      "label": "Bate metálico",
+      "kind": "bat",
+      "source": "baseball bat/Baseball-Bat-01.obj",
+      "metalness": 0.35,
+      "roughness": 0.4,
+      "teams": ["nyy", "det", "cws"]
+    },
+    {
+      "id": "bat-wood",
+      "label": "Bate de madera clara",
+      "kind": "bat",
+      "source": "baseball bat/Baseball-Bat-02.obj",
+      "metalness": 0,
+      "roughness": 0.65,
+      "teams": ["tex", "ath"]
+    },
+    {
+      "id": "bat-dark",
+      "label": "Bate de madera oscura",
+      "kind": "bat",
+      "source": "baseball bat/Baseball-Bat-03.obj",
+      "metalness": 0,
+      "roughness": 0.65,
+      "teams": ["bos", "bal"]
+    },
+    {
+      "id": "ball-classic",
+      "label": "Pelota clásica",
+      "kind": "ball",
+      "source": "baseball cap/Baseball-Ball-01.obj",
+      "metalness": 0,
+      "roughness": 0.7,
+      "teams": ["tor", "cle", "min", "laa"]
+    },
+    {
+      "id": "ball-dark",
+      "label": "Pelota oscura",
+      "kind": "ball",
+      "source": "baseball cap/Baseball-Ball-02.obj",
+      "metalness": 0,
+      "roughness": 0.7,
+      "teams": ["sea"]
+    },
+    {
+      "id": "ball-gold",
+      "label": "Pelota dorada",
+      "kind": "ball",
+      "source": "baseball cap/Baseball-Ball-03.obj",
+      "metalness": 0.15,
+      "roughness": 0.5,
+      "teams": ["hou", "tb"]
+    },
+    {
+      "id": "dice-gold",
+      "label": "Dado dorado",
+      "kind": "die",
+      "source": "dados/dado_v2.obj",
+      "metalness": 0.15,
+      "roughness": 0.5,
+      "teams": ["kc"]
+    }
+  ]
+}

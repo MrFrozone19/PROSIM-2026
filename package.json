@@ -10,7 +10,8 @@
     "teams:check": "node scripts/verify-teams.mjs",
     "teams:recognition": "node scripts/verify-recognition.mjs",
     "targets": "node scripts/compile-targets.mjs",
-    "model": "node scripts/make-cap.mjs"
+    "model": "node scripts/make-cap.mjs",
+    "models:import": "node scripts/import-models.mjs"
   },
   "private": true,
   "packageManager": "npm@11.11.0",

@@ -88,6 +88,9 @@ interface Particle {
         <span class="font-sans text-[11px] font-semibold uppercase leading-normal text-muted">{{ team().abbr }} · {{ team().division }}</span>
       </div>
       <p class="font-display text-[22px] font-black uppercase leading-normal text-white">{{ team().name }}</p>
+      @if (modelLabel(); as label) {
+        <p class="font-sans text-[12px] font-semibold text-white/85">{{ label }}</p>
+      }
       @if (hint(); as h) {
         <p class="mt-1 w-fit rounded-pill border border-line bg-black/60 px-2.5 py-1 font-sans text-[10px] font-semibold text-white/85">
           {{ h }}
@@ -306,6 +309,7 @@ export class ArHud implements OnDestroy {
   readonly animating = input(false);
   readonly status = input('AR HUB ACTIVE');
   readonly hint = input<string | null>(null);
+  readonly modelLabel = input<string | null>(null);
   /** Muestra el botón Foto (solo tiene sentido con cámara real). */
   readonly photo = input(true);
 
@@ -378,7 +382,8 @@ export class ArHud implements OnDestroy {
 
   protected readonly narration = computed(() => {
     const t = this.team();
-    return `${`${t.city} ${t.name}`.trim()}: la franquicia comenzó a jugar en ${t.founded}. Su estadio es ${t.stadium}, pertenece a la ${t.division} y hasta 2025 suma ${t.titles} ${t.titles === 1 ? 'título' : 'títulos'} de Serie Mundial. El cubo con su logo es un modelo provisional.`;
+    const model = this.modelLabel();
+    return `${`${t.city} ${t.name}`.trim()}: la franquicia comenzó a jugar en ${t.founded}. Su estadio es ${t.stadium}, pertenece a la ${t.division} y hasta 2025 suma ${t.titles} ${t.titles === 1 ? 'título' : 'títulos'} de Serie Mundial.${model ? ' En realidad aumentada se muestra: ' + model + '.' : ''}`;
   });
 
   protected readonly panelTitle = computed(() => {

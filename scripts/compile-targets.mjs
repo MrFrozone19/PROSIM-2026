@@ -12,7 +12,7 @@
 // el recorte de detección (512 px), así que las escalas mayores solo harían más lento el emparejamiento.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { extname, join, resolve } from 'node:path';
-import { createHash } from 'node:crypto';
+import { writeTargetMap } from './write-target-map.mjs';
 import { requestBody, runBrowserTask } from './browser-task.mjs';
 
 const root = resolve(import.meta.dirname, '..');
@@ -150,19 +150,5 @@ await runBrowserTask(page, async (req, res, url) => {
 if (!compiled) throw new Error('El compilador no produjo targets.mind');
 await mkdir(resolve(outFile, '..'), { recursive: true });
 await writeFile(outFile, compiled);
-// El mapa de índices se genera desde el mismo manifiesto que el archivo .mind.
-const mapping = manifest.map((t, index) => ({index, teamId:t.team, model:`assets/models/cube-${t.team}.glb`}));
-const version = createHash('sha256').update(compiled).digest('hex').slice(0, 12);
-await writeFile(join(root, 'src/app/data/targets.ts'), `/** Generado por npm run targets desde design/targets/targets.json. No editar los índices a mano. */
-export const TARGETS_SRC = 'assets/targets/targets.mind?v=${version}';
-
-export interface ArTarget {
-  index: number;
-  teamId: string;
-  /** Cubo provisional por equipo; puede sustituirse por un GLB definitivo. */
-  model: string;
-}
-
-export const AR_TARGETS: ArTarget[] = ${JSON.stringify(mapping, null, 2)};
-`);
-console.log(`listo: ${mapping.length} marcadores, ${new Set(mapping.map((t) => t.teamId)).size} equipos; ${(compiled.length / 1024).toFixed(0)} kB`);
+await writeTargetMap(root, manifest, compiled);
+console.log(`listo: ${manifest.length} marcadores, ${new Set(manifest.map((t) => t.team)).size} equipos; ${(compiled.length / 1024).toFixed(0)} kB`);

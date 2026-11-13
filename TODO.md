@@ -13,7 +13,8 @@
 ## Modelos 3D
 - [x] Modelo glTF anclado al marcador, con rotación y escala táctil, botón para detener/reanudar la animación y giro 360° en Info.
 - [x] Cubo GLB por equipo con el logo al frente, color del equipo y animación suave.
-- [ ] Reemplazar los cubos provisionales por los modelos glTF/GLB de Diseño de ventanas, optimizados (< 2 MB, texturas comprimidas). El motor ya reproduce los clips que traiga el archivo.
+- [x] Integrar la primera entrega de modelos: tres bates, tres pelotas y un dado, convertidos a GLB autocontenidos de 25–121 KB y asignados a los 15 equipos (ver `design/models/README.md`).
+- [ ] Incorporar las siguientes entregas hasta que cada uno de los 15 equipos tenga su propio modelo único, sin compartirlo. Asignar los nuevos modelos a los equipos correspondientes conforme lleguen. Los OBJ recibidos tienen movimiento de exhibición agregado por la app.
 - [ ] Elegir qué clip dispara cada botón cuando el modelo traiga varios (celebración, bateo, saludo); hoy se reproducen todos a la vez.
 - [ ] Efectos: partículas y banner sobre la escena 3D en lugar de la capa 2D actual.
 

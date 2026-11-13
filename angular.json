@@ -26,6 +26,7 @@
               {
                 "glob": "**/*",
                 "input": "src/assets",
+                "ignore": ["models/newModels/**"],
                 "output": "assets"
               }
             ],
