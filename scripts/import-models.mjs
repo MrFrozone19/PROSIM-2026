@@ -1,4 +1,4 @@
-// Convierte las entregas OBJ/MTL a GLB autocontenidos. Los archivos de newModels nunca se modifican.
+// Importa OBJ/MTL o GLB autocontenidos. Los archivos de newModels nunca se modifican.
 // La asignación por equipo vive en design/models/catalog.json. Uso: npm run models:import.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, relative, isAbsolute, join, extname } from 'node:path';
@@ -20,18 +20,26 @@ const safePath = (base, path) => {
   return absolute;
 };
 const ids = new Set(),
-  assignments = new Set();
+  assignments = new Set(),
+  owners = new Set();
 const sources = new Map();
 for (const model of recipe.models) {
   if (!/^[a-z0-9-]+$/.test(model.id) || ids.has(model.id))
     throw new Error('ID de modelo inválido o duplicado');
   ids.add(model.id);
+  if (!model.teams.includes(model.ownerTeam) || owners.has(model.ownerTeam))
+    throw new Error('El modelo debe tener un equipo propietario único: ' + model.id);
+  owners.add(model.ownerTeam);
+  if (!/\.(obj|glb)$/i.test(model.source))
+    throw new Error('Formato no compatible: ' + model.source);
   for (const team of model.teams) {
     if (!TEAMS.some((t) => t.id === team) || assignments.has(team))
       throw new Error('Asignación inválida o duplicada: ' + team);
     assignments.add(team);
   }
-  for (const source of [model.source, model.source.replace(/\.obj$/i, '.mtl')]) {
+  for (const source of /\.obj$/i.test(model.source)
+    ? [model.source, model.source.replace(/\.obj$/i, '.mtl')]
+    : [model.source]) {
     const path = safePath(sourceRoot, source);
     const bytes = await readFile(path);
     sources.set(path, createHash('sha256').update(bytes).digest('hex'));
@@ -53,8 +61,8 @@ const recipe=${JSON.stringify(recipe.models)};
 const teams=${JSON.stringify(TEAMS.map((t) => ({ id: t.id, abbr: t.abbr })))};
 const base='/source/';
 const save=async(path,data)=>{const r=await fetch(path,{method:'POST',body:data});if(!r.ok)throw Error(await r.text());};
-const sheet=document.createElement('canvas');sheet.width=1400;sheet.height=720;
-const context=sheet.getContext('2d');context.fillStyle='#0c0c12';context.fillRect(0,0,1400,720);
+const sheet=document.createElement('canvas');sheet.width=1400;sheet.height=Math.ceil(recipe.length/4)*360;
+const context=sheet.getContext('2d');context.fillStyle='#0c0c12';context.fillRect(0,0,sheet.width,sheet.height);
 const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(330,270);
 const camera=new THREE.PerspectiveCamera(35,330/270,0.1,100);camera.position.set(1.3,0.8,3.3);camera.lookAt(0,0,0);
 const exportScene=new GLTFExporter();
@@ -62,11 +70,18 @@ const manager=new THREE.LoadingManager();let resourceError='';manager.onError=(u
 try{
  for(const [index,model] of recipe.entries()){
   const objUrl=base+model.source.split('/').map(encodeURIComponent).join('/');
-  const materials=await new MTLLoader(manager).loadAsync(objUrl.replace(/\\.obj$/i,'.mtl'));
-  const texturesReady=new Promise(ok=>{manager.onLoad=ok;});
-  materials.preload();
-  const object=await new OBJLoader(manager).setMaterials(materials).loadAsync(objUrl);
-  await texturesReady;
+  const isGlb=/\\.glb$/i.test(model.source);
+  let object,sourceAnimations=[];
+  if(isGlb){
+   const gltf=await new GLTFLoader(manager).loadAsync(objUrl);
+   object=gltf.scene;sourceAnimations=gltf.animations;
+  }else{
+   const materials=await new MTLLoader(manager).loadAsync(objUrl.replace(/\\.obj$/i,'.mtl'));
+   const texturesReady=new Promise(ok=>{manager.onLoad=ok;});
+   materials.preload();
+   object=await new OBJLoader(manager).setMaterials(materials).loadAsync(objUrl);
+   await texturesReady;
+  }
   if(resourceError)throw Error('No se pudo cargar una textura: '+resourceError);
   const textureImages=[];
   let triangles=0,materialCount=0;
@@ -77,7 +92,8 @@ try{
    const original=node.geometry;node.geometry=mergeVertices(original);original.dispose();
    const convert=(source)=>{
     if(replacements.has(source))return replacements.get(source);
-    const material=new THREE.MeshStandardMaterial({name:source.name,color:source.color.clone(),
+    const color=!source.name&&model.fallbackColor?new THREE.Color(model.fallbackColor):source.color.clone();
+    const material=isGlb?source:new THREE.MeshStandardMaterial({name:source.name,color,
       map:source.map,roughness:model.roughness,metalness:model.metalness,
       transparent:source.transparent,opacity:source.opacity,side:source.side});
     materialCount++;
@@ -95,7 +111,7 @@ try{
   const normalized=new THREE.Group();normalized.scale.setScalar(1/max);normalized.add(object);
   const exhibit=new THREE.Group();exhibit.name='Model_'+model.id.replaceAll('-','_');exhibit.add(normalized);
   exhibit.userData={modelId:model.id,source:model.source,placeholder:false};
-  // Movimiento de exhibición propio: el OBJ no contiene clips de animación.
+  // Se conservan los clips recibidos; solo se agrega exhibición cuando no hay animación.
   const times=model.kind==='bat'?[0,2,4,6]:[0,2,4,6,8];
   const angles=model.kind==='bat'?[-0.25,0.25,-0.25,-0.25]:[0,Math.PI/2,Math.PI,Math.PI*1.5,Math.PI*2];
   const rotation=angles.flatMap((angle)=>new THREE.Quaternion().setFromEuler(new THREE.Euler(0,angle,0)).toArray());
@@ -103,18 +119,23 @@ try{
    new THREE.QuaternionKeyframeTrack(exhibit.name+'.quaternion',times,rotation),
    new THREE.VectorKeyframeTrack(exhibit.name+'.position',times,times.flatMap((_,i)=>[0,i%2===0?0:0.035,0])),
   ]);
+  const animations=sourceAnimations.length?sourceAnimations:[clip];
   const scene=new THREE.Scene();scene.add(exhibit);
-  const glb=await exportScene.parseAsync(scene,{binary:true,animations:[clip],maxTextureSize:1024});
+  const glb=await exportScene.parseAsync(scene,{binary:true,animations,maxTextureSize:1024});
   if(resourceError)throw Error('No se pudo cargar una textura: '+resourceError);
   const reloaded=await new GLTFLoader().parseAsync(glb,'');
   const normalizedBox=new THREE.Box3().setFromObject(reloaded.scene);
   const dimensions=normalizedBox.getSize(new THREE.Vector3()).toArray();
   if(Math.abs(Math.max(...dimensions)-1)>0.001)throw Error('Escala incorrecta: '+model.id);
   if(!reloaded.animations.length)throw Error('No se exportó el clip de exhibición: '+model.id);
+  for(const original of sourceAnimations){
+   const exported=reloaded.animations.find(a=>a.name===original.name);
+   if(!exported||exported.tracks.length!==original.tracks.length)throw Error('Se perdió una animación recibida: '+model.id);
+  }
   await save('/save-model?id='+model.id,glb);
-  await save('/report',JSON.stringify({id:model.id,label:model.label,kind:model.kind,teams:model.teams,
+  await save('/report',JSON.stringify({id:model.id,label:model.label,kind:model.kind,ownerTeam:model.ownerTeam,teams:model.teams,
    source:model.source,bytes:glb.byteLength,triangles,materials:materialCount,textures:textureImages.length,
-   animations:reloaded.animations.map(a=>a.name),dimensions}));
+   animations:reloaded.animations.map(a=>a.name),animationSource:sourceAnimations.length?'original':'generated',dimensions}));
   const shown=new THREE.Scene();shown.background=new THREE.Color('#141420');shown.add(reloaded.scene);
   shown.add(new THREE.HemisphereLight(0xffffff,0x30304a,2.2));
   const light=new THREE.DirectionalLight(0xffffff,2.6);light.position.set(1.5,2.5,3);shown.add(light);

@@ -88,7 +88,7 @@ Te imprime una URL `https://….trycloudflare.com` que puedes abrir desde el cel
 5. **Foto** guarda una captura con la cámara y el modelo (sin la interfaz) en TCG Vault → Galería; desde ahí se comparte o descarga.
 
 Hay 18 marcadores para 15 equipos: se conservan los tres originales de los Yankees y se añade un logo oficial por equipo.
-El archivo `.mind` ocupa aproximadamente 3 MB y los siete GLB recibidos, compartidos entre los 15 equipos, suman menos de 500 kB. La detección se probó
+El archivo `.mind` ocupa aproximadamente 3 MB y los diez GLB distintos, algunos compartidos temporalmente entre los 15 equipos, suman menos de 1.4 MB. La detección se probó
 con todos los candidatos simultáneamente, a 280 y 400 px, de frente y con una ligera rotación (72 casos), usando
 el detector real de MindAR. El matcher elige el candidato con más correspondencias geométricas para reducir confusiones entre logos.
 La fiabilidad en cámaras físicas, iluminación variable, bordados y otros diseños de logo debe comprobarse en el dispositivo.
@@ -146,7 +146,7 @@ de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores ti
 | Navegación entre las 7 pantallas, tab bar, transiciones | Real |
 | Cámara trasera en `/scan` (permiso concedido / rechazado / sin soporte / error de carga) | Real |
 | Reconocimiento de marcadores en `/scan` | **Real** con MindAR: los 15 equipos de la Liga Americana, con sus logos oficiales sobre fondo claro; se conservan los marcadores anteriores de NYY |
-| Modelo 3D anclado al marcador | **Real** con three.js. Siete modelos recibidos (tres bates, tres pelotas y un dado), distribuidos entre los 15 equipos; materiales y textura incrustada, con movimiento de exhibición. Importados con `npm run models:import` |
+| Modelo 3D anclado al marcador | **Real** con three.js. Diez modelos distintos (tres bates, tres pelotas, un dado, dos gorras y un guante), distribuidos entre los 15 equipos; materiales y textura incrustada. La gorra de Yankees conserva `Celebrate`; los OBJ usan movimiento de exhibición. Importados con `npm run models:import` |
 | Interacción con el modelo | Real: un dedo lo gira, dos dedos lo escalan; el botón Animate/Stop reanuda o detiene su animación; Info lo hace girar 360° |
 | Modo libre | Real: si el logo sale de cuadro, el modelo queda flotando frente a la cámara para seguir interactuando; la flecha vuelve a escanear |
 | Dock de la ventana AR: Animate/Stop, Foto, Effects, Info, Video, Stats, Trivia | Real (estado activo, animaciones, paneles, sonidos). La trivia viene de la API y se califica en el servidor; Stats sigue siendo una tabla simulada |

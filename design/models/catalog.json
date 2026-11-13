@@ -7,7 +7,8 @@
       "source": "baseball bat/Baseball-Bat-01.obj",
       "metalness": 0.35,
       "roughness": 0.4,
-      "teams": ["nyy", "det", "cws"]
+      "ownerTeam": "det",
+      "teams": ["det", "cws"]
     },
     {
       "id": "bat-wood",
@@ -16,6 +17,7 @@
       "source": "baseball bat/Baseball-Bat-02.obj",
       "metalness": 0,
       "roughness": 0.65,
+      "ownerTeam": "tex",
       "teams": ["tex", "ath"]
     },
     {
@@ -25,7 +27,8 @@
       "source": "baseball bat/Baseball-Bat-03.obj",
       "metalness": 0,
       "roughness": 0.65,
-      "teams": ["bos", "bal"]
+      "ownerTeam": "bos",
+      "teams": ["bos"]
     },
     {
       "id": "ball-classic",
@@ -34,6 +37,7 @@
       "source": "baseball cap/Baseball-Ball-01.obj",
       "metalness": 0,
       "roughness": 0.7,
+      "ownerTeam": "tor",
       "teams": ["tor", "cle", "min", "laa"]
     },
     {
@@ -43,6 +47,7 @@
       "source": "baseball cap/Baseball-Ball-02.obj",
       "metalness": 0,
       "roughness": 0.7,
+      "ownerTeam": "sea",
       "teams": ["sea"]
     },
     {
@@ -52,7 +57,8 @@
       "source": "baseball cap/Baseball-Ball-03.obj",
       "metalness": 0.15,
       "roughness": 0.5,
-      "teams": ["hou", "tb"]
+      "ownerTeam": "tb",
+      "teams": ["tb"]
     },
     {
       "id": "dice-gold",
@@ -61,7 +67,37 @@
       "source": "dados/dado_v2.obj",
       "metalness": 0.15,
       "roughness": 0.5,
+      "ownerTeam": "kc",
       "teams": ["kc"]
+    },
+    {
+      "id": "cap-navy",
+      "label": "Gorra azul marino",
+      "kind": "cap",
+      "source": "cap.glb",
+      "ownerTeam": "nyy",
+      "teams": ["nyy"]
+    },
+    {
+      "id": "hat-classic",
+      "label": "Gorra clásica",
+      "kind": "cap",
+      "source": "baseball hat/Baseball-Hat.obj",
+      "metalness": 0,
+      "roughness": 0.75,
+      "ownerTeam": "hou",
+      "teams": ["hou"]
+    },
+    {
+      "id": "glove-leather",
+      "label": "Guante de béisbol",
+      "kind": "glove",
+      "source": "guante/Baseball-Glove.obj",
+      "metalness": 0,
+      "roughness": 0.8,
+      "fallbackColor": "#985828",
+      "ownerTeam": "bal",
+      "teams": ["bal"]
     }
   ]
 }

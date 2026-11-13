@@ -9,7 +9,9 @@ import { AR_TARGETS, modelForTeam } from '../src/app/data/targets.ts';
 
 const root = resolve(import.meta.dirname, '..');
 const manifest = JSON.parse(await readFile(resolve(root, 'design/targets/targets.json'), 'utf8'));
-const models = JSON.parse(await readFile(resolve(root, 'src/assets/models/imported/catalog.json'), 'utf8')).models;
+const models = JSON.parse(
+  await readFile(resolve(root, 'src/assets/models/imported/catalog.json'), 'utf8'),
+).models;
 const expected = [
   'nyy',
   'bos',
@@ -28,8 +30,30 @@ const expected = [
   'sea',
 ];
 const ids = front.map((t) => t.id);
-assert.deepEqual(models.flatMap((m) => m.teams).sort(), [...ids].sort(), 'Cada equipo debe tener un modelo asignado');
+const recipe = JSON.parse(
+  await readFile(resolve(root, 'design/models/catalog.json'), 'utf8'),
+).models;
+assert.deepEqual(
+  models.flatMap((m) => m.teams).sort(),
+  [...ids].sort(),
+  'Cada equipo debe tener un modelo asignado',
+);
 assert.equal(new Set(models.map((m) => m.id)).size, models.length);
+assert.equal(
+  new Set(models.map((m) => m.ownerTeam)).size,
+  models.length,
+  'Un modelo propio por equipo',
+);
+for (const model of models) {
+  assert.ok(
+    ids.includes(model.ownerTeam) && model.teams.includes(model.ownerTeam),
+    'Propietario válido',
+  );
+  const source = recipe.find((entry) => entry.id === model.id);
+  assert.ok(source, 'Modelo registrado en la receta');
+  assert.deepEqual(model.teams, source.teams);
+  assert.equal(model.ownerTeam, source.ownerTeam);
+}
 assert.deepEqual([...ids].sort(), [...expected].sort());
 assert.equal(new Set(ids).size, 15);
 assert.deepEqual(
@@ -87,11 +111,24 @@ for (const team of front) {
   assert.equal(glb.readUInt32LE(4), 2);
   assert.equal(glb.readUInt32LE(8), glb.length);
   const json = JSON.parse(glb.toString('utf8', 20, 20 + glb.readUInt32LE(12)));
-  assert.ok(json.nodes.some((node) => node.extras?.modelId === model.id && node.extras?.placeholder === false));
+  assert.ok(
+    json.nodes.some(
+      (node) => node.extras?.modelId === model.id && node.extras?.placeholder === false,
+    ),
+  );
   assert.ok(json.materials.length > 0);
-  assert.ok((json.images ?? []).every((image) => !image.uri && image.bufferView !== undefined), 'Texturas autocontenidas');
+  assert.ok(
+    (json.images ?? []).every((image) => !image.uri && image.bufferView !== undefined),
+    'Texturas autocontenidas',
+  );
   if (model.id === 'dice-gold') assert.equal(json.images.length, 1, 'Falta la textura del dado');
   assert.ok(json.animations.length >= 1);
+  if (model.id === 'cap-navy') {
+    assert.ok(
+      json.animations.some((clip) => clip.name === 'Celebrate'),
+      'Conservar la animación de cap.glb',
+    );
+  }
   assert.ok(glb.length < 2_000_000, `${team.id}: modelo demasiado pesado`);
 }
 for (const q of TRIVIA) {
@@ -106,4 +143,8 @@ assert.deepEqual(
 );
 console.log(
   `OK: 15 equipos, ${AR_TARGETS.length} marcadores, ${models.length} modelos asignados, 15 cartas, ${TRIVIA.length} trivias y tres divisiones completas.`,
+);
+const pending = front.filter((team) => !models.some((model) => model.ownerTeam === team.id));
+console.log(
+  `Modelos distintos reservados: ${models.length}/15. Pendientes (${pending.length}): ${pending.map((team) => team.name).join(', ')}.`,
 );

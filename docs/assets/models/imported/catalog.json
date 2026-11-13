@@ -4,8 +4,8 @@
       "id": "bat-metal",
       "label": "Bate metálico",
       "kind": "bat",
+      "ownerTeam": "det",
       "teams": [
-        "nyy",
         "det",
         "cws"
       ],
@@ -17,6 +17,7 @@
       "animations": [
         "Exhibition"
       ],
+      "animationSource": "generated",
       "dimensions": [
         0.09746299684047699,
         1,
@@ -28,6 +29,7 @@
       "id": "bat-wood",
       "label": "Bate de madera clara",
       "kind": "bat",
+      "ownerTeam": "tex",
       "teams": [
         "tex",
         "ath"
@@ -40,6 +42,7 @@
       "animations": [
         "Exhibition"
       ],
+      "animationSource": "generated",
       "dimensions": [
         0.10409692952777869,
         1,
@@ -51,9 +54,9 @@
       "id": "bat-dark",
       "label": "Bate de madera oscura",
       "kind": "bat",
+      "ownerTeam": "bos",
       "teams": [
-        "bos",
-        "bal"
+        "bos"
       ],
       "source": "baseball bat/Baseball-Bat-03.obj",
       "bytes": 75532,
@@ -63,6 +66,7 @@
       "animations": [
         "Exhibition"
       ],
+      "animationSource": "generated",
       "dimensions": [
         0.13873624345636396,
         1,
@@ -74,6 +78,7 @@
       "id": "ball-classic",
       "label": "Pelota clásica",
       "kind": "ball",
+      "ownerTeam": "tor",
       "teams": [
         "tor",
         "cle",
@@ -88,6 +93,7 @@
       "animations": [
         "Exhibition"
       ],
+      "animationSource": "generated",
       "dimensions": [
         1,
         1,
@@ -99,6 +105,7 @@
       "id": "ball-dark",
       "label": "Pelota oscura",
       "kind": "ball",
+      "ownerTeam": "sea",
       "teams": [
         "sea"
       ],
@@ -110,6 +117,7 @@
       "animations": [
         "Exhibition"
       ],
+      "animationSource": "generated",
       "dimensions": [
         0.9999902284147855,
         1,
@@ -121,8 +129,8 @@
       "id": "ball-gold",
       "label": "Pelota dorada",
       "kind": "ball",
+      "ownerTeam": "tb",
       "teams": [
-        "hou",
         "tb"
       ],
       "source": "baseball cap/Baseball-Ball-03.obj",
@@ -133,6 +141,7 @@
       "animations": [
         "Exhibition"
       ],
+      "animationSource": "generated",
       "dimensions": [
         0.8421751750056075,
         1,
@@ -144,6 +153,7 @@
       "id": "dice-gold",
       "label": "Dado dorado",
       "kind": "die",
+      "ownerTeam": "kc",
       "teams": [
         "kc"
       ],
@@ -155,12 +165,85 @@
       "animations": [
         "Exhibition"
       ],
+      "animationSource": "generated",
       "dimensions": [
         1,
         1,
         1
       ],
       "src": "assets/models/imported/dice-gold-0c528638037b.glb"
+    },
+    {
+      "id": "cap-navy",
+      "label": "Gorra azul marino",
+      "kind": "cap",
+      "ownerTeam": "nyy",
+      "teams": [
+        "nyy"
+      ],
+      "source": "cap.glb",
+      "bytes": 115140,
+      "triangles": 4216,
+      "materials": 4,
+      "textures": 0,
+      "animations": [
+        "Celebrate"
+      ],
+      "animationSource": "original",
+      "dimensions": [
+        0.7033212642766773,
+        0.3626831972585063,
+        1
+      ],
+      "src": "assets/models/imported/cap-navy-d4a3f151ca79.glb"
+    },
+    {
+      "id": "hat-classic",
+      "label": "Gorra clásica",
+      "kind": "cap",
+      "ownerTeam": "hou",
+      "teams": [
+        "hou"
+      ],
+      "source": "baseball hat/Baseball-Hat.obj",
+      "bytes": 261340,
+      "triangles": 3696,
+      "materials": 1,
+      "textures": 0,
+      "animations": [
+        "Exhibition"
+      ],
+      "animationSource": "generated",
+      "dimensions": [
+        1,
+        0.40141169187239545,
+        0.7042066059664089
+      ],
+      "src": "assets/models/imported/hat-classic-2deda0a54a3e.glb"
+    },
+    {
+      "id": "glove-leather",
+      "label": "Guante de béisbol",
+      "kind": "glove",
+      "ownerTeam": "bal",
+      "teams": [
+        "bal"
+      ],
+      "source": "guante/Baseball-Glove.obj",
+      "bytes": 548108,
+      "triangles": 7792,
+      "materials": 1,
+      "textures": 0,
+      "animations": [
+        "Exhibition"
+      ],
+      "animationSource": "generated",
+      "dimensions": [
+        0.9492572950379747,
+        1,
+        0.8552095111340487
+      ],
+      "src": "assets/models/imported/glove-leather-840ed6a0d311.glb"
     }
   ]
 }
