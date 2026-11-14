@@ -22,7 +22,9 @@
 
 ## Contenido
 - [ ] Narraciones grabadas (audio) en lugar de `speechSynthesis`, o mantener la síntesis como respaldo.
-- [ ] Videos definitivos por equipo para la galería (hoy son clips Ken Burns generados del arte del diseño).
+- [x] Reemplazar el video pregrabado del escáner por grabación de cámara + modelo 3D, con cámara frontal/trasera, revisión y guardado en Galería.
+- [x] Canales oficiales RSS de MLB y los quince equipos en Inicio.
+- [x] Terminar la trivia con resultado y revisión; permitir nuevos intentos tras 5 minutos de cooldown por cuenta y equipo, persistido y validado en el servidor, sin duplicar XP.
 - [x] Estadísticas simuladas de los 15 equipos, con cinco equipos por división.
 - [x] 75 preguntas repartidas entre equipos (5 por cada uno), más 2 generales: 77 en total, calificadas en la API.
 

@@ -12,7 +12,12 @@ export const requestBody = async (req) => {
   return Buffer.concat(chunks);
 };
 
-export async function runBrowserTask(page, handleRequest, timeoutMs = 15 * 60 * 1000) {
+export async function runBrowserTask(
+  page,
+  handleRequest,
+  timeoutMs = 15 * 60 * 1000,
+  browserArgs = [],
+) {
   const browser = [
     process.env.BROWSER_PATH,
     'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -56,6 +61,7 @@ export async function runBrowserTask(page, handleRequest, timeoutMs = 15 * 60 * 
       '--no-first-run',
       '--enable-unsafe-swiftshader',
       '--ignore-gpu-blocklist',
+      ...browserArgs,
       `--user-data-dir=${profile}`,
       `http://127.0.0.1:${server.address().port}/`,
     ],

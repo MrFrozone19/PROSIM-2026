@@ -16,14 +16,17 @@ Al arrancar crea las tablas que falten y sincroniza el catálogo (`src/catalog.t
 
 ## Rutas
 
-Todas menos `/api/health` y `/api/trivia/summary` exigen `Authorization: Bearer <ID token de Firebase>`.
+Todas menos `/api/health`, `/api/news` y `/api/trivia/summary` exigen `Authorization: Bearer <ID token de Firebase>`.
 
 | Método y ruta | Qué hace |
 |---|---|
 | `GET /api/me` · `PATCH /api/me` | Perfil, XP, nivel, posición semanal · cambiar nombre o equipo favorito |
 | `GET /api/collection` | Cartas, trofeos e insignias con lo que el usuario ya tiene |
 | `POST /api/scans` | Registra un escaneo; el primero de cada equipo desbloquea su carta |
-| `GET /api/trivia?teamId=` · `POST /api/trivia/:id/answer` | Preguntas (sin respuesta) · contestar |
+| `GET /api/trivia?teamId=` · `POST /api/trivia/:id/answer` | Preguntas y avance de la cuenta; solo revela soluciones ya contestadas. Una respuesta por pregunta; los duplicados devuelven el intento guardado sin modificarlo |
+| `GET /api/trivia/session?teamId=` | Recupera el intento del equipo (o crea el inicial), con preguntas, avance, `serverNow`, `completedAt` y `retryAt`; nunca revela soluciones pendientes |
+| `POST /api/trivia/retry` | Recibe `{ teamId, previousId }`; permite otra ronda solo 5 minutos después de terminar la anterior. Concurrencia/reenvíos devuelven la misma ronda nueva |
+| `GET /api/news?channel=mlb` | Canal oficial RSS de MLB o del equipo (`nyy`, `bos`, etc.). Lista cerrada de 16 canales, caché por 10 minutos y hasta 24 h del último feed ante fallos; no acepta URLs arbitrarias |
 | `GET /api/trivia/summary` | Conteo público del catálogo activo por equipo y de preguntas generales; no expone preguntas ni respuestas |
 | `GET /api/game` | Récord, victorias, XP de partidas disponible y desglose semanal de la misma XP del leaderboard |
 | `POST /api/game/start` | Crea una partida de Diamond Flight con ID, semilla y versión de reglas |
@@ -56,8 +59,12 @@ con un máximo de 300 XP de partidas en las últimas 24 horas. Los trofeos First
 agregan 50 XP cada uno al desbloquearse; Aviator y Two-Way Star son insignias.
 
 Las acciones que entregan puntos se serializan por usuario y se liquidan en una transacción. Repetir el envío
-de una partida finalizada no repite puntos ni logros; la trivia solo da XP por la primera respuesta correcta
-a cada pregunta, incluso con peticiones concurrentes. Los IDs y recompensas existentes se conservan.
+de una partida finalizada no repite puntos ni logros. En trivia, enviar `runId` junto con `option` vincula la
+respuesta al intento actual. Cada pregunta se responde una vez por ronda; al terminar se esperan 300 segundos
+antes de reiniciarla. Las rondas y respuestas se guardan en `trivia_runs` / `trivia_run_answers`, creadas por una
+migración aditiva. Los reintentos solo entregan XP por preguntas acertadas por primera vez en la cuenta.
+Las llamadas antiguas sin `runId` conservan el comportamiento anterior para mantener compatibilidad durante el despliegue.
 
-`npm test` ejecuta las pruebas de física y del catálogo de 77 preguntas. Las pruebas de integración requieren
-`RUN_DB_TESTS=1` y una base exclusiva `basedex_test` en `127.0.0.1:3308`; se niegan a usar Cloud SQL o la base habitual.
+`npm test` ejecuta las pruebas de física, del catálogo de 77 preguntas y del servicio RSS (parser, caché y fallos).
+Las pruebas de integración requieren `RUN_DB_TESTS=1` y una base exclusiva `basedex_test` en `127.0.0.1:3308`,
+con el servidor MySQL en UTC (`--default-time-zone=+00:00`); se niegan a usar Cloud SQL o la base habitual.

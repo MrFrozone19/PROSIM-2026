@@ -1,5 +1,14 @@
 import { Location } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, computed, inject, signal, viewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScreenShell } from '../../shared/screen-shell';
 import { Icon } from '../../shared/icon';
@@ -13,6 +22,7 @@ import { TEAM_BY_ID, TEAMS, Team } from '../../data/teams';
 import { AR_TARGETS, TARGETS_SRC, modelForTeam } from '../../data/targets';
 import { ArEngine, CameraError } from '../../ar/ar-engine';
 import { ArHud } from '../ar/ar-hud';
+import { ArRecorder, ArRecording } from '../../ar/ar-recorder';
 
 type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
 
@@ -41,19 +51,129 @@ type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
         }
 
         @if (team(); as t) {
-          <div class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/60 to-transparent"></div>
-          <app-ar-hud
-            [team]="t"
-            [modelLabel]="modelForTeam(t.id).label"
-            [animating]="animating()"
-            [status]="tracking() ? 'TARGET LOCKED' : 'AR HUB ACTIVE'"
-            [hint]="tracking() ? 'Desliza para girar · pellizca para escalar' : 'Modo libre · apunta al logo para anclarlo'"
-            (back)="rescan()"
-            (animationToggle)="toggleAnimation()"
-            (infoOpened)="engine?.spin()"
-            (photoRequested)="takePhoto()"
-            (panelChange)="engine?.setPanelOpen($event)"
-          />
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/60 to-transparent"
+          ></div>
+          @if (!videoMode()) {
+            <app-ar-hud
+              [team]="t"
+              [modelLabel]="modelForTeam(t.id).label"
+              [recordVideo]="true"
+              [animating]="animating()"
+              [status]="tracking() ? 'TARGET LOCKED' : 'AR HUB ACTIVE'"
+              [hint]="
+                tracking()
+                  ? 'Desliza para girar · pellizca para escalar'
+                  : 'Modo libre · apunta al logo para anclarlo'
+              "
+              (back)="rescan()"
+              (animationToggle)="toggleAnimation()"
+              (infoOpened)="engine?.spin()"
+              (photoRequested)="takePhoto()"
+              (videoRequested)="openVideo()"
+              (panelChange)="engine?.setPanelOpen($event)"
+            />
+          } @else {
+            <div
+              class="absolute inset-x-0 top-0 flex items-center justify-between gap-3 bg-gradient-to-b from-black/80 to-transparent p-5"
+            >
+              <button
+                type="button"
+                (click)="closeVideo()"
+                [disabled]="recording() || preparing() || savingVideo()"
+                aria-label="Cerrar grabadora"
+                class="pressable flex h-11 w-11 items-center justify-center rounded-full border border-line bg-black/70 text-white disabled:opacity-40"
+              >
+                <app-icon name="ArrowLeft" [size]="20" />
+              </button>
+              <div class="text-right font-sans text-white">
+                <p class="text-[13px] font-bold">Video AR · {{ t.name }}</p>
+                <p class="text-[11px] text-white/75">Cámara y modelo · sin filtros · máximo 30 s</p>
+              </div>
+            </div>
+            @if (videoTake(); as take) {
+              <section
+                role="dialog"
+                aria-label="Revisar video AR"
+                class="absolute inset-x-4 top-[19%] z-10 rounded-card border border-line bg-surface p-4 shadow-xl"
+              >
+                <h2 class="mb-3 font-display text-[14px] font-bold text-white">REVISA TU VIDEO</h2>
+                <video
+                  [src]="take.url"
+                  controls
+                  playsinline
+                  class="max-h-[42vh] w-full rounded-row bg-black"
+                ></video>
+                <p class="mt-2 font-sans text-[12px] text-muted">
+                  {{ seconds(take.durationMs) }} s · {{ t.name }}
+                </p>
+                <div class="mt-4 flex gap-3">
+                  <button
+                    type="button"
+                    (click)="discardVideo()"
+                    [disabled]="savingVideo()"
+                    class="pressable min-h-11 flex-1 rounded-cta border border-line font-sans text-[12px] font-bold text-white disabled:opacity-40"
+                  >
+                    Descartar
+                  </button>
+                  <button
+                    type="button"
+                    (click)="saveVideo()"
+                    [disabled]="savingVideo()"
+                    class="pressable min-h-11 flex-1 rounded-cta bg-cta font-sans text-[12px] font-bold text-white disabled:opacity-40"
+                  >
+                    {{ savingVideo() ? 'Guardando ' + videoUpload() + '%' : 'Guardar en Galería' }}
+                  </button>
+                </div>
+              </section>
+            } @else {
+              <div class="absolute inset-x-0 bottom-6 flex flex-col items-center gap-4 px-5">
+                <p
+                  aria-live="polite"
+                  class="rounded-pill bg-black/70 px-4 py-2 font-sans text-[12px] font-bold text-white"
+                >
+                  {{
+                    preparing()
+                      ? 'Preparando cámara y micrófono…'
+                      : recording()
+                        ? '● REC ' +
+                          seconds(recordElapsed()) +
+                          ' / 30 s' +
+                          (recordAudio() ? '' : ' · sin audio')
+                        : 'Gira o escala el modelo y graba tu clip'
+                  }}
+                </p>
+                <div class="flex items-center gap-6">
+                  <button
+                    type="button"
+                    (click)="toggleVideo()"
+                    [disabled]="preparing() || switchingCamera()"
+                    [attr.aria-label]="recording() ? 'Detener grabación AR' : 'Grabar video AR'"
+                    class="pressable flex h-20 w-20 items-center justify-center rounded-full border-[3px] border-white bg-black/50 disabled:opacity-40"
+                  >
+                    <span
+                      class="bg-pink"
+                      [class]="recording() ? 'h-7 w-7 rounded-md' : 'h-14 w-14 rounded-full'"
+                    ></span>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="flipCamera()"
+                    [disabled]="recording() || preparing() || switchingCamera()"
+                    class="pressable flex min-h-11 flex-col items-center gap-1 rounded-card border border-line bg-black/70 p-3 text-white disabled:opacity-40"
+                  >
+                    <app-icon name="RefreshCw" [size]="22" /><span class="font-sans text-[10px]">{{
+                      switchingCamera()
+                        ? 'Cambiando…'
+                        : frontCamera()
+                          ? 'Cámara trasera'
+                          : 'Cámara frontal'
+                    }}</span>
+                  </button>
+                </div>
+              </div>
+            }
+          }
         } @else {
           <!-- overlay oscuro + cuadrícula -->
           <div
@@ -69,12 +189,20 @@ type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
           <div class="relative flex h-full flex-col items-center justify-between px-6 pb-5 pt-5">
             <!-- scanner-top-bar -->
             <div class="flex w-full items-center justify-between">
-              <div class="flex items-center gap-2 rounded-row border border-line bg-black/60 px-3 py-1.5">
+              <div
+                class="flex items-center gap-2 rounded-row border border-line bg-black/60 px-3 py-1.5"
+              >
                 <span
                   class="h-2 w-2 rounded-full"
-                  [class]="state() === 'scanning' ? 'animate-pulse bg-[#2ee6c5] shadow-[0_0_6px_#2ee6c5]' : 'bg-muted'"
+                  [class]="
+                    state() === 'scanning'
+                      ? 'animate-pulse bg-[#2ee6c5] shadow-[0_0_6px_#2ee6c5]'
+                      : 'bg-muted'
+                  "
                 ></span>
-                <span class="font-sans text-[12px] font-bold leading-normal text-white">{{ statusLabel() }}</span>
+                <span class="font-sans text-[12px] font-bold leading-normal text-white">{{
+                  statusLabel()
+                }}</span>
               </div>
               <button
                 type="button"
@@ -90,10 +218,16 @@ type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
             <div class="relative h-[260px] w-[260px] max-w-full">
               <span class="reticle-corner left-0 top-0 rounded-tl-sm border-l-2 border-t-2"></span>
               <span class="reticle-corner right-0 top-0 rounded-tr-sm border-r-2 border-t-2"></span>
-              <span class="reticle-corner bottom-0 left-0 rounded-bl-sm border-b-2 border-l-2"></span>
-              <span class="reticle-corner bottom-0 right-0 rounded-br-sm border-b-2 border-r-2"></span>
+              <span
+                class="reticle-corner bottom-0 left-0 rounded-bl-sm border-b-2 border-l-2"
+              ></span>
+              <span
+                class="reticle-corner bottom-0 right-0 rounded-br-sm border-b-2 border-r-2"
+              ></span>
               @if (state() === 'scanning') {
-                <span class="scan-line absolute inset-x-3 h-0.5 rounded-full bg-pink shadow-[0_0_10px_#f72585]"></span>
+                <span
+                  class="scan-line absolute inset-x-3 h-0.5 rounded-full bg-pink shadow-[0_0_10px_#f72585]"
+                ></span>
               }
               @if (state() === 'denied' || state() === 'unsupported' || state() === 'error') {
                 <div
@@ -108,14 +242,21 @@ type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
                       </p>
                     }
                     @case ('unsupported') {
-                      <p class="font-display text-[12px] font-bold text-white">SIN SOPORTE DE CÁMARA</p>
+                      <p class="font-display text-[12px] font-bold text-white">
+                        SIN SOPORTE DE CÁMARA
+                      </p>
                       <p class="font-sans text-[11px] leading-snug text-muted">
-                        Este navegador no expone la cámara. Abre la app por HTTPS en Safari o Chrome.
+                        Este navegador no expone la cámara. Abre la app por HTTPS en Safari o
+                        Chrome.
                       </p>
                     }
                     @default {
-                      <p class="font-display text-[12px] font-bold text-white">NO SE PUDO INICIAR EL AR</p>
-                      <p class="font-sans text-[11px] leading-snug text-muted">{{ errorDetail() }}</p>
+                      <p class="font-display text-[12px] font-bold text-white">
+                        NO SE PUDO INICIAR EL AR
+                      </p>
+                      <p class="font-sans text-[11px] leading-snug text-muted">
+                        {{ errorDetail() }}
+                      </p>
                     }
                   }
                   @if (state() !== 'unsupported') {
@@ -137,12 +278,18 @@ type ScanState = 'loading' | 'scanning' | 'denied' | 'unsupported' | 'error';
                 {{ state() === 'loading' ? 'STARTING AR ENGINE' : 'POINT AT A TEAM LOGO' }}
               </p>
               <p class="text-center font-sans text-[12px] leading-normal text-muted">
-                {{ state() === 'loading' ? 'Loading camera, targets and 3D models…' : 'Scanning for AR stadium triggers...' }}
+                {{
+                  state() === 'loading'
+                    ? 'Loading camera, targets and 3D models…'
+                    : 'Scanning for AR stadium triggers...'
+                }}
               </p>
               <div class="h-1 w-[140px] overflow-hidden rounded-sm bg-white/[0.13]">
                 <div class="loader-fill h-full w-20 rounded-sm bg-pink"></div>
               </div>
-              <p class="mt-1 text-center font-sans text-[10px] text-muted/80">15 equipos de la Liga Americana · {{ activeTeams }}</p>
+              <p class="mt-1 text-center font-sans text-[10px] text-muted/80">
+                15 equipos de la Liga Americana · {{ activeTeams }}
+              </p>
               @if (canSimulate()) {
                 <button
                   type="button"
@@ -201,6 +348,19 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
   private readonly progress = inject(Progress);
   private readonly gallery = inject(Gallery);
   private destroyed = false;
+  private recorder?: ArRecorder;
+  protected readonly videoMode = signal(false);
+  protected readonly recording = signal(false);
+  protected readonly preparing = signal(false);
+  protected readonly recordAudio = signal(false);
+  protected readonly recordElapsed = signal(0);
+  protected readonly frontCamera = signal(false);
+  protected readonly switchingCamera = signal(false);
+  protected readonly videoTake = signal<(ArRecording & { url: string; teamId: string }) | null>(
+    null,
+  );
+  protected readonly savingVideo = signal(false);
+  protected readonly videoUpload = signal(0);
   /** Momento en que empezó la búsqueda actual; da la duración del escaneo (trofeo Perfect Scan). */
   private scanStartedAt = 0;
 
@@ -214,7 +374,9 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
   protected readonly tracking = signal(false);
   protected readonly animating = signal(true);
 
-  protected readonly activeTeams = [...new Set(AR_TARGETS.map((t) => TEAM_BY_ID[t.teamId]?.abbr ?? t.teamId))].join(' · ');
+  protected readonly activeTeams = [
+    ...new Set(AR_TARGETS.map((t) => TEAM_BY_ID[t.teamId]?.abbr ?? t.teamId)),
+  ].join(' · ');
 
   protected readonly statusLabel = computed(() => {
     switch (this.state()) {
@@ -229,7 +391,9 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
 
   /** La detección simulada queda como respaldo: sin cámara disponible, o a petición con ?sim=1. */
   protected readonly canSimulate = computed(
-    () => this.state() !== 'loading' && (this.state() !== 'scanning' || this.route.snapshot.queryParamMap.has('sim')),
+    () =>
+      this.state() !== 'loading' &&
+      (this.state() !== 'scanning' || this.route.snapshot.queryParamMap.has('sim')),
   );
 
   ngAfterViewInit(): void {
@@ -238,6 +402,9 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.destroyed = true;
+    this.recorder?.dispose();
+    const take = this.videoTake();
+    if (take) URL.revokeObjectURL(take.url);
     this.engine?.stop();
   }
 
@@ -299,6 +466,105 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
     this.engine?.setAnimating(on);
   }
 
+  protected seconds(ms: number): number {
+    return Math.floor(ms / 1000);
+  }
+
+  protected openVideo(): void {
+    this.videoMode.set(true);
+    this.engine?.setPanelOpen(false);
+    this.engine?.setVideoMode(true);
+  }
+
+  protected closeVideo(): void {
+    if (this.recording() || this.preparing() || this.savingVideo()) return;
+    this.discardVideo();
+    this.videoMode.set(false);
+    this.engine?.setVideoMode(false);
+  }
+
+  protected discardVideo(): void {
+    const take = this.videoTake();
+    if (take) URL.revokeObjectURL(take.url);
+    this.videoTake.set(null);
+  }
+
+  protected async toggleVideo(): Promise<void> {
+    if (this.recording()) {
+      this.recorder?.stop();
+      return;
+    }
+    const engine = this.engine,
+      team = this.team();
+    if (!engine || !team || this.preparing() || this.switchingCamera()) return;
+    this.preparing.set(true);
+    this.recordElapsed.set(0);
+    this.recorder?.dispose();
+    this.recorder = new ArRecorder(
+      () => engine.createRecordingStream(),
+      () => engine.endRecordingStream(),
+      {
+        elapsed: (ms) => this.recordElapsed.set(ms),
+        audio: (audio) => this.recordAudio.set(audio),
+        finished: (take) => {
+          this.recording.set(false);
+          if (!this.destroyed)
+            this.videoTake.set({ ...take, teamId: team.id, url: URL.createObjectURL(take.blob) });
+        },
+        failed: () => {
+          this.recording.set(false);
+          if (!this.destroyed) this.toast.show('No se pudo grabar el video. Intenta de nuevo.');
+        },
+      },
+    );
+    try {
+      await this.recorder.start();
+      if (!this.destroyed) this.recording.set(true);
+    } catch {
+      if (!this.destroyed)
+        this.toast.show(
+          'Este navegador no pudo grabar el video AR. Intenta en Chrome o Safari actualizado.',
+        );
+    } finally {
+      if (!this.destroyed) this.preparing.set(false);
+    }
+  }
+
+  protected async flipCamera(): Promise<void> {
+    if (!this.engine || this.switchingCamera() || this.recording() || this.preparing()) return;
+    this.switchingCamera.set(true);
+    try {
+      const front = await this.engine.switchCamera();
+      if (!this.destroyed) this.frontCamera.set(front);
+    } catch (error) {
+      if (!this.destroyed)
+        this.toast.show(error instanceof Error ? error.message : 'No se pudo cambiar de cámara.');
+    } finally {
+      if (!this.destroyed) this.switchingCamera.set(false);
+    }
+  }
+
+  protected async saveVideo(): Promise<void> {
+    const take = this.videoTake();
+    if (!take || this.savingVideo()) return;
+    this.savingVideo.set(true);
+    this.videoUpload.set(0);
+    try {
+      const reward = await this.gallery.save('video', take.blob, {
+        teamId: take.teamId,
+        durationMs: take.durationMs,
+        onProgress: (value) => this.videoUpload.set(Math.round(value * 100)),
+      });
+      this.discardVideo();
+      this.toast.show('Video AR guardado en tu Galería');
+      this.progress.celebrate(reward);
+    } catch (error) {
+      this.toast.show(saveErrorMessage(error), 3500);
+    } finally {
+      this.savingVideo.set(false);
+    }
+  }
+
   /** Detección falsa: elige un equipo con logo y abre la ventana AR sin cámara. */
   protected simulate(): void {
     const withLogo = TEAMS.filter((t) => t.logo);
@@ -325,7 +591,8 @@ export class ScanScreen implements AfterViewInit, OnDestroy {
       // ?crop=256 permite comparar en el celular el recorte chico (más rápido) contra el de 512 (más confiable);
       // sin el parámetro manda la "Calidad AR" elegida en el perfil.
       detectionCropSize:
-        Number(this.route.snapshot.queryParamMap.get('crop')) || (getArQuality() === 'fast' ? 256 : undefined),
+        Number(this.route.snapshot.queryParamMap.get('crop')) ||
+        (getArQuality() === 'fast' ? 256 : undefined),
       onFound: (teamId) => {
         // Volver a anclar tras el modo libre no cuenta como un escaneo nuevo.
         const fresh = this.team()?.id !== teamId;

@@ -1,12 +1,21 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, OnDestroy, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
 import { Icon, IconName } from '../../shared/icon';
 import { StatCard } from '../../shared/stat-card';
 import { Feedback } from '../../shared/feedback';
 import { TEAM_BY_ID, Team } from '../../data/teams';
 import { STANDINGS } from '../../data/standings';
-import { VIDEO_CLIPS } from '../../data/videos';
-import { Api, TriviaQuestion } from '../../core/api';
+import { Api, TriviaQuestion, TriviaSession } from '../../core/api';
 import { Progress } from '../../core/progress';
 
 type DockId = 'animation' | 'info' | 'video' | 'effects' | 'stats' | 'trivia' | 'photo';
@@ -51,9 +60,13 @@ interface Particle {
           ></span>
         }
       </div>
-      <div class="banner absolute inset-x-6 top-[30%] rounded-card bg-cta px-5 py-3 text-center shadow-glow">
+      <div
+        class="banner absolute inset-x-6 top-[30%] rounded-card bg-cta px-5 py-3 text-center shadow-glow"
+      >
         <p class="font-display text-[18px] font-black text-white">HOME RUN!</p>
-        <p class="font-sans text-[11px] font-semibold text-white/80">{{ team().name }} celebration</p>
+        <p class="font-sans text-[11px] font-semibold text-white/80">
+          {{ team().name }} celebration
+        </p>
       </div>
     }
 
@@ -74,7 +87,9 @@ interface Particle {
       </button>
       <div class="flex items-center gap-1.5 rounded-row border border-pink bg-pink/25 px-3 py-1.5">
         <span class="h-2 w-2 animate-pulse rounded-full bg-pink"></span>
-        <span class="font-sans text-[11px] font-bold leading-normal text-white">{{ status() }}</span>
+        <span class="font-sans text-[11px] font-bold leading-normal text-white">{{
+          status()
+        }}</span>
       </div>
     </div>
 
@@ -85,14 +100,20 @@ interface Particle {
           {{ team().city }} {{ team().name }}
         </span>
         <span class="h-1 w-1 rounded-full bg-muted"></span>
-        <span class="font-sans text-[11px] font-semibold uppercase leading-normal text-muted">{{ team().abbr }} · {{ team().division }}</span>
+        <span class="font-sans text-[11px] font-semibold uppercase leading-normal text-muted"
+          >{{ team().abbr }} · {{ team().division }}</span
+        >
       </div>
-      <p class="font-display text-[22px] font-black uppercase leading-normal text-white">{{ team().name }}</p>
+      <p class="font-display text-[22px] font-black uppercase leading-normal text-white">
+        {{ team().name }}
+      </p>
       @if (modelLabel(); as label) {
         <p class="font-sans text-[12px] font-semibold text-white/85">{{ label }}</p>
       }
       @if (hint(); as h) {
-        <p class="mt-1 w-fit rounded-pill border border-line bg-black/60 px-2.5 py-1 font-sans text-[10px] font-semibold text-white/85">
+        <p
+          class="mt-1 w-fit rounded-pill border border-line bg-black/60 px-2.5 py-1 font-sans text-[10px] font-semibold text-white/85"
+        >
           {{ h }}
         </p>
       }
@@ -105,7 +126,10 @@ interface Particle {
       }
     </div>
     <!-- dock: fila inferior -->
-    <div class="absolute inset-x-0 bottom-3 flex justify-center" [class]="photo() ? 'gap-[22px]' : 'gap-[46px]'">
+    <div
+      class="absolute inset-x-0 bottom-3 flex justify-center"
+      [class]="photo() ? 'gap-[22px]' : 'gap-[46px]'"
+    >
       @for (item of bottomDock(); track item.id) {
         <ng-container *ngTemplateOutlet="dockBtn; context: { $implicit: item }" />
       }
@@ -138,7 +162,11 @@ interface Particle {
 
     <!-- panel inferior -->
     @if (panel(); as p) {
-      <div class="pointer-events-auto absolute inset-0 bg-black/40" (click)="closePanel()" aria-hidden="true"></div>
+      <div
+        class="pointer-events-auto absolute inset-0 bg-black/40"
+        (click)="closePanel()"
+        aria-hidden="true"
+      ></div>
       <section
         class="sheet-in pointer-events-auto absolute inset-x-0 bottom-0 max-h-[72%] overflow-y-auto rounded-t-[32px] border-t border-line bg-surface/95 px-5 pb-6 pt-3 shadow-[0_-8px_24px_rgba(0,0,0,0.5)] backdrop-blur"
         role="dialog"
@@ -146,7 +174,9 @@ interface Particle {
       >
         <div class="mx-auto mb-3 h-1 w-9 rounded-full bg-white/20"></div>
         <div class="mb-4 flex items-center justify-between">
-          <h2 class="font-display text-[16px] font-black uppercase text-white">{{ panelTitle() }}</h2>
+          <h2 class="font-display text-[16px] font-black uppercase text-white">
+            {{ panelTitle() }}
+          </h2>
           <button
             type="button"
             (click)="closePanel()"
@@ -161,11 +191,17 @@ interface Particle {
           @case ('info') {
             <div class="grid grid-cols-2 gap-3">
               <app-stat-card label="Fundado" [value]="team().founded" />
-              <app-stat-card label="Títulos" [value]="team().titles" hint="Series Mundiales · hasta 2025" />
+              <app-stat-card
+                label="Títulos"
+                [value]="team().titles"
+                hint="Series Mundiales · hasta 2025"
+              />
               <app-stat-card label="Estadio" [value]="team().stadium" />
               <app-stat-card label="División" [value]="team().division" />
             </div>
-            <p class="mt-4 font-sans text-[13px] leading-relaxed text-white/90">{{ narration() }}</p>
+            <p class="mt-4 font-sans text-[13px] leading-relaxed text-white/90">
+              {{ narration() }}
+            </p>
             <button
               type="button"
               (click)="toggleNarration()"
@@ -176,24 +212,9 @@ interface Particle {
             </button>
           }
           @case ('video') {
-            @if (clip(); as videoClip) {
-            <div class="overflow-hidden rounded-row border border-line bg-black">
-              <video
-                class="aspect-video w-full"
-                [src]="videoClip.src"
-                [poster]="videoClip.poster"
-                controls
-                autoplay
-                muted
-                loop
-                playsinline
-              ></video>
-            </div>
-            <p class="mt-3 font-sans text-[13px] font-bold text-white">{{ videoClip.title }}</p>
-            <p class="font-sans text-[11px] text-muted">{{ videoClip.duration }} · {{ team().city }} {{ team().name }}</p>
-            } @else {
-              <p class="py-6 text-center font-sans text-[13px] text-muted">El video de {{ team().name }} estará disponible próximamente.</p>
-            }
+            <p class="py-6 text-center font-sans text-[13px] text-muted">
+              Para grabar video con el modelo, abre el escáner con una cámara real.
+            </p>
           }
           @case ('stats') {
             <p class="mb-2 font-sans text-[11px] font-semibold uppercase tracking-wide text-muted">
@@ -203,13 +224,19 @@ interface Particle {
               @for (row of standings(); track row.teamId; let i = $index) {
                 <div
                   class="flex items-center gap-3 px-3 py-2.5 font-sans text-[13px]"
-                  [class]="row.teamId === team().id ? 'bg-purple/25 text-white' : 'bg-surface text-white/85'"
+                  [class]="
+                    row.teamId === team().id
+                      ? 'bg-purple/25 text-white'
+                      : 'bg-surface text-white/85'
+                  "
                   [class.border-t]="i > 0"
                   [class.border-line]="i > 0"
                 >
                   <span class="w-4 text-muted">{{ i + 1 }}</span>
                   <span class="flex-1 font-bold">{{ teamName(row.teamId) }}</span>
-                  <span class="w-14 text-right font-display text-[12px] font-bold">{{ row.wins }}-{{ row.losses }}</span>
+                  <span class="w-14 text-right font-display text-[12px] font-bold"
+                    >{{ row.wins }}-{{ row.losses }}</span
+                  >
                   <span class="w-10 text-right text-muted">{{ row.gamesBack }}</span>
                   <span
                     class="w-8 text-right font-bold"
@@ -221,14 +248,68 @@ interface Particle {
             </div>
           }
           @case ('trivia') {
-            @if (question(); as q) {
+            @if (triviaComplete()) {
+              <p class="font-display text-[18px] font-black text-white">TRIVIA COMPLETADA</p>
+              <p class="mt-2 font-sans text-[14px] text-white">
+                {{ correctCount() }} de {{ questions().length }} respuestas correctas.
+              </p>
+              <p class="mt-2 font-sans text-[12px] text-muted">
+                Tu intento quedó guardado. Puedes revisar tus respuestas y volver a jugar después de
+                5 minutos.
+              </p>
+              <button
+                type="button"
+                (click)="retryTrivia()"
+                [disabled]="cooldownRemaining() > 0 || retrying() || !runId()"
+                class="pressable mt-4 min-h-11 w-full rounded-cta bg-cta font-display text-[12px] font-bold text-white disabled:opacity-50"
+              >
+                {{
+                  retrying()
+                    ? 'PREPARANDO INTENTO…'
+                    : cooldownRemaining() > 0
+                      ? 'NUEVO INTENTO EN ' + cooldownLabel()
+                      : 'VOLVER A JUGAR'
+                }}
+              </button>
+              @if (retryError()) {
+                <p role="alert" class="mt-2 font-sans text-[12px] text-pink">{{ retryError() }}</p>
+              }
+              <button
+                type="button"
+                (click)="reviewing.update(toggleReview)"
+                class="pressable mt-4 min-h-11 w-full rounded-cta bg-cta font-display text-[12px] font-bold text-white"
+              >
+                {{ reviewing() ? 'OCULTAR RESPUESTAS' : 'VER MIS RESPUESTAS' }}
+              </button>
+              @if (reviewing()) {
+                @for (saved of questions(); track saved.id) {
+                  <div class="mt-3 rounded-row border border-line bg-ink p-3 font-sans text-[12px]">
+                    <p class="font-bold text-white">{{ saved.question }}</p>
+                    <p class="mt-2" [class]="saved.correct ? 'text-[#80ed99]' : 'text-pink'">
+                      Tu respuesta: {{ saved.options[saved.chosen ?? 0] }}
+                    </p>
+                    @if (!saved.correct) {
+                      <p class="mt-1 text-muted">
+                        Correcta: {{ saved.options[saved.answer ?? 0] }}
+                      </p>
+                    }
+                  </div>
+                }
+              }
+            } @else if (question(); as q) {
               <p class="font-sans text-[11px] font-semibold uppercase tracking-wide text-muted">
                 Pregunta {{ triviaIndex() + 1 }} de {{ questions().length }}
                 @if (q.teamId === team().id) {
                   · {{ team().name }}
                 }
               </p>
-              <p class="mt-1 font-sans text-[15px] font-bold leading-snug text-white">{{ q.question }}</p>
+              <p class="mt-1 font-sans text-[15px] font-bold leading-snug text-white">
+                {{ q.question }}
+              </p>
+              <p class="mt-2 font-sans text-[11px] text-muted">
+                Una respuesta por pregunta en este intento. Puedes repetir la trivia 5 minutos
+                después de terminar.
+              </p>
               <div class="mt-4 flex flex-col gap-2">
                 @for (opt of q.options; track opt; let i = $index) {
                   <button
@@ -247,10 +328,19 @@ interface Particle {
               </div>
             } @else {
               <p class="py-6 text-center font-sans text-[12px] text-muted">
-                {{ triviaError() ? 'No se pudo cargar la trivia. Cierra y vuelve a abrir el panel.' : 'Cargando preguntas…' }}
+                {{
+                  triviaError()
+                    ? 'No se pudo cargar la trivia. Cierra y vuelve a abrir el panel.'
+                    : 'Cargando preguntas…'
+                }}
               </p>
             }
-            @if (correctAnswer() !== null) {
+            @if (answerError()) {
+              <p role="alert" class="mt-3 font-sans text-[12px] text-pink">
+                No se pudo guardar la respuesta. Intenta de nuevo.
+              </p>
+            }
+            @if (!triviaComplete() && correctAnswer() !== null) {
               <p
                 class="mt-3 font-display text-[12px] font-bold"
                 [class]="answered() === correctAnswer() ? 'text-[#80ed99]' : 'text-pink'"
@@ -262,7 +352,7 @@ interface Particle {
                 (click)="nextQuestion()"
                 class="pressable mt-3 flex min-h-[44px] w-full items-center justify-center rounded-cta bg-cta font-display text-[12px] font-bold text-white"
               >
-                SIGUIENTE
+                {{ remainingCount() === 0 ? 'VER RESULTADO' : 'SIGUIENTE' }}
               </button>
             }
           }
@@ -275,17 +365,33 @@ interface Particle {
       animation: burst 1.1s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
     }
     @keyframes burst {
-      0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
-      100% { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity: 0; }
+      0% {
+        transform: translate(0, 0) scale(0.6);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--dx), var(--dy)) scale(1.2);
+        opacity: 0;
+      }
     }
     .banner {
       animation: banner 2.6s ease-out forwards;
     }
     @keyframes banner {
-      0% { transform: translateY(-16px) scale(0.9); opacity: 0; }
-      12% { transform: none; opacity: 1; }
-      80% { opacity: 1; }
-      100% { opacity: 0; }
+      0% {
+        transform: translateY(-16px) scale(0.9);
+        opacity: 0;
+      }
+      12% {
+        transform: none;
+        opacity: 1;
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
     }
     .sheet-in {
       animation: sheet 200ms ease-out;
@@ -294,12 +400,22 @@ interface Particle {
       animation: flash 320ms ease-out forwards;
     }
     @keyframes flash {
-      0% { opacity: 0.9; }
-      100% { opacity: 0; }
+      0% {
+        opacity: 0.9;
+      }
+      100% {
+        opacity: 0;
+      }
     }
     @keyframes sheet {
-      from { transform: translateY(24px); opacity: 0; }
-      to { transform: none; opacity: 1; }
+      from {
+        transform: translateY(24px);
+        opacity: 0;
+      }
+      to {
+        transform: none;
+        opacity: 1;
+      }
     }
   `,
 })
@@ -312,6 +428,7 @@ export class ArHud implements OnDestroy {
   readonly modelLabel = input<string | null>(null);
   /** Muestra el botón Foto (solo tiene sentido con cámara real). */
   readonly photo = input(true);
+  readonly recordVideo = input(false);
 
   readonly back = output<void>();
   readonly animationToggle = output<void>();
@@ -319,6 +436,7 @@ export class ArHud implements OnDestroy {
   readonly infoOpened = output<void>();
   /** Botón Foto: quien hospeda compone y guarda la imagen. */
   readonly photoRequested = output<void>();
+  readonly videoRequested = output<void>();
   /** Se abrió o cerró un panel inferior: quien hospeda puede subir el modelo para que no quede tapado. */
   readonly panelChange = output<boolean>();
 
@@ -329,16 +447,27 @@ export class ArHud implements OnDestroy {
   /** Equipo para el que ya se cargó su trivia y las preguntas generales de la liga. */
   private triviaTeam = '';
   private triviaRequest = 0;
+  private cooldownTimer?: ReturnType<typeof setInterval>;
+  private serverClockStart = 0;
+  private localClockStart = 0;
   // Si se detecta otro equipo sin salir del escáner, descarta paneles y respuestas del anterior.
   private readonly resetForTeam = effect(() => {
     this.team();
     untracked(() => {
+      clearInterval(this.cooldownTimer);
       this.closePanel();
       this.triviaRequest++;
       this.triviaTeam = '';
       this.questions.set([]);
       this.answered.set(null);
       this.correctAnswer.set(null);
+      this.triviaComplete.set(false);
+      this.reviewing.set(false);
+      this.answerError.set(false);
+      this.runId.set('');
+      this.retryAt.set(0);
+      this.retryError.set('');
+      this.retrying.set(false);
     });
   });
 
@@ -368,11 +497,29 @@ export class ArHud implements OnDestroy {
   protected readonly triviaIndex = signal(0);
   protected readonly answered = signal<number | null>(null);
   protected readonly correctAnswer = signal<number | null>(null);
-  protected readonly question = computed(() => this.questions()[this.triviaIndex()] ?? null);
-
-  protected readonly clip = computed(
-    () => VIDEO_CLIPS.find((v) => v.teamId === this.team().id) ?? null,
+  protected readonly answerError = signal(false);
+  protected readonly triviaComplete = signal(false);
+  protected readonly runId = signal('');
+  protected readonly retryAt = signal(0);
+  protected readonly serverClock = signal(0);
+  protected readonly retrying = signal(false);
+  protected readonly retryError = signal('');
+  protected readonly cooldownRemaining = computed(() =>
+    Math.max(0, Math.ceil((this.retryAt() - this.serverClock()) / 1000)),
   );
+  protected readonly cooldownLabel = computed(
+    () =>
+      `${Math.floor(this.cooldownRemaining() / 60)}:${String(this.cooldownRemaining() % 60).padStart(2, '0')}`,
+  );
+  protected readonly reviewing = signal(false);
+  protected readonly toggleReview = (value: boolean) => !value;
+  protected readonly correctCount = computed(
+    () => this.questions().filter((q) => q.correct).length,
+  );
+  protected readonly remainingCount = computed(
+    () => this.questions().filter((q) => q.chosen == null).length,
+  );
+  protected readonly question = computed(() => this.questions()[this.triviaIndex()] ?? null);
 
   protected readonly standings = computed(() => {
     const div = this.team().division;
@@ -402,6 +549,8 @@ export class ArHud implements OnDestroy {
   });
 
   ngOnDestroy(): void {
+    clearInterval(this.cooldownTimer);
+    this.triviaRequest++;
     this.timers.forEach(clearTimeout);
     this.stopNarration();
   }
@@ -439,6 +588,13 @@ export class ArHud implements OnDestroy {
         if (this.panel() === 'trivia') this.loadTrivia();
         break;
       case 'video':
+        if (this.recordVideo()) {
+          this.closePanel();
+          this.videoRequested.emit();
+          break;
+        }
+        this.togglePanel('video');
+        break;
       case 'stats':
         this.togglePanel(id);
         break;
@@ -459,11 +615,25 @@ export class ArHud implements OnDestroy {
     const q = this.question();
     if (!q || this.answered() !== null) return;
     const request = this.triviaRequest;
+    this.answerError.set(false);
     this.answered.set(i);
     try {
-      const r = await this.api.answer(q.id, i);
+      const r = await this.api.answer(q.id, i, this.runId());
       if (request !== this.triviaRequest) return;
       this.correctAnswer.set(r.answer);
+      const chosen = r.chosen ?? i;
+      this.answered.set(chosen);
+      this.questions.update((questions) =>
+        questions.map((question) =>
+          question.id === q.id
+            ? { ...question, chosen, answer: r.answer, correct: r.correct }
+            : question,
+        ),
+      );
+      if (r.session) {
+        this.questions.set(r.session.questions);
+        this.setSessionClock(r.session);
+      }
       if (r.correct) this.fb.success();
       else this.fb.error();
       this.progress.celebrate(r);
@@ -471,22 +641,31 @@ export class ArHud implements OnDestroy {
       console.error(e);
       if (request !== this.triviaRequest) return;
       this.answered.set(null);
+      this.answerError.set(true);
       this.fb.error();
+      if ((e as { status?: number })?.status === 409) {
+        this.triviaTeam = '';
+        this.loadTrivia();
+      }
     }
   }
 
   protected nextQuestion(): void {
+    if (this.correctAnswer() === null) return;
     this.fb.tap();
     this.answered.set(null);
     this.correctAnswer.set(null);
-    this.triviaIndex.update((n) => (n + 1) % Math.max(1, this.questions().length));
+    const next = this.questions().findIndex((q) => q.chosen == null);
+    if (next < 0) this.triviaComplete.set(true);
+    else this.triviaIndex.set(next);
   }
 
   protected optionClass(i: number): string {
     const a = this.answered();
     const correct = this.correctAnswer();
     if (a === null) return 'border-line bg-ink text-white';
-    if (correct === null) return i === a ? 'border-purple bg-purple/20 text-white' : 'border-line bg-ink text-muted';
+    if (correct === null)
+      return i === a ? 'border-purple bg-purple/20 text-white' : 'border-line bg-ink text-muted';
     if (i === correct) return 'border-[#80ed99] bg-[#80ed99]/15 text-[#80ed99]';
     if (i === a) return 'border-pink bg-pink/15 text-pink';
     return 'border-line bg-ink text-muted';
@@ -503,10 +682,14 @@ export class ArHud implements OnDestroy {
     this.triviaIndex.set(0);
     this.answered.set(null);
     this.correctAnswer.set(null);
+    this.triviaComplete.set(false);
+    this.reviewing.set(false);
+    this.answerError.set(false);
     this.api
-      .trivia(teamId)
-      .then((qs) => {
-        if (request === this.triviaRequest) this.questions.set(qs);
+      .triviaSession(teamId)
+      .then((session) => {
+        if (request !== this.triviaRequest) return;
+        this.applySession(session);
       })
       .catch((e) => {
         console.error(e);
@@ -514,6 +697,59 @@ export class ArHud implements OnDestroy {
         this.triviaTeam = '';
         this.triviaError.set(true);
       });
+  }
+
+  private applySession(session: TriviaSession): void {
+    const qs = session.questions;
+    this.runId.set(session.id);
+    this.setSessionClock(session);
+    this.questions.set(qs);
+    this.answered.set(null);
+    this.correctAnswer.set(null);
+    this.answerError.set(false);
+    this.reviewing.set(false);
+    const next = qs.findIndex((q) => q.chosen == null);
+    this.triviaComplete.set(qs.length > 0 && next < 0);
+    this.triviaIndex.set(Math.max(0, next));
+  }
+
+  private setSessionClock(session: TriviaSession): void {
+    this.runId.set(session.id);
+    this.retryAt.set(session.retryAt ? Date.parse(session.retryAt) : 0);
+    this.serverClockStart = Date.parse(session.serverNow);
+    this.localClockStart = performance.now();
+    this.serverClock.set(this.serverClockStart);
+    clearInterval(this.cooldownTimer);
+    if (session.retryAt)
+      this.cooldownTimer = setInterval(() => {
+        this.serverClock.set(this.serverClockStart + performance.now() - this.localClockStart);
+        if (this.serverClock() >= this.retryAt()) clearInterval(this.cooldownTimer);
+      }, 1000);
+  }
+
+  protected async retryTrivia(): Promise<void> {
+    if (this.cooldownRemaining() > 0 || this.retrying() || !this.runId()) return;
+    const request = ++this.triviaRequest;
+    const teamId = this.team().id;
+    this.retrying.set(true);
+    this.retryError.set('');
+    try {
+      const session = await this.api.retryTrivia(teamId, this.runId());
+      if (request === this.triviaRequest) this.applySession(session);
+    } catch {
+      if (request !== this.triviaRequest) return;
+      this.retryError.set(
+        'No se pudo iniciar otro intento. Revisa tu conexión o espera a que termine el cooldown.',
+      );
+      try {
+        const session = await this.api.triviaSession(teamId);
+        if (request === this.triviaRequest) this.applySession(session);
+      } catch {
+        /* Conserva el resultado para revisar. */
+      }
+    } finally {
+      if (request === this.triviaRequest) this.retrying.set(false);
+    }
   }
 
   protected toggleNarration(): void {

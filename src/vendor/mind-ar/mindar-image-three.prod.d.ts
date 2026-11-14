@@ -27,6 +27,9 @@ export interface MindARThreeOptions {
 }
 
 export class MindARThree {
+  shouldFaceUser: boolean;
+  anchors: MindARAnchor[];
+  controller?: { dispose(): void; worker?: Worker };
   constructor(options: MindARThreeOptions);
   readonly scene: Scene;
   readonly camera: PerspectiveCamera;

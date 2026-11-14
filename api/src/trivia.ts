@@ -45,6 +45,18 @@ export async function answerTrivia(uid: string, id: number, option: number) {
     );
     if (!q) throw new TriviaError(404, 'Pregunta no encontrada');
     if (option < 0 || option >= Number(q['n'])) throw new TriviaError(400, 'Opción inválida');
+    const [[previous]] = await db.query<RowDataPacket[]>(
+      'SELECT chosen, correct FROM trivia_answers WHERE uid = ? AND question_id = ? ORDER BY id DESC LIMIT 1',
+      [uid, id],
+    );
+    if (previous)
+      return {
+        correct: Boolean(previous['correct']),
+        answer: Number(q['answer']),
+        chosen: Number(previous['chosen']),
+        alreadyAnswered: true,
+        ...(await reward(uid, 0, `trivia:${id}`, null, db)),
+      };
     const correct = option === Number(q['answer']);
     const [[before]] = await db.query<RowDataPacket[]>(
       'SELECT COUNT(*) AS n FROM trivia_answers WHERE uid = ? AND question_id = ? AND correct',
@@ -57,8 +69,31 @@ export async function answerTrivia(uid: string, id: number, option: number) {
     const xp = correct && Number(before['n']) === 0 ? XP.triviaFirstCorrect : 0;
     return {
       correct,
+      chosen: option,
+      alreadyAnswered: false,
       answer: Number(q['answer']),
       ...(await reward(uid, xp, `trivia:${id}`, null, db)),
     };
   });
+}
+
+/** Recupera el avance por cuenta; solo revela la solución de preguntas ya contestadas. */
+export async function triviaForUser(uid: string, teamId: string | null, db: ProgressDb = pool) {
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT q.id, q.team_id AS teamId, q.question, q.options, a.chosen,
+       CASE WHEN a.id IS NOT NULL THEN q.answer ELSE NULL END AS answer,
+       a.correct, a.created_at AS answeredAt
+     FROM trivia_questions q LEFT JOIN trivia_answers a ON a.id = (
+       SELECT MAX(last_answer.id) FROM trivia_answers last_answer WHERE last_answer.uid = ? AND last_answer.question_id = q.id
+     )
+     WHERE q.active AND (? IS NULL OR q.team_id = ? OR q.team_id IS NULL)
+     ORDER BY (q.team_id <=> ?) DESC, (q.team_id IS NULL) DESC, q.id`,
+    [uid, teamId, teamId, teamId],
+  );
+  return rows.map((row) => ({
+    ...row,
+    chosen: row['chosen'] === null ? null : Number(row['chosen']),
+    answer: row['answer'] === null ? null : Number(row['answer']),
+    correct: row['correct'] === null ? null : Boolean(row['correct']),
+  }));
 }

@@ -13,6 +13,7 @@ describe('Partidas, trivia y recompensas con MySQL real', { skip: !enabled }, ()
   let db: typeof import('../src/db.js');
   let progress: typeof import('../src/progress.js');
   let trivia: typeof import('../src/trivia.js');
+  let sessions: typeof import('../src/trivia-sessions.js');
   let game: typeof import('../src/game.js');
   let server: Server;
   let base: string;
@@ -27,6 +28,7 @@ describe('Partidas, trivia y recompensas con MySQL real', { skip: !enabled }, ()
     db = await import('../src/db.js');
     progress = await import('../src/progress.js');
     trivia = await import('../src/trivia.js');
+    sessions = await import('../src/trivia-sessions.js');
     game = await import('../src/game.js');
     await db.migrate();
     const app = express();
@@ -89,8 +91,6 @@ describe('Partidas, trivia y recompensas con MySQL real', { skip: !enabled }, ()
   it('acredita una trivia solo una vez incluso al responder simultáneamente', async () => {
     const uid = await user(),
       q = TRIVIA[0];
-    const wrong = (q.answer + 1) % q.options.length;
-    assert.equal((await trivia.answerTrivia(uid, q.id, wrong)).xpGained, 0);
     const responses = await Promise.all(
       Array.from({ length: 5 }, () => trivia.answerTrivia(uid, q.id, q.answer)),
     );
@@ -99,6 +99,137 @@ describe('Partidas, trivia y recompensas con MySQL real', { skip: !enabled }, ()
       50,
     );
     assert.equal(await progress.totalXp(uid), 50);
+    assert.equal(responses.filter((response) => !response.alreadyAnswered).length, 1);
+    const saved = (await trivia.triviaForUser(uid, q.teamId)).find((row) => row['id'] === q.id)!;
+    assert.equal(saved['chosen'], q.answer);
+    assert.equal(saved['correct'], true);
+  });
+
+  it('conserva una respuesta incorrecta, sin permitir cambiarla ni revelar preguntas de otra cuenta', async () => {
+    const uid = await user(),
+      other = await user(),
+      q = TRIVIA.find((q) => q.teamId === 'nyy')!;
+    const wrong = (q.answer + 1) % q.options.length;
+    const before = await trivia.triviaForUser(uid, 'nyy');
+    assert.equal(before.length, 7);
+    assert.ok(before.every((row) => row['answer'] === null && row['chosen'] === null));
+    await trivia.answerTrivia(uid, q.id, wrong);
+    const retry = await trivia.answerTrivia(uid, q.id, q.answer);
+    assert.equal(retry.alreadyAnswered, true);
+    assert.equal(retry.chosen, wrong);
+    assert.equal(retry.correct, false);
+    assert.equal(await progress.totalXp(uid), 0);
+    const own = (await trivia.triviaForUser(uid, 'nyy')).find((row) => row['id'] === q.id)!;
+    assert.equal(own['answer'], q.answer);
+    assert.equal(own['chosen'], wrong);
+    assert.ok((await trivia.triviaForUser(other, 'nyy')).every((row) => row['answer'] === null));
+    const [[row]] = await db.pool.query<any[]>(
+      'SELECT COUNT(*) AS n FROM trivia_answers WHERE uid = ?',
+      [uid],
+    );
+    assert.equal(Number(row.n), 1);
+  });
+
+  it('conserva un intento parcial al recargar, valida su propietario y bloquea cambios de respuesta', async () => {
+    const uid = await user(),
+      other = await user();
+    const opened = await Promise.all([
+      sessions.triviaSession(uid, 'nyy'),
+      sessions.triviaSession(uid, 'nyy'),
+    ]);
+    assert.equal(opened[0].id, opened[1].id);
+    assert.equal(opened[0].questions.length, 7);
+    assert.ok(opened[0].questions.every((q) => q.answer === null));
+    const q = TRIVIA.find((q) => q.id === opened[0].questions[0].id)!;
+    const wrong = (q.answer + 1) % q.options.length;
+    await sessions.answerTriviaSession(uid, opened[0].id, q.id, wrong);
+    const duplicate = await sessions.answerTriviaSession(uid, opened[0].id, q.id, q.answer);
+    assert.equal(duplicate.chosen, wrong);
+    assert.equal(duplicate.correct, false);
+    assert.equal(duplicate.xpGained, 0);
+    const restored = await sessions.triviaSession(uid, 'nyy');
+    assert.equal(restored.questions[0].chosen, wrong);
+    assert.equal(restored.completedAt, null);
+    assert.equal(restored.questions[1].answer, null);
+    await assert.rejects(
+      sessions.retryTrivia(uid, 'nyy', restored.id),
+      (e: any) => e.status === 429,
+    );
+    await assert.rejects(
+      sessions.answerTriviaSession(other, restored.id, q.id, q.answer),
+      (e: any) => e.status === 404,
+    );
+    await assert.rejects(
+      sessions.retryTrivia(other, 'nyy', restored.id),
+      (e: any) => e.status === 404,
+    );
+    const bos = await sessions.triviaSession(uid, 'bos');
+    assert.ok(bos.questions.every((q) => q.chosen === null));
+  });
+
+  it('exige 5 minutos desde el final, crea un solo reintento y no repite XP ya ganada', async () => {
+    const uid = await user();
+    const first = await sessions.triviaSession(uid, 'nyy');
+    for (const [index, row] of first.questions.entries()) {
+      const q = TRIVIA.find((q) => q.id === row.id)!;
+      await sessions.answerTriviaSession(
+        uid,
+        first.id,
+        q.id,
+        index === 0 ? (q.answer + 1) % q.options.length : q.answer,
+      );
+    }
+    const done = await sessions.triviaSession(uid, 'nyy');
+    assert.ok(done.completedAt && done.retryAt);
+    assert.equal(Date.parse(done.retryAt!) - Date.parse(done.completedAt!), 300_000);
+    await assert.rejects(sessions.retryTrivia(uid, 'nyy', done.id), (e: any) => e.status === 429);
+    await db.pool.query(
+      'UPDATE trivia_runs SET completed_at = UTC_TIMESTAMP(3) - INTERVAL 299 SECOND WHERE id = ?',
+      [done.id],
+    );
+    await assert.rejects(sessions.retryTrivia(uid, 'nyy', done.id), (e: any) => e.status === 429);
+    await db.pool.query(
+      'UPDATE trivia_runs SET completed_at = UTC_TIMESTAMP(3) - INTERVAL 300 SECOND WHERE id = ?',
+      [done.id],
+    );
+    const retries = await Promise.all(
+      Array.from({ length: 4 }, () => sessions.retryTrivia(uid, 'nyy', done.id)),
+    );
+    assert.equal(new Set(retries.map((r) => r.id)).size, 1);
+    assert.notEqual(retries[0].id, done.id);
+    assert.ok(retries[0].questions.every((q) => q.chosen === null && q.answer === null));
+    await assert.rejects(
+      sessions.answerTriviaSession(uid, first.id, first.questions[0].id, 0),
+      (e: any) => e.status === 409,
+    );
+    let gained = 0;
+    for (const row of retries[0].questions) {
+      const q = TRIVIA.find((q) => q.id === row.id)!;
+      gained += (await sessions.answerTriviaSession(uid, retries[0].id, q.id, q.answer)).xpGained;
+    }
+    assert.equal(gained, 50, 'Solo otorga XP por la pregunta acertada por primera vez');
+    const [[runs]] = await db.pool.query<any[]>(
+      'SELECT COUNT(*) AS n FROM trivia_runs WHERE uid = ? AND team_id = ?',
+      [uid, 'nyy'],
+    );
+    assert.equal(Number(runs.n), 2);
+    const independent = await sessions.triviaSession(uid, 'bos');
+    assert.ok(independent.questions.every((q) => q.chosen === null));
+  });
+
+  it('importa el intento anterior a la actualización y conserva su fecha de finalización', async () => {
+    const uid = await user();
+    for (const q of TRIVIA.filter((q) => q.teamId === 'nyy' || q.teamId === null))
+      await trivia.answerTrivia(uid, q.id, q.answer);
+    const imported = await sessions.triviaSession(uid, 'nyy');
+    assert.ok(imported.completedAt && imported.retryAt);
+    assert.ok(imported.questions.every((q) => q.chosen !== null));
+    assert.equal((await sessions.triviaSession(uid, 'nyy')).id, imported.id);
+    const [[count]] = await db.pool.query<any[]>(
+      'SELECT COUNT(*) AS n FROM trivia_answers WHERE uid = ?',
+      [uid],
+    );
+    assert.equal(Number(count.n), 7, 'No copia ni elimina las respuestas históricas');
   });
 
   it('reconstruye el score y no acepta un score inventado por el cliente', async () => {

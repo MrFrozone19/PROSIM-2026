@@ -144,6 +144,7 @@ de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores ti
 | Función | Estado |
 |---|---|
 | Navegación entre las 7 pantallas, tab bar, transiciones | Real |
+| Canales en Inicio | **Real**: noticias RSS oficiales de MLB y los 15 equipos, con titulares, fecha e imagen. Cada canal carga su feed; los enlaces abren el artículo en MLB.com. Caché de 10 minutos en la API y último feed disponible si MLB falla |
 | Cámara trasera en `/scan` (permiso concedido / rechazado / sin soporte / error de carga) | Real |
 | Reconocimiento de marcadores en `/scan` | **Real** con MindAR: los 15 equipos de la Liga Americana, con sus logos oficiales sobre fondo claro; se conservan los marcadores anteriores de NYY |
 | Modelo 3D anclado al marcador | **Real** con three.js. Diez modelos distintos (tres bates, tres pelotas, un dado, dos gorras y un guante), distribuidos entre los 15 equipos; materiales y textura incrustada. La gorra de Yankees conserva `Celebrate`; los OBJ usan movimiento de exhibición. Importados con `npm run models:import` |
@@ -154,11 +155,11 @@ de la app. MindAR usa esa misma API, así que el reconocimiento de marcadores ti
 | Colección (cartas, trofeos, insignias), nivel y XP | **Real**, guardado en MySQL. Escanear un logo por primera vez desbloquea la carta de ese equipo |
 | Perfil y leaderboard semanal | **Real**: nombre y equipo favorito editables; el leaderboard suma la XP de los últimos 7 días |
 | Botón Foto | Real: compone el cuadro de la cámara con el modelo 3D encima (sin interfaz) y lo guarda en la **Galería** de la app (TCG Vault → Galería) |
-| Galería (TCG Vault) | **Real**: fotos del escáner y clips grabados en Videos, guardados por cuenta en Firebase Storage (`gallery/{uid}/`, ver `storage.rules`) y registrados en MySQL. Desde el visor se comparten o descargan al teléfono, o se eliminan |
+| Galería (TCG Vault) | **Real**: fotos y videos del escáner, y clips de AR Studio, guardados por cuenta en Firebase Storage (`gallery/{uid}/`, ver `storage.rules`) y registrados en MySQL. Desde el visor se comparten o descargan al teléfono, o se eliminan |
 | `/ar` y el botón "Simular detección" | Respaldo sin cámara: el botón solo aparece si la cámara no está disponible o con `/#/scan?sim=1`, y abre la ventana AR con un logo holográfico en lugar del modelo |
 | Narración por voz en el panel Info | Real, con la síntesis de voz del navegador (`speechSynthesis`) |
 | `/videos` (AR Studio): grabadora con 5 filtros | **Real**: la cámara pasa por un shader WebGL (`shared/fx-renderer.ts`) con el filtro elegido y ese lienzo se graba con `MediaRecorder` (MP4, o WebM si el navegador no graba MP4), así que el filtro queda en el video. Máximo 30 s; se revisa y se guarda en la Galería |
-| Clips del botón Video de la ventana AR | Generados en el proyecto con ffmpeg a partir del arte del diseño (sin derechos de terceros) |
+| Botón Video dentro del escáner | **Real**: graba cámara + modelo 3D, sin controles ni filtros, hasta 30 s. Cambio entre cámara frontal y trasera antes de grabar; conserva el modelo en modo libre. Revisión, descarte y guardado en Galería. Micrófono opcional: si se deniega, conserva el video sin audio |
 | Minijuego en `/game` | **Real**: Diamond Flight, juego de pelota estilo Flappy Bird. Meta de 10 obstáculos, controles táctiles/teclado, pausa, partidas guardadas y recompensas conectadas a la misma clasificación de XP |
 
 Filtros de video permitidos por la rúbrica e implementados: desenfoque, pixelado, cámara térmica, ajuste de
@@ -171,6 +172,20 @@ El catálogo base contiene **77 preguntas**: **5 para cada uno de los 15 equipos
 `GET /api/trivia/summary` permite consultar el conteo activo real en MySQL, incluyendo cambios del administrador;
 solo publica cantidades, sin respuestas ni información de usuarios. En Fan Arcade también se puede desplegar el conteo por equipo.
 
+La trivia tiene un final: al completar las preguntas muestra el resultado y permite revisar las respuestas.
+Cada pregunta admite una respuesta **dentro del intento**; al completar la última pregunta empieza un cooldown
+de **5 minutos por cuenta y equipo**. La pantalla muestra la cuenta regresiva y habilita **Volver a jugar** al terminar.
+El servidor valida el tiempo y crea una sola ronda aunque se pulse varias veces o desde dos pestañas.
+Al volver a escanear se recupera el intento y su tiempo restante desde MySQL. Cada ronda incluye las preguntas
+del equipo y dos generales de MLB. La XP se otorga solo la primera vez que se acierta cada pregunta en la cuenta;
+los reintentos permiten practicar y corregir errores sin repetir puntos ya ganados.
+Las respuestas anteriores se conservan y el primer intento importa el avance de la versión anterior.
+
+Para grabar en AR: escanear un logo → **Video** → elegir cámara frontal/trasera → grabar → detener → revisar →
+**Guardar en Galería**. El cambio de cámara se bloquea mientras se graba. Al salir de la app se detiene la grabación;
+al cerrar el escáner se liberan cámara, micrófono y pistas del video. `npm run scan:check` prueba composición,
+cambio de cámaras, conservación del modelo y un MP4/WebM reproducible con dispositivos virtuales en Chrome.
+
 Todo suma al mismo libro `xp_events`: los escaneos, la primera respuesta correcta de cada pregunta, las partidas
 y los trofeos. El perfil usa la XP acumulada para el nivel y la clasificación muestra la de los últimos siete días.
 Fan Arcade incluye un desglose semanal de Trivia, Arcade, Explorar y Logros. Los empates comparten posición.
@@ -181,7 +196,7 @@ al cambiar de aplicación se pausa automáticamente. Al terminar se guarda el re
 
 | Acción | Recompensa |
 |---|---|
-| Acertar por primera vez una pregunta | 50 XP; los reintentos no repiten los puntos |
+| Acertar una pregunta | 50 XP; las preguntas contestadas quedan guardadas y no se vuelven a responder |
 | Superar un obstáculo | 10 XP al finalizar la partida |
 | Completar los diez obstáculos | 50 XP extra (150 XP de partida en total) |
 | Primera victoria | Trofeo First Flight y 50 XP adicionales |

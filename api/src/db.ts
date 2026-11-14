@@ -123,6 +123,28 @@ const SCHEMA = [
     FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
     FOREIGN KEY (question_id) REFERENCES trivia_questions(id) ON DELETE CASCADE
   )`,
+  /** Intentos de trivia por equipo: instantánea estable y cooldown calculado al completar. */
+  `CREATE TABLE IF NOT EXISTS trivia_runs (
+    seq BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id CHAR(36) NOT NULL UNIQUE,
+    uid VARCHAR(128) NOT NULL,
+    team_id VARCHAR(8) NOT NULL,
+    questions JSON NOT NULL,
+    started_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    completed_at DATETIME(3) NULL,
+    INDEX (uid, team_id, seq),
+    FOREIGN KEY (uid) REFERENCES users(uid) ON DELETE CASCADE,
+    FOREIGN KEY (team_id) REFERENCES teams(id)
+  )`,
+  `CREATE TABLE IF NOT EXISTS trivia_run_answers (
+    run_id CHAR(36) NOT NULL,
+    question_id INT NOT NULL,
+    answer_id BIGINT NOT NULL,
+    PRIMARY KEY (run_id, question_id),
+    INDEX (answer_id),
+    FOREIGN KEY (run_id) REFERENCES trivia_runs(id) ON DELETE CASCADE,
+    FOREIGN KEY (answer_id) REFERENCES trivia_answers(id) ON DELETE CASCADE
+  )`,
   /** Acciones que cuentan para logros (efectos, filtros de video). */
   `CREATE TABLE IF NOT EXISTS activity (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

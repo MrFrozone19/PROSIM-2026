@@ -5,7 +5,9 @@ import { migrate, pool } from './db.js';
 import { deleteUserFiles, gallery } from './gallery.js';
 import { XP, levelOf, reward, totalXp, weeklyStanding, weeklyLeaderboard } from './progress.js';
 import { game } from './game.js';
-import { answerTrivia, triviaSummary, TriviaError } from './trivia.js';
+import { answerTrivia, triviaForUser, triviaSummary, TriviaError } from './trivia.js';
+import { NEWS_CHANNELS, newsFeed } from './news.js';
+import { answerTriviaSession, retryTrivia, triviaSession } from './trivia-sessions.js';
 import { withUserTransaction } from './transactions.js';
 
 const FILTERS = new Set(['pixelate', 'thermal', 'pastel', 'blur', 'color']);
@@ -22,6 +24,19 @@ app.use('/api', api);
 
 api.get('/health', (_req, res) => {
   res.json({ ok: true });
+});
+
+api.get('/news', async (req, res) => {
+  const channel = typeof req.query['channel'] === 'string' ? req.query['channel'] : 'mlb';
+  if (!Object.hasOwn(NEWS_CHANNELS, channel))
+    return void res.status(400).json({ error: 'Canal inválido' });
+  try {
+    res.set('Cache-Control', 'public, max-age=60').json(await newsFeed(channel));
+  } catch {
+    res
+      .status(503)
+      .json({ error: 'No se pudieron cargar las noticias oficiales. Intenta de nuevo.' });
+  }
 });
 
 // Solo se publica el conteo del catálogo, sin preguntas, respuestas ni datos de usuarios.
@@ -189,18 +204,50 @@ api.post('/scans', async (req, res) => {
 
 api.get('/trivia', async (req, res) => {
   const teamId = typeof req.query['teamId'] === 'string' ? req.query['teamId'] : null;
-  const [rows] = await pool.query<RowDataPacket[]>(
-    `SELECT id, team_id AS teamId, question, options FROM trivia_questions
-     WHERE active AND (? IS NULL OR team_id = ? OR team_id IS NULL)
-     ORDER BY (team_id <=> ?) DESC, (team_id IS NULL) DESC, id`,
-    [teamId, teamId, teamId],
-  );
-  res.json(rows);
+  if (teamId && !(await teamExists(teamId))) return bad(res, 'Equipo inválido');
+  res.set('Cache-Control', 'no-store').json(await triviaForUser(uidOf(req), teamId));
+});
+
+api.get('/trivia/session', async (req, res) => {
+  try {
+    res
+      .set('Cache-Control', 'no-store')
+      .json(await triviaSession(uidOf(req), String(req.query['teamId'] ?? '')));
+  } catch (error) {
+    if (error instanceof TriviaError)
+      return void res.status(error.status).json({ error: error.message });
+    throw error;
+  }
+});
+
+api.post('/trivia/retry', async (req, res) => {
+  try {
+    res.json(
+      await retryTrivia(
+        uidOf(req),
+        String(req.body?.teamId ?? ''),
+        String(req.body?.previousId ?? ''),
+      ),
+    );
+  } catch (error) {
+    if (error instanceof TriviaError)
+      return void res.status(error.status).json({ error: error.message });
+    throw error;
+  }
 });
 
 api.post('/trivia/:id/answer', async (req, res) => {
   try {
-    res.json(await answerTrivia(uidOf(req), Number(req.params['id']), Number(req.body?.option)));
+    res.json(
+      req.body?.runId !== undefined
+        ? await answerTriviaSession(
+            uidOf(req),
+            String(req.body.runId),
+            Number(req.params['id']),
+            Number(req.body?.option),
+          )
+        : await answerTrivia(uidOf(req), Number(req.params['id']), Number(req.body?.option)),
+    );
   } catch (error) {
     if (error instanceof TriviaError) {
       res.status(error.status).json({ error: error.message });

@@ -10,6 +10,7 @@ import {
 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MindARThree } from '../../vendor/mind-ar/mindar-image-three.prod.js';
+import { drawArFrame } from './capture';
 
 export interface ArEngineTarget {
   /** Índice de la imagen dentro del archivo .mind. */
@@ -73,6 +74,12 @@ export class ArEngine {
   private last = 0;
   private targetsUrl?: string;
   private stopped = false;
+  private recordingCanvas?: HTMLCanvasElement;
+  private recordingStream?: MediaStream;
+  private changingCamera = false;
+  private frontCamera = false;
+  private videoMode = false;
+  private readonly disposedControllers = new WeakSet<object>();
 
   constructor(private readonly opts: ArEngineOptions) {
     this.mindar = new MindARThree({
@@ -103,8 +110,14 @@ export class ArEngine {
     scene.add(sun, this.freeGroup);
 
     // Se descargan antes de arrancar MindAR para que un 404 falle aquí y no deje la promesa de start() colgada.
-    const [targets] = await Promise.all([this.fetchBlobUrl(this.opts.targetsSrc), this.loadModels()]);
-    if (this.stopped) return;
+    const [targets] = await Promise.all([
+      this.fetchBlobUrl(this.opts.targetsSrc),
+      this.loadModels(),
+    ]);
+    if (this.stopped) {
+      URL.revokeObjectURL(targets);
+      return;
+    }
     this.targetsUrl = targets;
     (this.mindar as unknown as { imageTargetSrc: string }).imageTargetSrc = targets;
 
@@ -135,6 +148,74 @@ export class ArEngine {
 
   isAnimating(): boolean {
     return this.animating;
+  }
+
+  createRecordingStream(): MediaStream {
+    if (this.stopped || this.changingCamera) throw Error('La cámara no está lista.');
+    this.endRecordingStream();
+    const canvas = document.createElement('canvas');
+    const { clientWidth: width, clientHeight: height } = this.opts.container;
+    const scale = Math.min(2, 1280 / Math.max(width, height));
+    canvas.width = Math.max(2, Math.round((width * scale) / 2) * 2);
+    canvas.height = Math.max(2, Math.round((height * scale) / 2) * 2);
+    this.recordingCanvas = canvas;
+    this.mindar.renderer.render(this.mindar.scene, this.mindar.camera);
+    this.drawRecordingFrame();
+    this.recordingStream = canvas.captureStream(30);
+    return this.recordingStream;
+  }
+
+  endRecordingStream(): void {
+    this.recordingStream?.getTracks().forEach((track) => track.stop());
+    this.recordingStream = undefined;
+    this.recordingCanvas = undefined;
+  }
+
+  setVideoMode(on: boolean): void {
+    if (on && this.active) this.release(this.active.key);
+    this.videoMode = on;
+    if (!on) for (const anchor of this.mindar.anchors) anchor.visible = false;
+  }
+
+  /** Conserva el modelo en modo libre mientras cambia la cámara y reinicia el seguimiento. */
+  async switchCamera(): Promise<boolean> {
+    if (this.stopped || this.changingCamera || this.recordingStream)
+      throw Error('Detén la grabación antes de cambiar de cámara.');
+    const oldFront = this.frontCamera;
+    if (this.active) this.release(this.active.key);
+    this.changingCamera = true;
+    const previousController = this.mindar.controller;
+    this.mindar.stop();
+    for (const anchor of this.mindar.anchors) {
+      anchor.visible = false;
+      anchor.group.visible = false;
+    }
+    const restart = async (front: boolean) => {
+      this.mindar.shouldFaceUser = front;
+      await this.mindar.start();
+      if (this.stopped) this.teardown();
+    };
+    try {
+      await restart(!oldFront);
+      this.frontCamera = !oldFront;
+      return this.frontCamera;
+    } catch {
+      (this.mindar.video?.srcObject as MediaStream | null)
+        ?.getTracks()
+        .forEach((track) => track.stop());
+      this.mindar.video?.remove();
+      if (!this.stopped) {
+        try {
+          await restart(oldFront);
+        } catch {
+          throw new CameraError('No se pudo recuperar la cámara. Vuelve a abrir el escáner.');
+        }
+      }
+      throw Error('No se pudo cambiar de cámara. Se conservó la cámara anterior.');
+    } finally {
+      this.disposeController(previousController);
+      this.changingCamera = false;
+    }
   }
 
   /** Pausa o reanuda la animación del modelo; al pausar se queda congelado en la pose actual. */
@@ -168,7 +249,13 @@ export class ArEngine {
     if (video) {
       // MindAR posiciona el <video> con estilos para cubrir el contenedor; se reproduce el mismo recorte.
       const s = video.style;
-      ctx.drawImage(video, parseFloat(s.left) || 0, parseFloat(s.top) || 0, parseFloat(s.width) || w, parseFloat(s.height) || h);
+      ctx.drawImage(
+        video,
+        parseFloat(s.left) || 0,
+        parseFloat(s.top) || 0,
+        parseFloat(s.width) || w,
+        parseFloat(s.height) || h,
+      );
     }
     // El canvas WebGL no conserva el buffer entre cuadros: se vuelve a dibujar justo antes de copiarlo.
     renderer.render(scene, camera);
@@ -250,6 +337,7 @@ export class ArEngine {
   }
 
   private attachToAnchor(key: string, anchorGroup: Group): void {
+    if (this.stopped || this.changingCamera || this.videoMode) return;
     const rig = this.rigs.get(key);
     if (!rig) return;
     if (this.active && this.active !== rig) this.reset();
@@ -299,6 +387,26 @@ export class ArEngine {
     }
 
     this.mindar.renderer.render(this.mindar.scene, this.mindar.camera);
+    this.drawRecordingFrame();
+  }
+
+  private drawRecordingFrame(): void {
+    if (!this.recordingCanvas) return;
+    const { video, renderer } = this.mindar;
+    const { clientWidth: width, clientHeight: height } = this.opts.container;
+    drawArFrame(
+      this.recordingCanvas,
+      video && video.readyState >= 2 ? video : null,
+      renderer.domElement,
+      {
+        width,
+        height,
+        videoLeft: parseFloat(video?.style.left ?? '') || 0,
+        videoTop: parseFloat(video?.style.top ?? '') || 0,
+        videoWidth: parseFloat(video?.style.width ?? '') || width,
+        videoHeight: parseFloat(video?.style.height ?? '') || height,
+      },
+    );
   }
 
   /** Coloca el grupo libre centrado (un poco arriba, por el dock) y con tamaño relativo a la pantalla. */
@@ -365,6 +473,7 @@ export class ArEngine {
   }
 
   private teardown(): void {
+    this.endRecordingStream();
     this.abort.abort();
     const { renderer, cssRenderer, video } = this.mindar;
     renderer.setAnimationLoop(null);
@@ -377,11 +486,19 @@ export class ArEngine {
     }
     // MindAR deja un listener de resize en window; sin video no hace nada.
     this.mindar.video = null;
+    this.disposeController(this.mindar.controller);
     renderer.dispose();
     renderer.domElement.remove();
     cssRenderer.domElement.remove();
     if (this.targetsUrl) URL.revokeObjectURL(this.targetsUrl);
     this.rigs.clear();
     this.active = null;
+  }
+
+  private disposeController(controller: MindARThree['controller']): void {
+    if (!controller || this.disposedControllers.has(controller)) return;
+    this.disposedControllers.add(controller);
+    controller.dispose();
+    controller.worker?.terminate();
   }
 }

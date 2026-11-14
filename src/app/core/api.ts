@@ -92,6 +92,29 @@ export interface TriviaQuestion {
   teamId: string | null;
   question: string;
   options: string[];
+  chosen?: number | null;
+  answer?: number | null;
+  correct?: boolean | null;
+  answeredAt?: string | null;
+}
+
+export interface NewsFeed {
+  channel: string;
+  source: string;
+  sourceUrl: string;
+  fetchedAt: string;
+  stale: boolean;
+  items: { title: string; url: string; publishedAt: string | null; image: string | null }[];
+}
+
+export interface TriviaSession {
+  id: string;
+  teamId: string;
+  questions: TriviaQuestion[];
+  serverNow: string;
+  completedAt: string | null;
+  retryAt: string | null;
+  cooldownSeconds: number;
 }
 
 export interface TriviaSummary {
@@ -178,7 +201,11 @@ export class Api {
   collection = () => this.get<Collection>('collection');
   leaderboard = () => this.get<Leaderboard>('leaderboard');
   trivia = (teamId: string) => this.get<TriviaQuestion[]>('trivia', { teamId });
+  triviaSession = (teamId: string) => this.get<TriviaSession>('trivia/session', { teamId });
+  retryTrivia = (teamId: string, previousId: string) =>
+    this.send<TriviaSession>('POST', 'trivia/retry', { teamId, previousId });
   triviaSummary = () => this.get<TriviaSummary>('trivia/summary');
+  news = (channel: string) => this.get<NewsFeed>('news', { channel });
   gameStatus = () => this.get<GameStatus>('game');
   startGame = () => this.send<GameSession>('POST', 'game/start');
   finishGame = (id: string, flaps: number[]) =>
@@ -186,12 +213,16 @@ export class Api {
 
   scan = (teamId: string, durationMs: number | null) =>
     this.send<Reward & { firstScanOfTeam: boolean }>('POST', 'scans', { teamId, durationMs });
-  answer = (questionId: number, option: number) =>
-    this.send<Reward & { correct: boolean; answer: number }>(
-      'POST',
-      `trivia/${questionId}/answer`,
-      { option },
-    );
+  answer = (questionId: number, option: number, runId?: string) =>
+    this.send<
+      Reward & {
+        correct: boolean;
+        answer: number;
+        chosen: number;
+        alreadyAnswered: boolean;
+        session?: TriviaSession;
+      }
+    >('POST', `trivia/${questionId}/answer`, { option, ...(runId ? { runId } : {}) });
   event = (type: 'effect' | 'filter', value?: string) =>
     this.send<Reward>('POST', 'events', { type, value });
 
